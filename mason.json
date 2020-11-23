@@ -1,0 +1,17 @@
+{
+  "name": "ultimate-guide-building-shopify-app-with-laravel",
+  "description": "The Ultimate Guide to Building a Shopify App with Laravel.",
+  "repository": "https://github.com/benmag/ultimate-guide-building-shopify-app-with-laravel",
+  "masonVersion": "v1",
+  "type": "application",
+  "services": [
+    {
+      "name": "web",
+      "image": "${app}",
+      "ports": ["80:80"],
+      "environment": {
+        "APP_KEY": "base64:SXbQvysCa/Ymzb8lxubsOKWzYAqwLj3/dCdcr1J+5PU="
+      }
+    }
+  ]
+}

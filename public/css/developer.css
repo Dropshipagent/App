@@ -1,0 +1,182 @@
+.skin-blue .main-header .navbar
+{
+    background-color:#222d32 !important;
+}
+.skin-purple .main-header .logo 
+{
+    background-color: #222d32 !important;
+}
+.skin-purple .main-header .navbar 
+{
+    background-color: #222d32 !important;
+}
+.skin-purple .main-header .navbar .sidebar-toggle:hover 
+{
+    background-color: #1d272b !important;
+}
+.skin-red .main-header .logo 
+{
+    background-color: #222d32 !important;
+}
+.skin-red .main-header .navbar 
+{
+    background-color: #222d32 !important;
+}
+.skin-red .main-header .navbar .sidebar-toggle:hover 
+{
+    background-color: #1d272b !important;
+}
+.main-header-container
+{
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    width: 100% !important;
+}
+.navbar-header-logo
+{
+    color: #fff;
+    font-weight: bold;
+    font-size: 30px;
+    padding-top: 0px;
+}
+.box-primary-box
+{
+    border: 0px solid;
+    box-shadow:0 1px 1px rgba(0,0,0,0);
+    margin-bottom: 0px;
+}
+.box-footer-f
+{
+    border-top:0px solid;
+    text-align: center;
+}
+.btn-warning-btn
+{
+    background-color: #D7B441;
+    border-color: #D7B441;
+    font-weight: 900;
+    padding: 8px 33px;
+    font-size: 15px;
+}
+.logo-img
+{
+    width: 200px;
+}
+.navbar-nav li a 
+{
+    padding: 15px 8px;
+    font-size: 12px;
+}
+.active a
+{
+    font-weight: bold;
+    color: #d7b441 !important;
+    border-left: 0px solid !important;
+}
+.active a.btn
+{
+    color: #fff !important;
+}
+.products-table tr td
+{
+    border-top: 1px solid #ddd !important;
+}
+.btn-primary
+{
+    background-color: #D7B441 !important;
+    border-color: #D7B441 !important;
+}
+.developer-btn
+{
+    background-color: #D7B441 !important;
+    border-color: #D7B441 !important;
+}
+.datatablefilters
+{ 
+    float: right; 
+    display: flex;
+}
+.input-group-addon
+{
+    position: absolute; 
+    background: transparent !important; 
+    z-index: 111; 
+    border: none;  
+    padding: 0; 
+    top: 10px; 
+    width: 10px; 
+    left: 10px;
+}
+#searchbox
+{ 
+    padding-left: 30px; 
+    width: 250px; 
+}
+.dataTables_filter
+{ 
+    display: none;
+}
+#DataTables_Table_0_wrapper .row .col-sm-6
+{
+    width: 100px !important;
+}
+.margin2px
+{
+    margin: 2px;
+}
+
+.profilependingbox { min-height: 100px; padding-top: 0px;}
+.profilependingbox p { font-size: 16px;}
+
+
+.blackBoxBg{background: #0f0f0f; padding:10px 50px; text-align: center; }
+.blackBoxBg img { width: 50px; height: auto;}
+.blackBoxBg h2 { font-size: 16px; color: #fff; font-weight: 400; margin-top: 15px }
+.blackBoxBg p { font-size: 14px; color: #fff; line-height: 1.4; }
+
+.greenBoxBg{background: #43d394; padding:10px 50px; text-align: center; }
+.greenBoxBg h2 { font-size: 3em; color: #333; font-weight: 400; }
+.greenBoxBg p { font-size: 16px; color: #333; line-height: 1.4; }
+
+.activating_account_box { padding: 0px;}
+.activating_account_box h2{ font-size: 18px; margin: 10px 0px; }
+.activating_account_box h2{ font-size: 16px; margin: 10px 0px; }
+
+.AuthorizeNetSeal { position: absolute; right: 12px; top: -20px; }
+.fieldGroup{ border: solid 2px #d7b441; clear:both; padding: 10px; margin-bottom: 5px;  }
+
+.textPage{padding: 0 20px;}
+
+.textPage h3{
+    background: #222d32;
+    padding: 12px 8px;
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 0px;
+    margin-top: 15px; font-weight: bold;
+}
+
+
+.textPage h2{
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    color: #d7b223;
+}
+
+.textPage .boxPText{
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.textPage .boxPText p { 
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.invoice_logo{
+    background-color: #367fa9;
+    color: #fff;
+    border-bottom: 0 solid transparent;
+    padding: 10px;
+}

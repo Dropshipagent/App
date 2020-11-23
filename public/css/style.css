@@ -1,0 +1,23 @@
+body{ padding: 0px; margin: 0px }
+.ex-login-left{ background: url(../img/login_left_bg.jpg);background-repeat: no-repeat; min-height: 100vh; background-size: 100% 100%}
+.ex-login-logo{text-align: center; padding-top: 50px; float: left; width: 100%}
+.ex-login-logo img {max-width: 300px}
+.input-icon {position: relative;}
+.input-icon i {position: absolute;left: 15px;top: 18px;	display: inline-block;padding: 0 8px 0 0;}
+.input-icon i img {	width: 24px;}
+.login-input{ height: 60px; padding-left: 50px; border-radius: 30px;}
+
+.ex-login-right{ background: url(../img/login_right_bg.jpg);background-repeat: no-repeat; 
+	min-height: 100vh; background-size: 100% 100%; padding:25% 15% 0% 15%}
+.ex-login-right h1{ text-align: center; font-weight: bold; font-size: 30px; color: #333; margin: 20px 0; text-transform: uppercase; }
+.ex-login-right h1 span{ color: #d7b223; }
+
+.login-btn{ background: #d7b223; border:1px solid #d7b223; padding: 12px 50px; border-radius: 30px; color: #fff; font-size: 18px; display: inline-block; }
+.login-btn:hover{ background: #fff; color: #d7b223; border:1px solid #d7b223; text-decoration: none;}
+
+@media only screen and (max-width: 640px) {
+
+.ex-login-left{ min-height:70vh; }
+.ex-login-right{ min-height:50vh; padding:30px 20px;}
+.ex-login-logo img {max-width: 60%}
+}
