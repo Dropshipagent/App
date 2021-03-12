@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use Auth;
 use View;
+use App\User;
 use App\Order;
 use App\Store;
 use App\OrderItem;
@@ -29,7 +30,7 @@ class OrdersController extends Controller {
         if ($request->ajax()) {
             //dd($request->all());
             $extraSearch = array();
-            $assign_shipper = 1;
+            $assign_supplier = 1;
             $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr']);
             $TotalOrderData = $q->count();
 
@@ -216,7 +217,7 @@ class OrdersController extends Controller {
     }
 
     /**
-     * Method user for show list of all created invoices by logged in shipper
+     * Method user for show list of all created invoices by logged in supplier
      *
      * @return \Illuminate\Http\Response
      */
@@ -252,7 +253,7 @@ class OrdersController extends Controller {
                 $u['admin_price_total'] = '$' . $Invoice->admin_price_total;
                 $u['admin_commission_total'] = '$' . $Invoice->admin_commission_total;
                 if ($paid_status == 1) {
-                    $u['paid_status'] = '<input type="button" class="btn btn-primary shipperpaidbtn" value="Mark Paid" data-id="' . $Invoice->id . '" />';
+                    $u['paid_status'] = '<input type="button" class="btn btn-primary supplierpaidbtn" value="Mark Paid" data-id="' . $Invoice->id . '" />';
                 }
                 $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->created_at));
                 $u['action'] = '<a href="' . url('admin/showinvoicedetail/' . $Invoice->id) . '" class="btn btn-warning margin2px" title="View Invoice Detail"><i class="fa fa-eye"></i> View Invoice Detail</a>';
@@ -280,59 +281,13 @@ class OrdersController extends Controller {
      */
     public function showinvoicedetail(Request $request, $invoiceID) {
         $mainInvoice = Invoice::find($invoiceID);
+        $storeData = User::where('username', $mainInvoice->store_domain)->first();
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        if ($request->ajax()) {
-            $q = StoreInvoice::with(['orderdetail'])->whereIn('id', $invoiceIDs);
-            $TotalData = $q->count();
-            $limit = $request->input('length');
-            $start = $request->input('start');
-            $columnindex = $request['order']['0']['column'];
-            $orderby = $request['columns'][$columnindex]['data'];
-            $order = $orderby != "" ? $request['order']['0']['dir'] : "";
-            $draw = $request['draw'];
-            $response = $q->orderBy($orderby, $order)->offset($start)->limit($limit)->get();
-            if (!$response) {
-                $InvoiceData = [];
-                $paging = [];
-            } else {
-                $InvoiceData = $response;
-                $paging = $response;
-            }
-
-            $Data = array();
-            $i = 1;
-            foreach ($InvoiceData as $Invoice) {
-                $orderdetail = $Invoice->orderdetail;
-                $orderItems = OrderItem::with(['productdetail'])->where("order_id", $orderdetail->order_id)->get();
-                $u['order_id'] = $orderdetail->order_id;
-                $u['order_number'] = $orderdetail->order_number;
-                $u['email'] = $orderdetail->email;
-                $u['cust_fname'] = $orderdetail->cust_fname;
-                $u['payment_gateway'] = $orderdetail->payment_gateway;
-                $u['order_value'] = '$' . $orderdetail->order_value;
-                $u['ship_to'] = $orderdetail->ship_to;
-                $u['created_at'] = date('M d, Y H:i:s', strtotime($orderdetail->created_at));
-                $items = view('admin.showinvoiceslogItem', ['items' => $orderItems, 'Invoice' => $Invoice]);
-                $u['item'] = $items->render();
-                $shippingAdd = view('admin.showShipAddress', ['orderdetail' => $orderdetail]);
-                $u['ship_address'] = $shippingAdd->render();
-
-                $Data[] = $u;
-                $i++;
-                unset($u);
-            }
-            $return = [
-                "draw" => intval($draw),
-                "recordsFiltered" => intval($TotalData),
-                "recordsTotal" => intval($TotalData),
-                "data" => $Data
-            ];
-            return $return;
-        }
-        return view('admin.showinvoicedetail');
+        $invoice_items = Invoice::show_invoice_data(helGetSupplierID($storeData->id), $invoiceIDs);
+        return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
     }
 
-    public function shipper_paid_status_change(Request $request) {
+    public function supplier_paid_status_change(Request $request) {
         $invoice = Invoice::findOrFail($request->invoice_id);
         $invoice->paid_status = $request->status;
 
@@ -340,10 +295,10 @@ class OrdersController extends Controller {
         $invoiceIDs = json_decode($invoice->store_invoice_ids, true);
         StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => $request->status]);
 
-        //send payment status email to shipper
-        $getShipperData = helGetShipperDATA($invoice->store_domain);
+        //send payment status email to supplier
+        $getSupplierData = helGetSupplierDATA($invoice->store_domain);
         $data = [];
-        $data['receiver_name'] = $getShipperData->name;
+        $data['receiver_name'] = $getSupplierData->name;
         $data['receiver_message'] = "Admin has changed invoice status paid of invoice id :: " . $invoice->id;
         $data['sender_name'] = env('MAIL_FROM_NAME');
 
@@ -351,7 +306,7 @@ class OrdersController extends Controller {
         $email_data['subject'] = 'Invoice paid successfully :: ' . $invoice->id;
         $email_data['layout'] = 'emails.sendemail';
         try {
-            Mail::to($getShipperData->email)->send(new SendMailable($email_data));
+            Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
         } catch (\Exception $e) {
             // Never reached
         }

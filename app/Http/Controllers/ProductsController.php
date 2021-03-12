@@ -36,7 +36,8 @@ class ProductsController extends Controller {
             $start = $request->input('start');
 
             $columnindex = $request['order']['0']['column'];
-            $orderby = $request['columns'][$columnindex]['data'];
+            //$orderby = $request['columns'][$columnindex]['data'];
+            $orderby = "product_id";
             $order = $orderby != "" ? $request['order']['0']['dir'] : "";
             $draw = $request['draw'];
             //db($request);
@@ -59,6 +60,7 @@ class ProductsController extends Controller {
             foreach ($productData as $product) {
                 $u['product_id'] = $product->product_id;
                 $u['product_name'] = $product->title;
+                $u['shipping_time'] = ($product->shipping_time) ? $product->shipping_time : "-";
                 $productItems = view('products.productitems', ['store_product' => $product]);
                 $u['product_price'] = $productItems->render();
                 $imageArr = json_decode($product->image);
@@ -130,7 +132,20 @@ class ProductsController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function productflag(Request $request) {
-        Product::whereIn('id', $request->product_status)->update(['product_status' => 1]);
+        if (isset($request->product_status)) {
+            foreach ($request->product_status as $key => $val) {
+                //change product status
+                Product::where('id', $val)->update([
+                    'product_status' => 1,
+                    'aliexpress_url' => $request->aliexpress_url[$val],
+                    'orders_per_day' => $request->orders_per_day[$val],
+                    'variants_you_sell' => $request->variants_you_sell[$val],
+                    'countries_you_ship' => $request->countries_you_ship[$val],
+                    'cost_per_unit' => $request->cost_per_unit[$val],
+                    'shipping_time' => $request->shipping_time[$val],
+                ]);
+            }
+        }
         //get the all remainig temp product and delete based on id array
         $tempProducts = Product::where(['store_domain' => auth()->user()->username, 'product_status' => 0])->get(['id']);
         Product::destroy($tempProducts->toArray());

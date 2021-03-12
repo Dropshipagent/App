@@ -1,8 +1,8 @@
-@extends('shipper.layouts.app')
+@extends('supplier.layouts.app')
 @section('title', 'Dashboard')
 @section('main-content')
 <!-- Content Header (Page header) -->
-@include('shipper.layouts.header-tabs')
+@include('supplier.layouts.header-tabs')
 
 <!-- Main content -->
 <section class="content">
@@ -11,7 +11,8 @@
         <div class="box-body table-responsive no-padding">
             <table class="table table-hover">
                 <tr>
-                    <th>ID</th>
+                    <th>Export #</th>
+                    <th>Date Exported</th>
                     <th>Store Domain</th>
                     <th>Log file</th>
                 </tr>
@@ -22,6 +23,7 @@
                  */ ?>
                 <tr>
                     <td>{{ $cronorder_log->id }}</td>
+                    <td>{{ $cronorder_log->created_at }}</td>
                     <td>{{ $cronorder_log->store_domain }}</td>
                     <td><a target="_blank" href="{{ URL::to('/').Storage::url('ordercsv/'.$cronorder_log->csv_file_name) }}">{{ $cronorder_log->csv_file_name }}</a></td>
                 </tr>

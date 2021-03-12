@@ -9,6 +9,7 @@ use App\User;
 use App\Invoice;
 use App\StoreInvoice;
 use App\PaymentProfile;
+use App\Notification;
 use Illuminate\Http\Request;
 use net\authorize\api\contract\v1 as AnetAPI;
 use net\authorize\api\controller as AnetController;
@@ -25,7 +26,9 @@ class AuthorizeController extends Controller {
      */
     public function order_detail($orderID) {
         $orderData = Order::with(['itemsarr'])->where('order_id', $orderID)->first();
-        return view('common.orderitems', ['orderData' => $orderData]);
+        $orderDataArr = json_decode($orderData->items, true);
+        $shipping_phone = ($orderDataArr['shipping_address']['phone']) ? $orderDataArr['shipping_address']['phone'] : $orderDataArr['customer']['phone'];
+        return view('common.orderitems', ['orderData' => $orderData, 'shipping_address' => $orderDataArr['shipping_address'], 'shipping_phone' => $shipping_phone]);
     }
 
     /**
@@ -66,9 +69,11 @@ class AuthorizeController extends Controller {
                 $u['id'] = $Invoice->id;
                 $u['store_domain'] = $Invoice->store_domain;
                 $u['admin_price_total'] = currency($Invoice->invoice_total, 'USD', currency()->getUserCurrency());
+                $u['other_charges'] = currency($Invoice->other_charges, 'USD', currency()->getUserCurrency());
+                $invoice_grand_total = ($Invoice->invoice_total + $Invoice->other_charges);
                 $actionBtn .= '<a href="' . url('showinvoicedetail/' . $Invoice->id) . '" class="btn btn-warning margin2px" title="View Invoice Detail"><i class="fa fa-eye"></i> View Invoice Detail</a> <a href="' . url('downloadinvoice/' . $Invoice->id) . '" class="btn btn-success margin2px" title="View Invoice Detail"><i class="fa fa-download"></i> Download Invoice</a>';
                 if ($paid_status == 0) {
-                    $actionBtn .= ' <a href="javascript:void(0)" data-id="' . $Invoice->id . '" data-val="' . $Invoice->invoice_total . '" class="btn btn-danger pay_now_btn">Pay Now</a>';
+                    $actionBtn .= ' <a href="javascript:void(0)" data-id="' . $Invoice->id . '" data-val="' . $invoice_grand_total . '" class="btn btn-danger pay_now_btn">Pay Now</a>';
                 }
                 $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->created_at));
                 $u['action'] = $actionBtn;
@@ -101,17 +106,23 @@ class AuthorizeController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function showinvoicedetail(Request $request, $invoiceID) {
+        $userCardProfiles = [];
+        $paymentProfiles = PaymentProfile::where(['store_domain' => auth()->user()->username])->orderBy('created_at', 'desc')->get();
+        foreach ($paymentProfiles as $paymentProfile) {
+            $userCardProfiles[] = $this->getCustomerPaymentProfile($paymentProfile->profile_id, $paymentProfile->payment_profile_id, $paymentProfile->id);
+        }
         $mainInvoice = Invoice::find($invoiceID);
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data(helGetShipperID(auth()->user()->id), $invoiceIDs);
-        return view('showinvoicedetail', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items,'mainInvoice' => $mainInvoice]);
+        $invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
+        return view('common.showinvoicedetail', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice, 'userCardProfiles' => $userCardProfiles]);
     }
 
     public function downloadinvoice($invoiceID) {
         $mainInvoice = Invoice::find($invoiceID);
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data(helGetShipperID(auth()->user()->id), $invoiceIDs);
-        $pdf = PDF::loadView('downloadinvoice', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items]);
+        $invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
+        // return view('downloadinvoice', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
+        $pdf = PDF::loadView('common.downloadinvoice', ['storeData' => auth()->user(), 'mainInvoice' => $mainInvoice, 'invoice_items' => $invoice_items]);
         $pdf->setPaper('a4')->setWarnings(false);
         //$pdf->setOptions(['defaultFont' => 'Arial']);
         return $pdf->download($invoiceID . '.pdf');
@@ -124,18 +135,18 @@ class AuthorizeController extends Controller {
     public function chargeCreditCard(Request $request) {
         die("You cannot access this page!");
         /* code verify through middelware
-        $uUser = User::where('username', auth()->user()->username)->first();
-        $cUser = $uUser->providers->where('provider', 'shopify')->first();
-        $shopify = \Shopify::retrieve($uUser->username, $cUser->provider_token);
-        $optionsData = [
-            'application_charge' => [
-                "name" => "DSA Initiation",
-                "price" => 300.0,
-                'test' => false,
-                "return_url" => route('shopify.one-time-subscribe', ['storeId' => auth()->user()->id])
-            ]
-        ];
-        $reqResponse = $shopify->create('application_charges', $optionsData);*/
+          $uUser = User::where('username', auth()->user()->username)->first();
+          $cUser = $uUser->providers->where('provider', 'shopify')->first();
+          $shopify = \Shopify::retrieve($uUser->username, $cUser->provider_token);
+          $optionsData = [
+          'application_charge' => [
+          "name" => "DSA Initiation",
+          "price" => 300.0,
+          'test' => false,
+          "return_url" => route('shopify.one-time-subscribe', ['storeId' => auth()->user()->id])
+          ]
+          ];
+          $reqResponse = $shopify->create('application_charges', $optionsData); */
         //dd($reqResponse['application_charge']['confirmation_url']);
         return redirect($reqResponse['application_charge']['confirmation_url']);
     }
@@ -438,6 +449,10 @@ We would like to thank you and say it's a pleasure doing business with you. If y
                     } catch (\Exception $e) {
                         // Never reached
                     }
+
+                    //send notification to admin and supplier
+                    Notification::addNotificationFromAllPanel(helGetSupplierID(auth()->user()->id), 'New invoice paid :: ' . $invoiceData->id, auth()->user()->id);
+                    Notification::addNotificationFromAllPanel(helGetAdminID(), 'New invoice paid :: ' . $invoiceData->id, auth()->user()->id);
 
                     //send email to admin
                     $data = [];

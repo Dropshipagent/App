@@ -4,7 +4,7 @@
 <!-- include tags css -->
 <section class="content-header">
     <h1>
-        Shipper Detail
+        Supplier Detail
         <small>with order list</small>
     </h1>
     <ol class="breadcrumb">

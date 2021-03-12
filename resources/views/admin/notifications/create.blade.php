@@ -41,7 +41,7 @@
                 <strong>Send To:</strong><br>
                 {{ Form::radio('user_role', '1' , true) }} All <br>
                 {{ Form::radio('user_role', '2' , false) }} Store Owners <br>
-                {{ Form::radio('user_role', '3' , false) }} Shippers <br>
+                {{ Form::radio('user_role', '3' , false) }} Suppliers <br>
             </div>
             <div class="form-group">
                 <strong>Notification Text:</strong>

@@ -2,9 +2,10 @@
 @section('title', 'Dashboard')
 @section('main-content')
 <!-- Content Header (Page header) -->
+@include('admin.layouts.header-tabs')
 <section class="content-header">
     <h1>
-        Invoices List
+        Store [{{ Session::get('selected_store_id') }}] Invoices
         <small>list of invoices which created for selected store.</small>
     </h1>
     <ol class="breadcrumb">
@@ -21,22 +22,6 @@
             <li class="active"><a href="#unpaid_invoice" data-toggle="tab" id="unpaid_invoice_tab">Unpaid</a></li>
             <li><a href="#paid_invoice" data-toggle="tab" id="paid_invoice_tab">Paid</a></li>
         </ul>
-        <div class="pull-right" style="position: absolute; right:10px; top:6px;">
-            <div class="datatablefilters">
-                <div class="searchfilter">
-                    <select id="storedomain" class="form-control" style="width: 150px;">
-                        <option value="">Store Domain</option>
-                        <?php
-                        foreach ($store as $val) {
-                            ?>
-                            <option>{{$val->domain}}</option>
-                            <?php
-                        }
-                        ?>
-                    </select>                        
-                </div>  
-            </div>
-        </div>
         <div class="tab-content">
             <div class="tab-pane active" id="unpaid_invoice">
                 <table class="table table-hover table-striped table-bordered datatable" id="unpaid_invoice_table">
@@ -44,7 +29,7 @@
                         <tr>
                             <th>Invoice No.</th>
                             <th>Store Domain</th>
-                            <th>Shipper Price</th>
+                            <th>Supplier Price</th>
                             <th>Admin Commission</th>
                             <th>Created</th>
                             <th>Action</th>
@@ -58,9 +43,9 @@
                         <tr>
                             <th>Invoice No.</th>
                             <th>Store Domain</th>
-                            <th>Shipper Price</th>
+                            <th>Supplier Price</th>
                             <th>Admin Commission</th>
-                            <th>Shipper Paid Status</th>
+                            <th>Supplier Paid Status</th>
                             <th>Created</th>
                             <th>Action</th>
                         </tr>
@@ -85,7 +70,7 @@
                 url: "",
                 data: function (d) {
                     d.paid_status = "0";
-                    d.store_domain = $('#storedomain').val();
+                    d.store_domain = "{{ Session::get('selected_store_id') }}";
                 },
                 error: function (error) {
                     console.log(error);
@@ -121,7 +106,7 @@
                 url: "",
                 data: function (d) {
                     d.paid_status = "1";
-                    d.store_domain = $('#storedomain').val();
+                    d.store_domain = "{{ Session::get('selected_store_id') }}";
                 },
                 error: function (error) {
                     console.log(error);
@@ -154,14 +139,14 @@
         $('#paid_invoice_tab').click(function () {
             paid_invoice_table.draw();
         });
-        
-        $(document).on('click', '.shipperpaidbtn', function () {
+
+        $(document).on('click', '.supplierpaidbtn', function () {
             invoiceid = $(this).data("id");
             var r = confirm("Are you sure?");
             if (r == true) {
                 $.ajax({
                     type: 'POST',
-                    url: '{{ url("/admin/shipperpaidstatus_change") }}',
+                    url: '{{ url("/admin/supplierpaidstatus_change") }}',
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
                     data: {"invoice_id": invoiceid, "status": 2},
                     success: function (data) {

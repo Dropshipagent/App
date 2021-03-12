@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Notification;
+use App\NotificationStatus;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -15,8 +16,18 @@ class NotificationsController extends Controller {
      */
     public function index() {
         $admin_id = auth()->user()->id;
-        $notifications = Notification::where(['notification_by' => $admin_id])->orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.notifications.index', ['notifications' => $notifications]);
+        $notifications = Notification::with(["userdetail"])->where(['notification_by' => $admin_id])->orderBy('created_at', 'desc')->get();
+
+        $recNotifications = Notification::with(["userdetail", "senduserdetail"])
+                ->orWhere(function($query) {
+                    $query->where('user_id', 1);
+                })
+                ->orderBy('created_at', 'desc');
+        $notMaxID = $recNotifications->max('id');
+        $recNotifications = $recNotifications->get();
+
+
+        return view('admin.notifications.index', ['notifications' => $notifications, 'notMaxID' => $notMaxID, 'recNotifications' => $recNotifications]);
     }
 
     /**
@@ -81,6 +92,52 @@ class NotificationsController extends Controller {
      */
     public function destroy($id) {
         //
+    }
+
+    /**
+     * Set updated date of read notifications
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function read_notifications(Request $request) {
+        $notification_status = NotificationStatus::firstOrNew(['user_id' => $request->user_id]);
+        if ($request->not_id) {
+            $notification_status->not_id = $request->not_id;
+        } else {
+            $notification_status->not_id = 0;
+        }
+
+        return response()->json([
+                    'data' => [
+                        'success' => $notification_status->save(),
+                    ]
+        ]);
+    }
+
+    /**
+     * Get count of unread notifications
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function notifications_count(Request $request) {
+        $notificationsCount = 0;
+        $userID = $request->user_id;
+        $notification_status = NotificationStatus::where('user_id', $userID)->orderBy('created_at', 'desc')->first();
+        if ($notification_status) {
+            $userCreDate = $notification_status->updated_at;
+            $notifications = Notification::where('user_id', $userID)
+                    ->where('created_at', '>=', $userCreDate);
+            $notificationsCount = $notifications->count();
+        }
+
+        return response()->json([
+                    'data' => [
+                        'success' => TRUE,
+                        'not_count' => $notificationsCount,
+                    ]
+        ]);
     }
 
 }

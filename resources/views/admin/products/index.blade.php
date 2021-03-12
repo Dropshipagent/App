@@ -1,6 +1,7 @@
 @extends('admin.layouts.app')
 @section('title', 'Product Listing')
 @section('main-content')
+@include('admin.layouts.header-tabs')
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
@@ -26,10 +27,10 @@
                 <table class="table table-striped table-bordered datatable requested">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
-                            <th>Product Name</th>
-                            <th>Product Price</th>
                             <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Shipping Time</th>
+                            <th>Product Price</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -41,10 +42,10 @@
                 <table class="table table-striped table-bordered datatable admin_approved">
                     <thead> 
                         <tr>
-                            <th>Product ID</th>
-                            <th>Product Name</th>
-                            <th>Product Price</th>
                             <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Shipping Time</th>
+                            <th>Product Price</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -63,10 +64,6 @@
 
         <!-- Modal content-->
         <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Edit Product</h4>
-            </div>
             <div class="modal-body clearfix">
                 <div class="productsResult">
                 </div>
@@ -86,7 +83,7 @@
                 "bProcessing": true,
                 "serverSide": true,
                 "ordering": true,
-                "order": [[0, "desc"]],
+                "order": [[1, "desc"]],
                 "ajax": {
                     url: "",
                     data: function (d) {
@@ -99,10 +96,10 @@
                     }
                 },
                 "aoColumns": [
-                    {mData: 'product_id', "bSortable": true},
-                    {mData: 'product_name', "bSortable": false},
-                    {mData: 'product_price', "bSortable": false},
                     {mData: 'product_image', "bSortable": false},
+                    {mData: 'product_name', "bSortable": true},
+                    {mData: 'shipping_time', "bSortable": false},
+                    {mData: 'product_price', "bSortable": false},
                     {mData: 'product_action', "bSortable": false},
                 ],
                 "destroy": true,

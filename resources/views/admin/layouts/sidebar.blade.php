@@ -8,7 +8,7 @@
                 <img src="{{ asset('admin/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
-                <p>{{ Auth::user()->name }}</p>
+                <p class="text-capitalize">{{ Auth::user()->name }}</p>
             </div>
         </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
@@ -17,20 +17,25 @@
             <li class="{{ Request::is('admin/home') ? 'active' : '' }}">
                 <a href="{{ url('/admin/home') }}"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a>
             </li>
-            <li class="{{ Request::is('admin/orders') ? 'active' : '' }}">
+<!--            <li class="{{ Request::is('admin/orders') ? 'active' : '' }}">
                 <a href="{{ url('/admin/orders') }}"><i class="fa fa-book"></i> <span>Orders Listing</span></a>
-            </li>
+            </li>-->
             <li class="{{ Request::is('admin/users') ? 'active' : '' }}">
                 <a href="{{ url('/admin/users') }}"><i class="fa fa-user-o"></i> <span>Users Listing</span></a>
             </li>
-            <li class="{{ Request::is('admin/showinvoiceslog') ? 'active' : '' }}">
+<!--            <li class="{{ Request::is('admin/showinvoiceslog') ? 'active' : '' }}">
                 <a href="{{ url('/admin/showinvoiceslog') }}"><i class="fa fa-list"></i> <span>Invoices Logs</span></a>
-            </li>
+            </li>-->
             <li class="{{ Request::is('admin/trackinglogs') ? 'active' : '' }}">
                 <a href="{{ url('/admin/trackinglogs') }}"><i class="fa fa-bars"></i> <span>Tracking Logs</span></a>
             </li>
             <li class="{{ Request::is('admin/notifications') ? 'active' : '' }}">
-                <a href="{{ url('/admin/notifications') }}"><i class="fa fa-bell"></i> <span>Notifications</span></a>
+                <a href="{{ url('/admin/notifications') }}"><i class="fa fa-bell"></i> <span>Notifications</span>
+                    <span data-toggle="tooltip" title="" class="badge bg-red notCountShow">0</span>
+                </a>
+            </li>
+            <li class="{{ Request::is('admin/setting') ? 'active' : '' }}">
+                <a href="{{ url('/admin/setting') }}"><i class="fa fa-bell"></i> <span>Settings</span></a>
             </li>
         </ul>
     </section>

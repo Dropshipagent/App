@@ -49,7 +49,7 @@
                                         <th>Qty.</th>
                                         <th>Price</th>
                                         <th>Your Base Price</th>
-                                        <th>Shipper Price</th>
+                                        <th>Supplier Price</th>
                                     </tr>
                                     @foreach($order->itemsarr as $item)
                                     <tr>
@@ -64,9 +64,9 @@
                                         </td>
                                         <td>
                                             <?php
-                                            $shipperPriceArr = unserialize($invoices_log->invoice_data);
-                                            echo currency($shipperPriceArr[$item->variant_id], 'USD', currency()->getUserCurrency());
-                                            $total_amount += $shipperPriceArr[$item->variant_id];
+                                            $supplierPriceArr = unserialize($invoices_log->invoice_data);
+                                            echo currency($supplierPriceArr[$item->variant_id], 'USD', currency()->getUserCurrency());
+                                            $total_amount += $supplierPriceArr[$item->variant_id];
                                             ?>
                                         </td>
                                     </tr>
@@ -127,7 +127,7 @@
                                         <th>Qty.</th>
                                         <th>Price</th>
                                         <th>Your Base Price</th>
-                                        <th>Shipper Price</th>
+                                        <th>Supplier Price</th>
                                     </tr>
                                     @foreach($order->itemsarr as $item)
                                     <tr>
@@ -142,9 +142,9 @@
                                         </td>
                                         <td>
                                             <?php
-                                            $shipperPriceArr = unserialize($invoices_log->invoice_data);
-                                            echo currency($shipperPriceArr[$item->variant_id], 'USD', currency()->getUserCurrency());
-                                            $total_amount += $shipperPriceArr[$item->variant_id];
+                                            $supplierPriceArr = unserialize($invoices_log->invoice_data);
+                                            echo currency($supplierPriceArr[$item->variant_id], 'USD', currency()->getUserCurrency());
+                                            $total_amount += $supplierPriceArr[$item->variant_id];
                                             ?>
                                         </td>
                                     </tr>

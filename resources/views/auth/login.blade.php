@@ -10,7 +10,7 @@
     </div>
     <div class="col-sm-6">
         <div class="ex-login-right">
-            <h1>Welcome <span>Suppliers</span></h1>
+            <h1>Welcome</h1>
             <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}"  enctype="multipart/form-data">
                 @csrf
                 <div class="form-group">

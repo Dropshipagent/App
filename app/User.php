@@ -23,7 +23,7 @@ class User extends Authenticatable {
         'tags' => 'required',
     ];
     protected $fillable = [
-        'name', 'username', 'email', 'phone_code', 'phone', 'tags', 'role', 'status', 'get_order', 'password', 'auth_code', 'trans_id', 'charge_id', 'currency_code', 'location_id', 'cron_options', 'city', 'state', 'country', 'zip_code', 'billing_address', 'products_data', 'is_deleted'];
+        'name', 'username', 'email', 'phone_code', 'phone', 'tags', 'role', 'status', 'get_order', 'export_orders_from', 'password', 'auth_code', 'trans_id', 'charge_id', 'currency_code', 'location_id', 'cron_options', 'city', 'state', 'country', 'zip_code', 'address', 'is_same_address', 'billing_city', 'billing_state', 'billing_country', 'billing_zip_code', 'billing_address', 'is_deleted'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -35,9 +35,9 @@ class User extends Authenticatable {
     ];
 
     /**
-     * Get the assigned shipper
+     * Get the assigned supplier
      */
-    public function get_shipper() {
+    public function get_supplier() {
         return $this->belongsTo('App\StoreMapping', 'username', 'store_domain');
     }
 
@@ -45,7 +45,7 @@ class User extends Authenticatable {
      * Get the assigned store
      */
     public function get_store() {
-        return $this->belongsTo('App\StoreMapping', 'id', 'shipper_id');
+        return $this->belongsTo('App\StoreMapping', 'id', 'supplier_id');
     }
 
     /**
@@ -70,17 +70,17 @@ class User extends Authenticatable {
     }
 
     /**
-     * Get the shippers
+     * Get the suppliers
      */
     public function storemap() {
         return $this->hasMany('App\StoreMapping', 'store_id');
     }
 
     /**
-     * Get the shipper stores
+     * Get the supplier stores
      */
-    public function shipperstores() {
-        return $this->hasMany('App\StoreMapping', 'shipper_id');
+    public function supplierstores() {
+        return $this->hasMany('App\StoreMapping', 'supplier_id');
     }
 
     public function setPasswordAttribute($pass) {

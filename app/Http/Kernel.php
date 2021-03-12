@@ -63,7 +63,7 @@ class Kernel extends HttpKernel {
         'subscribed' => \App\Http\Middleware\VerifyStoreIsSubscribed::class,
         'webhook' => \App\Http\Middleware\VerifyWebhook::class,
         'admin' => \App\Http\Middleware\Admin::class,
-        'shipper' => \App\Http\Middleware\Shipper::class,
+        'supplier' => \App\Http\Middleware\Supplier::class,
         'front' => \App\Http\Middleware\Front::class,
     ];
 

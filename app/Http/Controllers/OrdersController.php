@@ -30,11 +30,11 @@ class OrdersController extends Controller {
         $user = Auth::user();
         if ($request->ajax()) {
             $extraSearch = array();
-            $assign_shipper = $request['assign_shipper'];
-            if ($assign_shipper == "all") {
+            $assign_supplier = $request['assign_supplier'];
+            if ($assign_supplier == "all") {
                 $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where(['orders.store_domain' => $user->username]);
             } else {
-                $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where(['orders.store_domain' => $user->username, 'orders.assign_shipper' => $assign_shipper]);
+                $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where(['orders.store_domain' => $user->username, 'orders.assign_supplier' => $assign_supplier]);
             }
 
             $TotalOrderData = $q->count();
@@ -100,10 +100,10 @@ class OrdersController extends Controller {
             $i = 1;
             foreach ($orderData as $order) {
                 $u['id'] = $order->id;
-                if ($order->assign_shipper == 1) {
-                    $u['assign_shipper'] = "Already Assigned";
+                if ($order->assign_supplier == 1) {
+                    $u['assign_supplier'] = "Already Assigned";
                 } else {
-                    $u['assign_shipper'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" />';
+                    $u['assign_supplier'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" />';
                 }
 
                 $u['order_id'] = $order->order_id;
@@ -222,7 +222,7 @@ class OrdersController extends Controller {
      */
     public function orderflag(Request $request) {
         $order = Order::findOrFail($request->order_id);
-        $order->assign_shipper = $request->flag_val;
+        $order->assign_supplier = $request->flag_val;
 
         return response()->json([
                     'data' => [
@@ -232,7 +232,7 @@ class OrdersController extends Controller {
     }
 
     /**
-     * Export csv and set flag for submit order to shipper
+     * Export csv and set flag for submit order to supplier
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -242,7 +242,7 @@ class OrdersController extends Controller {
         //comma seprated order ids
         $odrIdArr = [];
         if ($request->result == "b") {
-            $orderIdLists = Order::where(['assign_shipper' => 0])->pluck('order_id');
+            $orderIdLists = Order::where(['assign_supplier' => 0])->pluck('order_id');
             foreach ($orderIdLists as $orderIdList) {
                 $odrIdArr[] = $orderIdList;
             }
@@ -253,7 +253,7 @@ class OrdersController extends Controller {
 
         //get order list based on comma separated values
         $orderItems = OrderItem::whereIn('order_id', $odrIdArr)->with(['orderdetail'])->get();
-        Order::whereIn('order_id', $odrIdArr)->update(['assign_shipper' => 1]);
+        Order::whereIn('order_id', $odrIdArr)->update(['assign_supplier' => 1]);
 
         //create csv file code
         $view = View::make('export.csvorderlist', ['orderItems' => $orderItems]);
@@ -266,15 +266,15 @@ class OrdersController extends Controller {
         $csvstorepath = Config::get('filesystems.csv_storage_path');
         $writer->save($csvstorepath . '/' . $fileNameCsv);
 
-        //send email to shipper
-        $getShipperData = helGetShipperDATA(Auth::user()->username);
+        //send email to supplier
+        $getSupplierData = helGetSupplierDATA(Auth::user()->username);
         $attachFileURL = url('/storage/ordercsv/' . $fileNameCsv);
 
         //save order to csv logs
-        ExportOrderCsvLog::createNewLog(Auth::user()->id, $getShipperData->id, Auth::user()->username, $fileNameCsv);
+        ExportOrderCsvLog::createNewLog(Auth::user()->id, $getSupplierData->id, Auth::user()->username, $fileNameCsv);
 
         $data = [];
-        $data['shipper_name'] = $getShipperData->name;
+        $data['supplier_name'] = $getSupplierData->name;
         $data['message_body'] = "New order assigned by store owner. Please check the attached CSV.";
         $data['file_url'] = $attachFileURL;
 
@@ -282,13 +282,13 @@ class OrdersController extends Controller {
         $email_data['subject'] = 'New order assigned by store :: ' . Auth::user()->username;
         $email_data['layout'] = 'emails.assignorder';
         try {
-            Mail::to($getShipperData->email)->send(new SendMailable($email_data));
+            Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
         } catch (\Exception $e) {
             // Never reached
         }
 
         //echo "<meta http-equiv='refresh' content='0;" . env('APP_URL') . "orders_export.csv'/>";
-        return redirect()->back()->with('success', 'Orders are successfully assigned to shipper');
+        return redirect()->back()->with('success', 'Orders are successfully assigned to supplier');
     }
 
     /**

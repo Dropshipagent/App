@@ -16,3 +16,4 @@ $.widget.bridge('uibutton', $.ui.button);
 <!-- Responsive DataTables -->
 <script src="{{ asset('datatable/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('datatable/dataTables.responsive.min.js') }}"></script>
+<script src="{{ asset('js/developer.js') }}"></script>

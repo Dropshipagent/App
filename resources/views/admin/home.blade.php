@@ -17,9 +17,9 @@
     <div class="box">
         <div class="box-body">
             <div class="row">
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-3 col-xs-12">
                     <!-- small box -->
-                    <div class="small-box bg-aqua">
+                    <div class="small-box orders_bg">
                         <div class="inner">
                             <h3>{{ $orders }}</h3>
 
@@ -32,7 +32,7 @@
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-3 col-xs-12">
                     <!-- small box -->
                     <div class="small-box bg-green">
                         <div class="inner">
@@ -47,9 +47,9 @@
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-3 col-xs-12">
                     <!-- small box -->
-                    <div class="small-box bg-yellow">
+                    <div class="small-box source-product_store">
                         <div class="inner">
                             <h3>{{ $stores }}</h3>
 
@@ -62,9 +62,9 @@
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-3 col-xs-12">
                     <!-- small box -->
-                    <div class="small-box bg-red">
+                    <div class="small-box invoices_bg">
                         <div class="inner">
                             <h3>{{ $storeInvoices }}</h3>
 
@@ -77,9 +77,9 @@
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-6">
+                <div class="col-lg-3 col-xs-12">
                     <!-- small box -->
-                    <div class="small-box bg-aqua">
+                    <div class="small-box traking_bg">
                         <div class="inner">
                             <h3>{{ $uploadedTrackings }}</h3>
 

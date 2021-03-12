@@ -15,9 +15,9 @@
             <li><a href="#fulfilled" data-toggle="tab" id="fulfilled_tab">Fulfilled</a></li>
             <li><a href="#previous_export" data-toggle="tab" id="previous_export_tab">Previous Export</a></li>
         </ul>
-        @if(helGetShipperID(Auth::user()->id) > 0)
+        @if(helGetSupplierID(Auth::user()->id) > 0)
         <div class="pull-right" style="position: absolute; right:10px; top:6px;">
-            <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm assign_shipper_btn">Export to supplier</a>
+            <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm assign_supplier_btn">Export to supplier</a>
         </div>
         @endif
         <div class="tab-content">
@@ -49,7 +49,7 @@
                 <table class="table table-striped table-bordered datatable all">
                     <thead> 
                         <tr>
-                            <th>Shipper assign</th>
+                            <th>Supplier assign</th>
                             <th>Order</th>
                             <th>Date</th>
                             <th>Customer Email</th>
@@ -92,7 +92,7 @@
                 <table class="table table-striped table-bordered datatable open">
                     <thead> 
                         <tr>
-                            <th>Shipper assign</th>
+                            <th>Supplier assign</th>
                             <th>Order</th>
                             <th>Date</th>
                             <th>Customer Email</th>
@@ -132,7 +132,7 @@
                 <table class="table table-striped table-bordered datatable sourcedandpending">
                     <thead>
                         <tr>
-                            <th>Shipper assign</th>
+                            <th>Supplier assign</th>
                             <th>Order</th>
                             <th>Date</th>
                             <th>Customer Email</th>
@@ -173,7 +173,7 @@
                 <table class="table table-striped table-bordered datatable fulfilled">
                     <thead>
                         <tr>
-                            <th>Shipper assign</th>
+                            <th>Supplier assign</th>
                             <th>Order</th>
                             <th>Date</th>
                             <th>Customer Email</th>
@@ -206,7 +206,7 @@
 <!-- /.content -->
 <!-- /.content-wrapper -->
 <!-- Modal -->
-<div id="shipperModal" class="modal fade" role="dialog">
+<div id="supplierModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
         {!! Form::open(array('url' => 'orders/export_csv_flag','id' => 'flag_submit','files'=>true,'method'=>'POST')) !!}
@@ -215,7 +215,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Export and Assign to Shipper</h4>
+                <h4 class="modal-title">Export and Assign to Supplier</h4>
             </div>
             <div class="modal-body clearfix">
                 <div class="col-md-12 clearfix">
@@ -254,9 +254,9 @@
 
 
         //show modal popup jquery
-        $(".assign_shipper_btn").click(function () {
+        $(".assign_supplier_btn").click(function () {
             // show Modal
-            $('#shipperModal').modal('show');
+            $('#supplierModal').modal('show');
         });
         $('.submit_type_flag').on('click', function () {
             var radioVal = $("input[name='result']:checked").val();
@@ -285,7 +285,7 @@
                 alert("Please select atleast one order.");
                 return false;
             } else {
-                if (confirm('Please confirm, really you want to assign these order to the Shipper')) {
+                if (confirm('Please confirm, really you want to assign these order to the Supplier')) {
                     $("#flag_submit").submit();
                 }
             }
@@ -327,7 +327,7 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.assign_shipper = "all";
+                    d.assign_supplier = "all";
                     d.financial_status = $('#all #paymentStatus').val();
                     d.fulfillment_status = $('#all #fulfillmentstatus').val();
                     d.order_status = $('#all #orderStatus').val();
@@ -338,7 +338,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'assign_shipper'},
+                {mData: 'assign_supplier'},
                 {mData: 'order_number'},
                 {mData: 'created_at'},
                 {mData: 'email'},
@@ -369,7 +369,7 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.assign_shipper = 0;
+                    d.assign_supplier = 0;
                     d.financial_status = $('#open #paymentStatus').val();
                     d.fulfillment_status = $('#open #fulfillmentstatus').val();
                     d.order_status = $('#open #orderStatus').val();
@@ -380,7 +380,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'assign_shipper'},
+                {mData: 'assign_supplier'},
                 {mData: 'order_number'},
                 {mData: 'created_at'},
                 {mData: 'email'},
@@ -411,7 +411,7 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.assign_shipper = 1;
+                    d.assign_supplier = 1;
                     d.financial_status = $('#sourcedandpending #paymentStatus').val();
                     d.fulfillment_status = $('#sourcedandpending #fulfillmentstatus').val();
                     d.order_status = $('#sourcedandpending #orderStatus').val();
@@ -422,7 +422,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'assign_shipper'},
+                {mData: 'assign_supplier'},
                 {mData: 'order_number'},
                 {mData: 'created_at'},
                 {mData: 'email'},
@@ -453,7 +453,7 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.assign_shipper = 1;
+                    d.assign_supplier = 1;
                     d.financial_status = $('#fulfilled #paymentStatus').val();
                     d.fulfillment_status = "fulfilled";
                     d.order_status = $('#fulfilled #orderStatus').val();
@@ -464,7 +464,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'assign_shipper'},
+                {mData: 'assign_supplier'},
                 {mData: 'order_number'},
                 {mData: 'created_at'},
                 {mData: 'email'},

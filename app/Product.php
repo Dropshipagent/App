@@ -13,7 +13,7 @@ class Product extends Model {
      * @var array
      */
     protected $fillable = [
-        'store_domain', 'product_id', 'title', 'body_html', 'vendor', 'product_type', 'created_at', 'handle', 'updated_at', 'published_at', 'template_suffix', 'tags', 'published_scope', 'admin_graphql_api_id', 'variants', 'options', 'images', 'image', 'base_price', 'admin_commission', 'source_flag', 'product_status'];
+        'store_domain', 'product_id', 'title', 'body_html', 'vendor', 'product_type', 'created_at', 'handle', 'updated_at', 'published_at', 'template_suffix', 'tags', 'published_scope', 'admin_graphql_api_id', 'variants', 'options', 'images', 'image', 'base_price', 'admin_commission', 'source_flag', 'product_status', 'aliexpress_url', 'orders_per_day', 'variants_you_sell', 'countries_you_ship', 'cost_per_unit', 'shipping_time'];
 
     static function syncproducts($store_domain) {
         $cUser = User::select('user_providers.provider_token')->join('user_providers', 'user_providers.user_id', 'users.id')->where('users.username', $store_domain)->where('user_providers.provider', 'shopify')->first();

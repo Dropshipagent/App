@@ -49,6 +49,11 @@ Route::get('messages/{receiverID}', 'ChatsController@fetchMessages');
 Route::post('messages', 'ChatsController@sendMessage');
 Route::post('messages_status', 'ChatsController@read_messages');
 
+######################### notification routs ##########################
+Route::post('user_not_status', 'NotificationsController@read_notifications');
+Route::post('user_not_count', 'NotificationsController@notifications_count');
+Route::resource('storenotifications', 'NotificationsController');
+
 
 ######################## sopify store related routs ###################################
 Route::get('stores/{storeId}', function(\Illuminate\Http\Request $request, $storeId) {
@@ -146,7 +151,6 @@ Route::get('shipping-info', function () {
     return view('seller.shippinginfo');
 });
 
-
 Route::group(['prefix' => '', 'middleware' => ['auth', 'front']], function() {
 
     Route::get('home', 'SellerOrderController@index')->name('home');
@@ -158,9 +162,6 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'front']], function() {
     Route::get('orders', 'OrdersController@index');
     Route::post('orders/orderflag', 'OrdersController@orderflag');
     Route::post('orders/export_csv_flag', 'OrdersController@export_csv_flag');
-    Route::resource('storenotifications', 'NotificationsController');
-    Route::post('user_not_status', 'NotificationsController@read_notifications');
-    Route::post('user_not_count', 'NotificationsController@notifications_count');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function() {
@@ -171,7 +172,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     Route::get('showinvoiceslog', 'Admin\OrdersController@showinvoiceslog');
     Route::get('showinvoicedetail/{invoiceID}', 'Admin\OrdersController@showinvoicedetail');
 
-    Route::post('shipperpaidstatus_change', 'Admin\OrdersController@shipper_paid_status_change');
+    Route::post('supplierpaidstatus_change', 'Admin\OrdersController@supplier_paid_status_change');
+
+    Route::get('users/set_store_session/{storeId}', 'Admin\UsersController@setStoreSession');
     Route::get('users/showcsvlogs/{storeId}', 'Admin\UsersController@showcsvlogs');
     Route::post('users/email_csv', 'Admin\UsersController@email_csv');
     Route::get('users/search_users', 'Admin\UsersController@searchUsers');
@@ -180,32 +183,37 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     Route::resource('users', 'Admin\UsersController');
 
     Route::resource('notifications', 'Admin\NotificationsController');
+    Route::post('user_not_status', 'Admin\NotificationsController@read_notifications');
+    Route::post('user_not_count', 'Admin\NotificationsController@notifications_count');
 
     Route::post('products/product-status', 'Admin\ProductsController@product_status');
     Route::get('products/index/{storeId}', 'Admin\ProductsController@index');
     Route::resource('products', 'Admin\ProductsController');
+
+    Route::any('/setting', 'Admin\SettingController@index');
+    Route::any('/setting/{id}', 'Admin\SettingController@update');
 });
 
-Route::group(['prefix' => 'shipper', 'middleware' => ['auth', 'shipper']], function() {
-    Route::get('home', 'Shipper\OrdersController@index');
-    Route::get('set_store_session/{storeId}', 'Shipper\PageController@setStoreSession');
+Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], function() {
+    Route::get('home', 'Supplier\OrdersController@index');
+    Route::get('set_store_session/{storeId}', 'Supplier\PageController@setStoreSession');
 
-    Route::get('showcsvlogs/{storeId}', 'Shipper\OrdersController@showcsvlogs'); //csv list of store orders which is created only for loggedin shipper
-    Route::get('bluckinvoice/{storeId}', 'Shipper\OrdersController@bluckinvoice'); //show list of all pendig invoice orders
-    Route::post('showbluckinvoice/{storeId}', 'Shipper\OrdersController@showbluckinvoice'); //show list of all pendig invoice orders
-    Route::post('createbluckinvoice/{storeId}', 'Shipper\OrdersController@createbluckinvoice'); //show list of all pendig invoice orders
-    Route::get('trackinglogs/{storeId}', 'Shipper\OrdersController@trackinglogs');
-    Route::get('showinvoiceslog/{storeId}', 'Shipper\OrdersController@showinvoiceslog'); //invoices logs which is created by shippers
-    Route::get('showinvoicedetail/{invoiceID}', 'Shipper\OrdersController@showinvoicedetail'); //invoice detail page
-    Route::get('downloadinvoice/{invoiceID}', 'Shipper\OrdersController@downloadinvoice'); //invoice download page
-    Route::get('searchorder', 'Shipper\OrdersController@searchorder'); //search order behalf on order id
-    Route::post('create_invoice', 'Shipper\OrdersController@create_invoice'); //invoice which is created for admin and for the store owner
-    Route::get('uploadtracking', 'Shipper\OrdersController@uploadtracking');
-    Route::post('uploadtracking', 'Shipper\OrdersController@uploadtrackingPost');
-    //Route::get('stores', 'Shipper\OrdersController@index'); //showing list of store which is assign to logged in shipper
-    Route::resource('/orders', 'Shipper\OrdersController');
+    Route::get('showcsvlogs/{storeId}', 'Supplier\OrdersController@showcsvlogs'); //csv list of store orders which is created only for loggedin supplier
+    Route::get('bluckinvoice/{storeId}', 'Supplier\OrdersController@bluckinvoice'); //show list of all pendig invoice orders
+    Route::post('showbluckinvoice/{storeId}', 'Supplier\OrdersController@showbluckinvoice'); //show list of all pendig invoice orders
+    Route::post('createbluckinvoice/{storeId}', 'Supplier\OrdersController@createbluckinvoice'); //show list of all pendig invoice orders
+    Route::get('trackinglogs/{storeId}', 'Supplier\OrdersController@trackinglogs');
+    Route::get('showinvoiceslog/{storeId}', 'Supplier\OrdersController@showinvoiceslog'); //invoices logs which is created by suppliers
+    Route::get('showinvoicedetail/{invoiceID}', 'Supplier\OrdersController@showinvoicedetail'); //invoice detail page
+    Route::get('downloadinvoice/{invoiceID}', 'Supplier\OrdersController@downloadinvoice'); //invoice download page
+    Route::get('searchorder', 'Supplier\OrdersController@searchorder'); //search order behalf on order id
+    Route::post('create_invoice', 'Supplier\OrdersController@create_invoice'); //invoice which is created for admin and for the store owner
+    Route::get('uploadtracking', 'Supplier\OrdersController@uploadtracking');
+    Route::post('uploadtracking', 'Supplier\OrdersController@uploadtrackingPost');
+    //Route::get('stores', 'Supplier\OrdersController@index'); //showing list of store which is assign to logged in supplier
+    Route::resource('/orders', 'Supplier\OrdersController');
 
-    Route::resource('shippernotifications', 'Shipper\NotificationsController');
-    Route::post('user_not_status', 'Shipper\NotificationsController@read_notifications');
-    Route::post('user_not_count', 'Shipper\NotificationsController@notifications_count');
+    Route::resource('suppliernotifications', 'Supplier\NotificationsController');
+    Route::post('user_not_status', 'Supplier\NotificationsController@read_notifications');
+    Route::post('user_not_count', 'Supplier\NotificationsController@notifications_count');
 });

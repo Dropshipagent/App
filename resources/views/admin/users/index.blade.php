@@ -24,7 +24,7 @@
                     <li class="active"><a href="#pending_req" id="pending_req_tab" data-toggle="tab">Pending requests</a></li>
                     <li><a href="#app_and_unpaid" id="app_and_unpaid_tab" data-toggle="tab">Approved and Unpaid</a></li>
                     <li><a href="#app_and_paid" id="app_and_paid_tab" data-toggle="tab">Approved and Paid</a></li>
-                    <li><a href="#shippers" id="shippers_tab" data-toggle="tab">Shippers</a></li>
+                    <li><a href="#suppliers" id="suppliers_tab" data-toggle="tab">Suppliers</a></li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="pending_req">
@@ -72,31 +72,23 @@
                             </thead>
                         </table>
                     </div>
-                    <div class="tab-pane" id="shippers">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">Shippers</h3>
-
-                            <div class="box-tools pull-right">
-                                <a href="{{ url('/admin/users/create') }}" class="btn btn-block btn-danger btn-sm">Add New Shipper</a>
-                            </div>
+                    <div class="tab-pane" id="suppliers">
+                        <div class="box-tools pull-right">
+                            <a href="{{ url('/admin/users/create') }}" class="btn btn-block btn-danger btn-sm">Add New Supplier</a>
                         </div>
-                        <div class="box">
-                            <div class="box-body table-responsive no-padding">
-                                <table id="shipperData" class="table table-hover table-striped table-bordered datatable">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Name</th>
-                                            <th>Username</th>
-                                            <th>Email</th>
-                                            <th>Created</th>
-                                            <th>Updated</th>
-                                            <th>Mapped Store</th>
-                                        </tr>
-                                    </thead>
-                                </table>
-                            </div>
-                        </div>
+                        <table id="supplierData" class="table table-hover table-striped table-bordered datatable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Created</th>
+                                    <th>Updated</th>
+                                    <th>Mapped Store</th>
+                                </tr>
+                            </thead>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -106,30 +98,30 @@
 <!-- /.content -->
 
 <!-- Modal -->
-<div id="shipperModal" class="modal fade" role="dialog">
+<div id="supplierModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
 
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Select Shipper</h4>
+                <h4 class="modal-title">Select Supplier</h4>
             </div>
             <div class="modal-body">
                 <div class="col-md-12">
-                    {!! Form::open(array('url' => 'admin/users/email_csv','id' => 'assignShipperForm','files'=>true,'method'=>'POST')) !!}
+                    {!! Form::open(array('url' => 'admin/users/email_csv','id' => 'assignSupplierForm','files'=>true,'method'=>'POST')) !!}
                     {!! Form::hidden('store_id', null, array('class' => 'store_id')) !!}
-                    {!! Form::hidden('shipper_id', null, array('class' => 'shipper_id')) !!}
+                    {!! Form::hidden('supplier_id', null, array('class' => 'supplier_id')) !!}
                     {!! Form::hidden('store_domain', null, array('class' => 'store_domain')) !!}
                     <div class="col-md-8">
                         <div class="form-group">
-                            <strong>Select Shipper by Tag:</strong>
+                            <strong>Select Supplier by Tag:</strong>
                             <input id="tags" class="form-control" required="required">
                         </div>    
                     </div>
                     <div class="col-md-4">
                         <br>
-                        <button type="button" id="" class="btn btn-primary asnShipperBtn">Submit</button> 
+                        <button type="button" id="" class="btn btn-primary asnSupplierBtn">Submit</button> 
                     </div>
                     {!! Form::close() !!}
                 </div>
@@ -145,11 +137,11 @@
 <script type="text/javascript">
     $(document).ready(function () {
         //show modal popup jquery
-        $(document).on('click', '.assign_shipper_btn', function () {
+        $(document).on('click', '.assign_supplier_btn', function () {
             $('.store_id').val($(this).data("id"));
             $('.store_domain').val($(this).data("val"));
             // show Modal
-            $('#shipperModal').modal('show');
+            $('#supplierModal').modal('show');
         });
         //auto complete textbox jquery
         $("#tags").autocomplete({
@@ -167,16 +159,16 @@
             },
             minLength: 2,
             select: function (event, ui) {
-                $(".shipper_id").val(ui.item.id);
+                $(".supplier_id").val(ui.item.id);
                 //log("Selected: " + ui.item.value + " aka " + ui.item.id);
             }
         });
-        $(document).on('click', '.asnShipperBtn', function () {
-            var shipperID = $(".shipper_id").val();
-            if (shipperID != '') {
-                $("#assignShipperForm").submit();
+        $(document).on('click', '.asnSupplierBtn', function () {
+            var supplierID = $(".supplier_id").val();
+            if (supplierID != '') {
+                $("#assignSupplierForm").submit();
             } else {
-                alert("Please select shipper from the autocomplete dropdown!");
+                alert("Please select supplier from the autocomplete dropdown!");
             }
         });
     });
@@ -311,7 +303,7 @@
                 }
             }
         });
-        var shipperData = $('#shipperData').DataTable({
+        var supplierData = $('#supplierData').DataTable({
             "responsive": true,
             "bProcessing": true,
             "serverSide": true,
@@ -320,7 +312,7 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.tab = "Shippers";
+                    d.tab = "Suppliers";
                     d.role = "3";
                     d.status = null;
                 },
@@ -361,24 +353,25 @@
         $('#app_and_paid_tab').click(function () {
             app_and_paidData.draw();
         });
-        $('#shippers_tab').click(function () {
-            shipperData.draw();
+        $('#suppliers_tab').click(function () {
+            supplierData.draw();
         });
         //$('#pending_reqData').DataTable();
         //$('#app_and_unpaidData').DataTable();
         //$('#app_and_paidData').DataTable();
-        //$('#shipperData').DataTable();
+        //$('#supplierData').DataTable();
 
         //code for final approval of a product
-        $(document).on('click', '.accept_user', function (e) {
+        $(document).on('click', '.accept_user,.reject_user', function (e) {
             var userID = $(this).data('id');
+            var userStatus = $(this).data('val');
             var r = confirm("Are you sure?");
             if (r == true) {
                 $.ajax({
                     type: 'POST',
                     url: '{{ url("admin/users/user-status") }}',
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                    data: {"user_id": userID},
+                    data: {"user_id": userID, "user_status": userStatus},
                     success: function (data) {
                         if (data.data.success) {
                             alert(data.data.message);

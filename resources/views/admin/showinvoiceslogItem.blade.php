@@ -3,7 +3,7 @@
         <th>Item Name</th>
         <th>Qty.</th>
         <th>Price</th>
-        <th>Shipper Price</th>
+        <th>Supplier Price</th>
         @if(auth()->user()->role == 1)
         <th>Admin Commission</th>
         @endif
@@ -19,9 +19,9 @@
         <td>${{ ($item->quantity*$item->price) }}</td>
         <td>
             <?php
-            $shipperPriceArr = json_decode($Invoice->invoice_data, true);
-            echo ($shipperPriceArr[$item->variant_id] > 0) ? '$' . $shipperPriceArr[$item->variant_id] : '-';
-            $invoiceTotal += $shipperPriceArr[$item->variant_id];
+            $supplierPriceArr = json_decode($Invoice->invoice_data, true);
+            echo ($supplierPriceArr[$item->variant_id] > 0) ? '$' . $supplierPriceArr[$item->variant_id] : '-';
+            $invoiceTotal += $supplierPriceArr[$item->variant_id];
             ?>
         </td>
         @if(auth()->user()->role == 1)

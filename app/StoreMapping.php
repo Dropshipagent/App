@@ -13,6 +13,6 @@ class StoreMapping extends Model {
      * @var array
      */
     protected $fillable = [
-        'store_id', 'shipper_id', 'store_domain',
+        'store_id', 'supplier_id', 'store_domain',
     ];
 }

@@ -44,7 +44,7 @@ use AuthenticatesUsers;
                 return '/home';
                 break;
             case 3:
-                return '/shipper/home';
+                return '/supplier/home';
                 break;
             default:
                 return '/login';

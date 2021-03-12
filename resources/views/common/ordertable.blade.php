@@ -5,7 +5,7 @@
             <tr>
                 <th>ID</th>
                 @if($user->role == 2)
-                <th>Shipper assign 
+                <th>Supplier assign 
                     {!! Form::open(array('id' => 'flag_filter','files'=>true,'method'=>'GET')) !!}
                     <?php
                     if (isset($_REQUEST['type'])) {
@@ -16,7 +16,7 @@
                     ?>
                     <select name="type" class="search_type_tag form-control" required="">
                         <option value="">-- Select Filter --</option>
-                        <option value="filterShipper" <?php echo ($typeKey == "filterShipper") ? "selected" : ""; ?>>Assigned Orders</option>
+                        <option value="filterSupplier" <?php echo ($typeKey == "filterSupplier") ? "selected" : ""; ?>>Assigned Orders</option>
                         <option value="all" <?php echo ($typeKey == "all") ? "selected" : ""; ?>>All Order</option>
                     </select>
                     {!! Form::close() !!}
@@ -39,7 +39,7 @@
                 @if($user->role == 2)
                 <td class="text-center">
                     <?php
-                    if ($order->assign_shipper == 1) {
+                    if ($order->assign_supplier == 1) {
                         echo "Already Assigned";
                     } else {
                         ?>

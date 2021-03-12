@@ -38,24 +38,24 @@
                 <table class="table table-striped table-bordered datatable approved">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
-                            <th>Product Name</th>
-                            <th>Product Price</th>
                             <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Shipping Time</th>
+                            <th>Product Price</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
                 </table>
             </div>
-        
+
             <div class="tab-pane" id="admin_approved">
                 <table class="table table-striped table-bordered datatable admin_approved">
                     <thead> 
                         <tr>
-                            <th>Product ID</th>
-                            <th>Product Name</th>
-                            <th>Product Price</th>
                             <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Shipping Time</th>
+                            <th>Product Price</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -66,10 +66,10 @@
                 <table class="table table-striped table-bordered datatable requested">
                     <thead>
                         <tr>
-                            <th>Product ID</th>
-                            <th>Product Name</th>
-                            <th>Product Price</th>
                             <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Shipping Time</th>
+                            <th>Product Price</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -85,7 +85,7 @@
 
 <!-- Modal -->
 <div id="syncProductsModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
         <div class="modal-content">
@@ -136,7 +136,7 @@
                 "bProcessing": true,
                 "serverSide": true,
                 "ordering": true,
-                "order": [[0, "asc"]],
+                "order": [[1, "asc"]],
                 "ajax": {
                     url: "",
                     data: function (d) {
@@ -149,10 +149,10 @@
                     }
                 },
                 "aoColumns": [
-                    {mData: 'product_id', "bSortable": true},
-                    {mData: 'product_name', "bSortable": false},
-                    {mData: 'product_price', "bSortable": false},
                     {mData: 'product_image', "bSortable": false},
+                    {mData: 'product_name', "bSortable": true},
+                    {mData: 'shipping_time', "bSortable": false},
+                    {mData: 'product_price', "bSortable": false},
                     {mData: 'product_action', "bSortable": false},
                 ],
                 "destroy": true,
@@ -189,7 +189,7 @@
                     success: function (data) {
                         if (data.data.success) {
                             jQuery('.close').trigger("click");
-                            alert("Product accepted successfully!");
+                            showAlertMessage("Product accepted successfully!");
                             initiateTable("admin_approved", "2", "1");
                         }
                     }

@@ -2,9 +2,10 @@
 @section('title', 'Dashboard')
 @section('main-content')
 <!-- Content Header (Page header) -->
+@include('admin.layouts.header-tabs')
 <section class="content-header">
     <h1>
-        Order List
+        Store [{{ Session::get('selected_store_id') }}] Orders
         <small>list of all orders from shopify</small>
     </h1>
     <ol class="breadcrumb">
@@ -42,18 +43,6 @@
                         <option value="pending">Unfulfilled</option>
                     </select>                        
                 </div>
-                <div class="searchfilter">
-                    <select id="storedomain" class="form-control" style="width: 150px;">
-                        <option value="">Store Domain</option>
-                        <?php
-                        foreach ($store as $val) {
-                            ?>
-                            <option>{{$val->domain}}</option>
-                            <?php
-                        }
-                        ?>
-                    </select>                        
-                </div>   
             </div>
             <table class="table table-hover table-striped table-bordered datatable orderlist">
                 <thead> 
@@ -111,11 +100,11 @@
             "ajax": {
                 url: "",
                 data: function (d) {
-                    d.assign_shipper = 0;
+                    d.assign_supplier = 0;
                     d.financial_status = $('#paymentStatus').val();
                     d.fulfillment_status = $('#fulfillmentstatus').val();
                     d.order_status = $('#orderStatus').val();
-                    d.store_domain = $('#storedomain').val();
+                    d.store_domain = "{{ Session::get('selected_store_id') }}";
                 },
                 error: function (error) {
                     console.log(error);

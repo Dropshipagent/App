@@ -20,6 +20,7 @@
                             <th>Invoice No.</th>
                             <th>Date</th>
                             <th>Order Value</th>
+                            <th>Other Charges</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -33,6 +34,7 @@
                             <th>Invoice No.</th>
                             <th>Date</th>
                             <th>Order Value</th>
+                            <th>Other Charges</th>
                             <th>&nbsp;</th>
                         </tr>
                     </thead>
@@ -144,6 +146,7 @@
                                 {mData: 'id'},
                                 {mData: 'created_at'},
                                 {mData: 'admin_price_total'},
+                                {mData: 'other_charges'},
                                 {mData: 'action'},
                             ],
                             "aoColumnDefs": [
@@ -177,6 +180,7 @@
                                 {mData: 'id'},
                                 {mData: 'store_domain'},
                                 {mData: 'admin_price_total'},
+                                {mData: 'other_charges'},
                                 {mData: 'action'},
                             ],
                             "aoColumnDefs": [

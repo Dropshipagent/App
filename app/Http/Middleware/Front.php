@@ -19,7 +19,7 @@ class Front {
         if (isset(auth()->user()->role) && auth()->user()->role == 1) {
             return redirect('/admin/home')->with('error', 'You have only admin access');
         } elseif (isset(auth()->user()->role) && auth()->user()->role == 3) {
-            return redirect('/shipper/home')->with('error', 'You have only shipper access');
+            return redirect('/supplier/home')->with('error', 'You have only supplier access');
         } elseif (isset(auth()->user()->status) && auth()->user()->status < 0 && !Request::is('my-account')) {
             return redirect('my-account');
         } elseif (isset(auth()->user()->status) && auth()->user()->status == 0 && !Request::is('profile-status')) {

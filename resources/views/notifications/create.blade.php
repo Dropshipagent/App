@@ -4,7 +4,7 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        Send Notification to Shipper
+        Send Notification to Supplier
         <small>add new notification</small>
     </h1>
     <ol class="breadcrumb">
@@ -35,7 +35,7 @@
             @endif
             {!! Form::open(array('route' => 'storenotifications.store','id' => '','files'=>true,'method'=>'POST')) !!}
             {!! Form::hidden('notification_by', auth()->user()->id) !!}
-            {!! Form::hidden('user_id', helGetShipperID(auth()->user()->id)) !!}
+            {!! Form::hidden('user_id', helGetSupplierID(auth()->user()->id)) !!}
             {!! Form::hidden('user_role', 3) !!}
 
             <!-- text input -->

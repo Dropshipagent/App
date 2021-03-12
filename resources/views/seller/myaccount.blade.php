@@ -13,6 +13,7 @@
 <section class="content">
     <!-- Default box -->
     <div class="row">
+        {!! Form::model($user, ['url' => ['my-account'], 'id'=>'flagRecForm','files'=>true,'method'=>'POST']) !!}
         <div class="col-md-6 col-md-offset-3">
             <div class="register-box-body">
                 @if (count($errors) > 0)
@@ -25,22 +26,29 @@
                     </ul>
                 </div>
                 @endif
-                {!! Form::model($user, ['url' => ['my-account'], 'id'=>'flagRecForm','files'=>true,'method'=>'POST']) !!}
                 <div class="box box-primary box-primary-box">
                     <!-- form start -->
                     <div class="box-body">
+                        <div class="col-md-12 text-center">
+                            <h1 class="text-uppercase m-0">My Account</h1>
+                        </div>
                         @if (auth()->user()->status < 0)
                         <div class="col-md-12 text-center">
-                            Thank you for choosing Dropship Agent as your dropshipping partner. <br><br>Please fill out the form below with details regarding the products you want sourced. Our team will check your requirements and if we can provide you better deals on your chosen products, we will notify you of the profile approval and the next steps in the process.<br><br>
+                            <br>
+                            Thank you for choosing Dropship Agent as your dropshipping partner. <br><br>Please fill out the form below with details regarding the products you want sourced. Our team will check your requirements and if we can provide you better deals on your chosen products, we will notify you of the product approval and the next steps in the process.<br><br>
+                        </div>
+                        @else
+                        <div class="col-md-12 text-center">
+                            <h4>Manage exports and account setting</h4><br>
                         </div>
                         @endif
                         <div class="col-md-6 form-group">
-                            <label for="">Store Name:</label>
+                            <label for="" class="required-field">Store Name:</label>
                             {!! Form::text('name', null, array('placeholder' => 'Full Name','class' => 'form-control', 'required' => 'required')) !!}
 
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="">Email:</label>
+                            <label for="" class="required-field">Email:</label>
                             {!! Form::email('email', null, array('placeholder' => 'Email','class' => 'form-control', 'required' => 'required')) !!}
                         </div>
                         <div class="col-md-6 form-group">
@@ -58,32 +66,73 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="phone">Contact Number:</label>
+                        <div class="col-md-6 form-group phone_div">
+                            <label for="phone" class="required-field">Contact Number:</label>
                             {!! Form::tel('phone', null, array('placeholder' => 'Contact Number','class' => 'form-control','id' => 'phone', 'required' => 'required')) !!}
                             {!! Form::hidden('phone_code', null, array('id' => 'phone_code')) !!}
                             {!! Form::hidden('iso2', null, array('id' => 'iso2')) !!}
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="">City:</label>
-                            {!! Form::text('city', null, array('placeholder' => 'City','class' => 'form-control', 'required' => 'required')) !!}
+                        <div class="form-group">
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">City:</label>
+                                {!! Form::text('city', null, array('placeholder' => 'City','class' => 'form-control city', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">State:</label>
+                                {!! Form::text('state', null, array('placeholder' => 'State','class' => 'form-control state', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">Country:</label>
+                                {!! Form::text('country', null, array('placeholder' => 'Country','class' => 'form-control country_text', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">Zip Code:</label>
+                                {!! Form::text('zip_code', null, array('placeholder' => 'Zip Code','class' => 'form-control zip_code', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="" class="required-field">Address</label>
+                                {!! Form::text('address', null, array('placeholder' => 'Address', 'class' => 'form-control address')) !!}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" id="same_address" name="is_same_address" value="1" @if($user->is_same_address){{ 'checked' }}@endif>
+                            <label for="same_address"> Billing address same as address</label></div>
+                        <div class="form-group billing_address_fields" {!! ($user->is_same_address)?'style="display:none;"':"" !!}>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">City:</label>
+                                {!! Form::text('billing_city', null, array('placeholder' => 'City','class' => 'form-control billing_city', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">State:</label>
+                                {!! Form::text('billing_state', null, array('placeholder' => 'State','class' => 'form-control billing_state', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">Country:</label>
+                                {!! Form::text('billing_country', null, array('placeholder' => 'Country','class' => 'form-control billing_country', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="" class="required-field">Zip Code:</label>
+                                {!! Form::text('billing_zip_code', null, array('placeholder' => 'Zip Code','class' => 'form-control billing_zip_code', 'required' => 'required')) !!}
+                            </div>
+                            <div class="col-md-12 form-group">
+                                <label for="" class="required-field">Billing Address</label>
+                                {!! Form::text('billing_address', null, array('placeholder' => 'Billing Address', 'class' => 'form-control billing_address', 'required' => 'required')) !!}
+                            </div>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="">State:</label>
-                            {!! Form::text('state', null, array('placeholder' => 'State','class' => 'form-control', 'required' => 'required')) !!}
+                            <label for="">Start my order exports from order number:</label>
+                            {!! Form::text('export_orders_from', null, array('placeholder' => 'Ex.: #1001','class' => 'form-control', 'required' => 'required')) !!}
                         </div>
-                        <div class="col-md-6 form-group">
-                            <label for="">Country:</label>
-                            {!! Form::text('country', null, array('placeholder' => 'Country','class' => 'form-control', 'required' => 'required')) !!}
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="">Zip Code:</label>
-                            {!! Form::text('zip_code', null, array('placeholder' => 'Zip Code','class' => 'form-control', 'required' => 'required')) !!}
-                        </div>
-                        <div class="col-md-12 form-group">
-                            <label for="">Billing Address</label>
-                            {!! Form::textarea('billing_address', null, array('placeholder' => 'Billing Address', 'rows' => 2,'class' => 'form-control')) !!}
-                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+
+            <div class="box ">
+                <div class="" >
+                    <div class="export_shadule">
+
                         @if (auth()->user()->status > 1)
                         <div class="col-md-12 form-group">
                             <h4>Schedule order export</h4><br>
@@ -98,49 +147,105 @@
                             $Dsaturday = (isset($cronOption->saturday)) ? true : false;
                             $Dsunday = (isset($cronOption->sunday)) ? true : false;
                             ?>
-                            <label for="daily">Export Daily: {!! Form::checkbox('cron_options[]', 'daily', $Ddaily, ['class' => 'daily', 'id' => 'daily']) !!} </label><br/>
+                            <!-- <label for="daily">Export Daily: {!! Form::checkbox('cron_options[]', 'daily', $Ddaily, ['class' => 'daily', 'id' => 'daily']) !!} </label> -->
+                            <label class="custom_checkbox_container" for="daily">Export Daily: {!! Form::checkbox('cron_options[]', 'daily', $Ddaily, ['class' => 'daily', 'id' => 'daily']) !!}
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                            </label>
                         </div>
-                        <div class="col-md-10 form-group">
+                        <div class="col-md-12 form-group">
                             <div class="all_day_box" style="<?php echo ($Ddaily == true) ? 'display:none' : ''; ?>">
-                                <div class="col-md-6 form-group">
-                                    <label for="monday">{!! Form::checkbox('cron_options[]', 'monday', $Dmonday, ['class' => 'all_day', 'id' => 'monday']) !!} Export every Monday</label><br/>
-                                    <label for="tuesday">{!! Form::checkbox('cron_options[]', 'tuesday', $Dtuesday, ['class' => 'all_day', 'id' => 'tuesday']) !!} Export every Tuesday</label><br/>
-                                    <label for="wednesday">{!! Form::checkbox('cron_options[]', 'wednesday', $Dwednesday, ['class' => 'all_day', 'id' => 'wednesday']) !!} Export every Wednesday</label><br/>
-                                    <label for="thursday">{!! Form::checkbox('cron_options[]', 'thursday', $Dthursday, ['class' => 'all_day', 'id' => 'thursday']) !!} Export every Thursday</label>
-                                </div>
-                                <div class="col-md-6 form-group">
-                                    <label for="friday">{!! Form::checkbox('cron_options[]', 'friday', $Dfriday, ['class' => 'all_day', 'id' => 'friday']) !!} Export every Friday</label><br/>
-                                    <label for="saturday">{!! Form::checkbox('cron_options[]', 'saturday', $Dsaturday, ['class' => 'all_day', 'id' => 'saturday']) !!} Export every Saturday</label><br/>
-                                    <label for="sunday">{!! Form::checkbox('cron_options[]', 'sunday', $Dsunday, ['class' => 'all_day', 'id' => 'sunday']) !!} Export every Sunday</label>
+                                <div class="col-md-12 form-group">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="monday">{!! Form::checkbox('cron_options[]', 'monday', $Dmonday, ['class' => 'all_day', 'id' => 'monday']) !!} Monday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="tuesday">{!! Form::checkbox('cron_options[]', 'tuesday', $Dtuesday, ['class' => 'all_day', 'id' => 'tuesday']) !!} Tuesday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="wednesday">{!! Form::checkbox('cron_options[]', 'wednesday', $Dwednesday, ['class' => 'all_day', 'id' => 'wednesday']) !!} Wednesday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="thursday">{!! Form::checkbox('cron_options[]', 'thursday', $Dthursday, ['class' => 'all_day', 'id' => 'thursday']) !!} Thursday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="friday">{!! Form::checkbox('cron_options[]', 'friday', $Dfriday, ['class' => 'all_day', 'id' => 'friday']) !!} Friday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="saturday">{!! Form::checkbox('cron_options[]', 'saturday', $Dsaturday, ['class' => 'all_day', 'id' => 'saturday']) !!} Saturday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="custom_checkbox_container" for="sunday">{!! Form::checkbox('cron_options[]', 'sunday', $Dsunday, ['class' => 'all_day', 'id' => 'sunday']) !!} Sunday
+                                                <input type="checkbox">
+                                                <span class="checkmark"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            @endif
+                            @if (auth()->user()->status < 0)
+                            <div class="col-md-12 products_list">
+                                <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm btnSyncProducts">Sync Products</a>
+                            </div>
+                            @endif
+                        </div><!-- /.box-body -->
+                        <div class="box-footer box-footer-f">
+                            @if (auth()->user()->status < 0)
+                            <button type="button" id="" class="btn btn-danger sendFlagRec">Send Request</button> 
+                            @else
+                            <button type="button" class="btn btn-warning btn-warning-btn updateProfileBtn">Update Profile</button>
+                            @endif
                         </div>
-                        @endif
-                        @if (auth()->user()->status < 0)
-                        <div class="col-md-12 products_list">
-                            <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm btnSyncProducts">Sync Products</a>
-                        </div>
-                        @endif
-                    </div><!-- /.box-body -->
-                    <div class="box-footer box-footer-f">
-                        @if (auth()->user()->status < 0)
-                        <button type="button" id="" class="btn btn-danger sendFlagRec">Send Request</button> 
-                        @else
-                        <button type="button" class="btn btn-warning btn-warning-btn updateProfileBtn">Update Profile</button>
-                        @endif
                     </div>
                 </div>
-                {!! Form::close() !!}
+                <!-- /.form-box -->
             </div>
-            <!-- /.form-box -->
         </div>
+        {!! Form::close() !!}
     </div>
-
 </section>
 <!-- /.content -->
 
 <script type="text/javascript">
     $(document).ready(function () {
+
+        //action on is billing address same checkbox check or uncheck
+        $(document).on('change', '#same_address', function (e) {
+            if (this.checked) {
+                $('.billing_city').val($('.city').val());
+                $('.billing_state').val($('.state').val());
+                $('.billing_country').val($('.country_text').val());
+                $('.billing_zip_code').val($('.zip_code').val());
+                $('.billing_address').val($('.address').val());
+                $('.billing_address_fields').hide();
+            } else {
+                $('.billing_address_fields').show();
+            }
+        });
+
         //sync and show product list
         $.ajax({
             url: "{{ url('storeproducts/syncproducts', auth()->user()->username) }}",
@@ -166,6 +271,7 @@
                 $('.variants_you_sell_' + productID).attr("required", true);
                 $('.countries_you_ship_' + productID).attr("required", true);
                 $('.cost_per_unit_' + productID).attr("required", true);
+                $('.shipping_time_' + productID).attr("required", true);
                 $('.product_item_' + productID).show();
             } else {
                 $('.aliexpress_url_' + productID).attr("required", false);
@@ -173,6 +279,7 @@
                 $('.variants_you_sell_' + productID).attr("required", false);
                 $('.countries_you_ship_' + productID).attr("required", false);
                 $('.cost_per_unit_' + productID).attr("required", false);
+                $('.shipping_time_' + productID).attr("required", false);
                 $('.product_item_' + productID).hide();
             }
         });
@@ -195,7 +302,7 @@
                 alert("Please enter valid phone number");
                 return false;
             }
-            
+
             var validateData = false;
             $('.flag_checkbox').each(function () {
                 if (this.checked) {

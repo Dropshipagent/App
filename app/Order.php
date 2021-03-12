@@ -16,7 +16,7 @@ class Order extends Model {
      * @var array
      */
     protected $fillable = [
-        'store_domain', 'order_id', 'order_number', 'email', 'cust_fname', 'payment_gateway', 'financial_status', 'order_value', 'order_status', 'ship_to', 'items', 'assign_shipper', 'shipping_method', 'created_at', 'updated_at',
+        'store_domain', 'order_id', 'order_number', 'email', 'cust_fname', 'payment_gateway', 'financial_status', 'order_value', 'order_status', 'ship_to', 'items', 'assign_supplier', 'shipping_method', 'created_at', 'updated_at',
     ];
 
     /**
@@ -103,7 +103,7 @@ class Order extends Model {
      *
      * @return \Illuminate\Http\Response
      */
-    static function create_orders_csv($store_domain, $minlimit = NULL) {
+    static function create_orders_csv($store_domain, $minlimit = NULL, $assign_supplier = 1) {
         $fileNameCsv = "orders_export_" . time() . ".csv";
         //get max id which will save into export csv log
         $maxIDVal = OrderItem::where(['store_domain' => $store_domain])->max('id');
@@ -114,13 +114,13 @@ class Order extends Model {
         } else {
             $orderItems = OrderItem::where(['store_domain' => $store_domain])->with(['orderdetail'])->get();
         }
-        //update assign shipper 
+        //update assign supplier 
         $odrIdArr = [];
         foreach ($orderItems as $orderIdList) {
             $odrIdArr[] = $orderIdList->order_id;
         }
         $odrIdArr = array_merge($odrIdArr);
-        Order::whereIn('order_id', $odrIdArr)->update(['assign_shipper' => 1]);
+        Order::whereIn('order_id', $odrIdArr)->update(['assign_supplier' => $assign_supplier]);
 
         //create csv file code
         $view = View::make('export.csvorderlist', ['orderItems' => $orderItems]);
@@ -149,7 +149,7 @@ class Order extends Model {
         $variant_id_arr = [];
         $invoice_items = [];
         foreach ($ordersID as $key => $val) {
-            $order = Order::where("order_id", $val)->where("assign_shipper", 1)->where('store_domain', $storeData->username)->first();
+            $order = Order::where("order_id", $val)->where("assign_supplier", 1)->where('store_domain', $storeData->username)->first();
             $orderItems = OrderItem::with(['productdetail'])->where("order_id", $val)->where('store_domain', $storeData->username)->get();
             foreach ($orderItems as $item) {
                 if (isset($item->productdetail->base_price) && $item->productdetail->product_status == 3) {

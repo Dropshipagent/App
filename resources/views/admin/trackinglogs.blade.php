@@ -8,8 +8,8 @@
         <small>list of all tracking info.</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="{{ url('/shipper/home') }}"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li><a href="{{ url('/shipper/stores') }}">Mapped Stores</a></li>
+        <li><a href="{{ url('/supplier/home') }}"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li><a href="{{ url('/supplier/stores') }}">Mapped Stores</a></li>
     </ol>
 </section>
 <section class="content">

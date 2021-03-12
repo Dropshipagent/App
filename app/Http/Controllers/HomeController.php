@@ -78,18 +78,18 @@ class HomeController extends Controller {
             $cron_options = NULL;
         }
         if (isset($request->product_status)) {
-            $productsData = [];
             foreach ($request->product_status as $key => $val) {
-                $productsData[$val] = [
+                //change product status
+                Product::where('id', $val)->update([
+                    'product_status' => 1,
                     'aliexpress_url' => $request->aliexpress_url[$val],
                     'orders_per_day' => $request->orders_per_day[$val],
                     'variants_you_sell' => $request->variants_you_sell[$val],
                     'countries_you_ship' => $request->countries_you_ship[$val],
                     'cost_per_unit' => $request->cost_per_unit[$val],
-                ];
+                    'shipping_time' => $request->shipping_time[$val],
+                ]);
             }
-            $products_data = json_encode($productsData);
-            $input['products_data'] = $products_data;
         }
         $input['cron_options'] = $cron_options;
         if (Auth::user()->status < 0) {
@@ -114,6 +114,7 @@ class HomeController extends Controller {
                     // Never reached
                 }
 
+
                 //send email to admin
                 $data = [];
                 $data['receiver_name'] = "Admin";
@@ -129,12 +130,12 @@ class HomeController extends Controller {
                     // Never reached
                 }
 
-                //change product status
-                Product::whereIn('id', $request->product_status)->update(['product_status' => 1]);
+                //send notification to admin 
+                Notification::addNotificationFromAllPanel(helGetAdminID(), "A new store [" . auth()->user()->username . "] request for product approval", auth()->user()->id);
                 //get the all remainig temp product and delete based on id array
                 $tempProducts = Product::where(['store_domain' => auth()->user()->username, 'product_status' => 0])->get(['id']);
                 Product::destroy($tempProducts->toArray());
-
+                NotificationStatus::create(['user_id' => Auth::user()->id, 'not_id' => 0]);
                 return redirect('profile-status?currency=' . $request->currency_code);
             } else {
                 return redirect('my-account?currency=' . $request->currency_code)->with('success', 'Account updated successfully!');

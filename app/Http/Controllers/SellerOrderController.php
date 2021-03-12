@@ -11,7 +11,9 @@ use App\Order;
 use App\Product;
 use App\Store;
 use App\UserProvider;
+use App\Invoice;
 use App\StoreInvoice;
+use App\AdminSetting;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -57,19 +59,19 @@ class SellerOrderController extends Controller {
             }
         }
         /**
-         * Method user for show list of all created invoices by logged in shipper
+         * Method user for show list of all created invoices by logged in supplier
          *
          * @return \Illuminate\Http\Response
          */
         $login_user = auth()->user()->username;
+        $storeInvoices = Invoice::where(['store_domain' => $login_user])->count();
+        $uploadedTracking = StoreInvoice::where(['store_domain' => $login_user])->where('tracking_number', '!=', null)->count();
+        $orders = Order::where('store_domain', $login_user)->count();
         $products = Product::where('store_domain', $login_user)->where('product_status', '!=', 0)->count();
         $flagProducts = Product::where(['store_domain' => $login_user, 'product_status' => 3])->count();
-        $storeInvoices = StoreInvoice::with(['orderdetail' => function($query) {
-                        $query->with(['itemsarr' => function($query) {
-                                $query->with('productdetail');
-                            }]);
-                    }])->where(['store_domain' => $login_user])->orderBy('created_at', 'desc')->count();
-        return view('home', ['flagProducts' => $flagProducts, 'products' => $products, 'storeInvoices' => $storeInvoices]);
+        $adminAcceptedProducts = Product::where(['store_domain' => $login_user, 'product_status' => 2])->count();
+        $adminSettings = AdminSetting::select('store_news')->first();
+        return view('home', ['storeInvoices' => $storeInvoices, 'uploadedTracking' => $uploadedTracking, 'orders' => $orders, 'flagProducts' => $flagProducts, 'adminAcceptedProducts' => $adminAcceptedProducts, 'adminSettings' => $adminSettings]);
     }
 
     /**

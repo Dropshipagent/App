@@ -18,7 +18,7 @@
                                                 <table style="background-clip:padding-box;border-collapse:collapse;border-color:rgb(221,221,221);border-radius:0px 0px 3px 3px;border-width:0px 1px 1px;width:100%;border-style:solid" cellspacing="0" cellpadding="0" border="0">
                                                     <tbody><tr>
                                                             <td style="background:white;background-clip:padding-box;border-radius:0 0 3px 3px;color:#525252;font-size:15px;line-height:22px;overflow:hidden;padding:40px 40px 30px" bgcolor="white">
-                                                                <p>Hello {{ $data['message']['shipper_name'] }},<br></p>
+                                                                <p>Hello {{ $data['message']['supplier_name'] }},<br></p>
                                                                 <p>{{ $data['message']['message_body'] }}</p>
                                                                 <p>Click <a target="_blank" href="{{ $data['message']['file_url'] }}">here</a> to download CSV file.</p>
                                                                 <p>Regards, your {{ config('app.name') }}.</p><center>

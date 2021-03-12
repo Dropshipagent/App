@@ -8,7 +8,7 @@
                 <img src="{{ asset('admin/dist/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image">
             </div>
             <div class="pull-left info">
-                <p>{{ Auth::user()->name }}</p>
+                <p class="text-capitalize">{{ Auth::user()->name }}</p>
             </div>
         </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
@@ -43,9 +43,9 @@
                     <span data-toggle="tooltip" title="" class="badge bg-red notCountShow">0</span>
                 </a>
             </li>
-            @if(helGetShipperID(Auth::user()->id) > 0)
+            @if(helGetSupplierID(Auth::user()->id) > 0)
             <li>
-                <a href="javascript::void(0)" target="_blank" onClick="window.open('{{ url('chats', helGetShipperID(Auth::user()->id)) }}', 'pagename', 'resizable,height=560,width=430'); return false;" title="Start Chat with Shipper">
+                <a href="javascript::void(0)" target="_blank" onClick="window.open('{{ url('chats', helGetSupplierID(Auth::user()->id)) }}', 'pagename', 'resizable,height=560,width=430'); return false;" title="Start Chat with Supplier">
                     <i class="fa fa-comments-o"></i> <span>Quick Chat</span> 
                     <span data-toggle="tooltip" title="" class="badge bg-red msgCountShow">0</span>
                 </a>

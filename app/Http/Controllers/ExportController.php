@@ -38,7 +38,7 @@ class ExportController extends Controller {
                 //dd($cronjson);
                 if ((array_key_exists('daily', $cronjson) && $cronjson['daily'] == 'yes') || (array_key_exists($crrDay, $cronjson) && $cronjson[$crrDay] == 'yes')) {
                     //get highest orderitem id from CronorderLog table
-                    $cronorder_log = CronorderLog::where(['shipper_id' => $storeMapping->shipper_id, 'store_domain' => $storeMapping->store_domain])->max('cron_last_order');
+                    $cronorder_log = CronorderLog::where(['supplier_id' => $storeMapping->supplier_id, 'store_domain' => $storeMapping->store_domain])->max('cron_last_order');
                     //get max id which will save into export csv log
                     $maxIDVal = OrderItem::where(['store_domain' => $storeMapping->store_domain])->max('id');
                     if ($maxIDVal > $cronorder_log) {
@@ -47,29 +47,29 @@ class ExportController extends Controller {
                         if ($fileNameRespoArr) {
                             $cronorder_log = new CronorderLog;
                             $cronorder_log->store_id = $storeMapping->store_id;
-                            $cronorder_log->shipper_id = $storeMapping->shipper_id;
+                            $cronorder_log->supplier_id = $storeMapping->supplier_id;
                             $cronorder_log->store_domain = $storeMapping->store_domain;
                             $cronorder_log->cron_last_order = $fileNameRespoArr->maxIDVal;
                             $cronorder_log->csv_file_name = "$fileNameRespoArr->csvFileName";
                             $cronorder_log->save();
 
                             //save order to csv logs
-                            ExportOrderCsvLog::createNewLog($storeMapping->store_id, $storeMapping->shipper_id, $storeMapping->store_domain, $fileNameRespoArr->csvFileName);
+                            ExportOrderCsvLog::createNewLog($storeMapping->store_id, $storeMapping->supplier_id, $storeMapping->store_domain, $fileNameRespoArr->csvFileName);
 
-                            //send email to shipper
-                            $getShipperData = User::find($storeMapping->shipper_id);
+                            //send email to supplier
+                            $getSupplierData = User::find($storeMapping->supplier_id);
                             $attachFileURL = url('/storage/ordercsv/' . $fileNameRespoArr->csvFileName);
 
                             $data = [];
-                            $data['shipper_name'] = $getShipperData->name;
+                            $data['supplier_name'] = $getSupplierData->name;
                             $data['message_body'] = "New order assigned by assigned order CRON. Please check the attached CSV.";
                             $data['file_url'] = $attachFileURL;
 
                             $email_data['message'] = $data;
-                            $email_data['subject'] = 'Assign order to shipper cron';
+                            $email_data['subject'] = 'Assign order to supplier cron';
                             $email_data['layout'] = 'emails.assignorder';
                             try {
-                                Mail::to($getShipperData->email)->send(new SendMailable($email_data));
+                                Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
                             } catch (\Exception $e) {
                                 // Never reached
                             }

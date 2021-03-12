@@ -3,7 +3,7 @@
         <th>Item Name</th>
         <th>Qty.</th>
         <th>Price</th>
-        <th>Shipper Price</th>
+        <th>Supplier Price</th>
     </tr>
     <?php
     $total_amount = 0;
@@ -16,8 +16,8 @@
         <td>{{ currency(($item->price*$item->quantity), 'USD', currency()->getUserCurrency()) }}</td>
         <td>
             <?php
-            $shipperPriceArr = json_decode($Invoice->invoice_data, true);
-            $variantPriceByAdmin = $shipperPriceArr[$item->variant_id];
+            $supplierPriceArr = json_decode($Invoice->invoice_data, true);
+            $variantPriceByAdmin = $supplierPriceArr[$item->variant_id];
 
             $adminComisonArr = json_decode($Invoice->commission_data, true);
             $variantCommissionByAdmin = $adminComisonArr[$item->variant_id];

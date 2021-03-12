@@ -11,9 +11,11 @@
                     <li class="active"><a href="#sent_noti" data-toggle="tab">Sent</a></li>
                     <li><a href="#received_noti" data-toggle="tab">Received</a></li>
                 </ul>
+                @if(helGetSupplierID(Auth::user()->id) > 0)
                 <div class="pull-right" style="position: absolute; right:20px; top:6px;">
                     <a href="{{ url('/storenotifications/create') }}" class="btn btn-block btn-danger btn-sm">Send Notification</a>
                 </div>
+                @endif
                 <div class="tab-content">
                     <div class="tab-pane active" id="sent_noti">
                         <table id="sent_notiData" class="table table-hover">

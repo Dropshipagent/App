@@ -38,7 +38,7 @@ class VerifyStoreIsSubscribed
         ];
 
         if(\App::environment('local')) {
-            $options['test'] = false;
+            $options['test'] = true;
         }
 
         return \ShopifyBilling::driver('RecurringBilling')

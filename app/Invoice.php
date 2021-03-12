@@ -14,10 +14,10 @@ class Invoice extends Model {
      * @var array
      */
     protected $fillable = [
-        'shipper_id', 'store_domain', 'order_ids', 'store_invoice_ids', 'admin_price_total', 'admin_commission_total', 'invoice_total', 'paid_status', 'auth_code', 'trans_id', 'notes'];
+        'supplier_id', 'store_domain', 'order_ids', 'store_invoice_ids', 'admin_price_total', 'admin_commission_total', 'invoice_total', 'other_charges_description', 'other_charges', 'paid_status', 'auth_code', 'trans_id', 'notes'];
 
-    static function show_invoice_data($shipper_id, $invoiceIDs = NULL) {
-        $InvoiceData = StoreInvoice::with(['orderdetail'])->where('shipper_id', $shipper_id)->whereIn('id', $invoiceIDs)->get();
+    static function show_invoice_data($supplier_id, $invoiceIDs = NULL) {
+        $InvoiceData = StoreInvoice::with(['orderdetail'])->where('supplier_id', $supplier_id)->whereIn('id', $invoiceIDs)->get();
         $variant_id_arr = [];
         $invoice_items = [];
         foreach ($InvoiceData as $Invoice) {

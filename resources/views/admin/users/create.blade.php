@@ -6,8 +6,8 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        Create Shipper
-        <small>add new shipper details</small>
+        Create Supplier
+        <small>add new supplier details</small>
     </h1>
     <ol class="breadcrumb">
         <li><a href="{{ url('/admin/home') }}"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -64,7 +64,7 @@
             </div>
             <div class="form-group">
                 <strong>Tags:</strong><br>
-                <strong>Use "Enter" key to add a variation tag for this shipper</strong><br>
+                <strong>Use "Enter" key to add a variation tag for this supplier</strong><br>
                 {!! Form::text('tags', null, array('placeholder' => 'Tags','class' => 'form-control','data-role' => 'tagsinput')) !!}
             </div>
             <div class="form-group">

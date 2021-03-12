@@ -12,7 +12,7 @@ class CronorderLog extends Model {
      * @var array
      */
     protected $fillable = [
-        'store_id', 'shipper_id', 'store_domain', 'cron_last_order', 'csv_file_name',
+        'store_id', 'supplier_id', 'store_domain', 'cron_last_order', 'csv_file_name',
     ];
 
 }
