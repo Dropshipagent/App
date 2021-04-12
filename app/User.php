@@ -23,7 +23,7 @@ class User extends Authenticatable {
         'tags' => 'required',
     ];
     protected $fillable = [
-        'name', 'username', 'email', 'phone_code', 'phone', 'tags', 'role', 'status', 'get_order', 'export_orders_from', 'password', 'auth_code', 'trans_id', 'charge_id', 'currency_code', 'location_id', 'cron_options', 'city', 'state', 'country', 'zip_code', 'address', 'is_same_address', 'billing_city', 'billing_state', 'billing_country', 'billing_zip_code', 'billing_address', 'is_deleted'];
+        'name', 'username', 'email', 'phone_code', 'phone', 'tags', 'role', 'status', 'get_order', 'export_orders_from', 'password', 'auth_code', 'trans_id', 'charge_id', 'currency_code', 'location_id', 'cron_options', 'city', 'state', 'country', 'zip_code', 'address', 'is_same_address', 'billing_city', 'billing_state', 'billing_country', 'billing_zip_code', 'billing_address', 'intro_video_status', 'is_deleted'];
 
     /**
      * The attributes that should be hidden for arrays.

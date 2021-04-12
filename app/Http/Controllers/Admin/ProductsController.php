@@ -203,6 +203,11 @@ class ProductsController extends Controller {
         $input['admin_commission'] = json_encode($adminComisonPriceArr);
         if ($product->fill($input)->save()) {
             $getStoreData = helGetStoreDATA($input['store_domain']);
+            //Update user status with product approval
+            if ($getStoreData->status < 1) {
+                $userUpdate['status'] = 1;
+                $getStoreData->fill($userUpdate)->save();
+            }
             if ($input['current_product_status'] == 1) {
                 //send email when first time approved the product by the admin
                 $data = [];
@@ -220,7 +225,7 @@ class ProductsController extends Controller {
                 }
 
                 //notification for store owner
-                Notification::addNotificationFromAllPanel($getStoreData->id, 'Product "' . $input['title'] . '" best price submitted by admin', auth()->user()->id);
+                Notification::addNotificationFromAllPanel($getStoreData->id, 'Product "' . $input['title'] . '" best price submitted by admin', auth()->user()->id, $getStoreData->id, 'PRODUCT_ACCEPTED_BY_ADMIN');
             } else {
                 //send email when admin update any product price after accept
                 $data = [];

@@ -10,6 +10,7 @@ use App\Store;
 use App\OrderItem;
 use App\Invoice;
 use App\StoreInvoice;
+use App\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -295,8 +296,13 @@ class OrdersController extends Controller {
         $invoiceIDs = json_decode($invoice->store_invoice_ids, true);
         StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => $request->status]);
 
-        //send payment status email to supplier
+        //get supplier data
         $getSupplierData = helGetSupplierDATA($invoice->store_domain);
+
+        //send notification to admin 
+        Notification::addNotificationFromAllPanel($getSupplierData->id, "Invoice paid for (" . $invoice->store_domain . ")", helGetAdminID(), $invoice->id, 'INVOICE_PAID');
+
+        //send payment status email to supplier
         $data = [];
         $data['receiver_name'] = $getSupplierData->name;
         $data['receiver_message'] = "Admin has changed invoice status paid of invoice id :: " . $invoice->id;

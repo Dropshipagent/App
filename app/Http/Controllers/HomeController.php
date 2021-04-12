@@ -131,7 +131,7 @@ class HomeController extends Controller {
                 }
 
                 //send notification to admin 
-                Notification::addNotificationFromAllPanel(helGetAdminID(), "A new store [" . auth()->user()->username . "] request for product approval", auth()->user()->id);
+                Notification::addNotificationFromAllPanel(helGetAdminID(), "You have a new quote request", auth()->user()->id, auth()->user()->id, 'NEW_STORE_CREATED');
                 //get the all remainig temp product and delete based on id array
                 $tempProducts = Product::where(['store_domain' => auth()->user()->username, 'product_status' => 0])->get(['id']);
                 Product::destroy($tempProducts->toArray());
@@ -221,6 +221,21 @@ class HomeController extends Controller {
             return $return;
         }
         return view('showtrackinglog');
+    }
+
+    /**
+     * change intro video status
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function intro_video_status_change(Request $request) {
+        $userID = $request->user_id;
+        User::where('id', $userID)->update(['intro_video_status' => '1']);
+        return response()->json([
+                    'data' => [
+                        'success' => TRUE,
+                    ]
+        ]);
     }
 
 }

@@ -25,8 +25,9 @@ class NotificationsController extends Controller {
                 ->orderBy('created_at', 'desc');
         $notMaxID = $recNotifications->max('id');
         $recNotifications = $recNotifications->get();
-
-
+        $recNotifications->map(function ($recNotifications) {
+            $recNotifications['notification_url'] = Notification::createNotificationUrlForAdmin($recNotifications->id);
+        });
         return view('admin.notifications.index', ['notifications' => $notifications, 'notMaxID' => $notMaxID, 'recNotifications' => $recNotifications]);
     }
 
@@ -136,6 +137,37 @@ class NotificationsController extends Controller {
                     'data' => [
                         'success' => TRUE,
                         'not_count' => $notificationsCount,
+                    ]
+        ]);
+    }
+
+    /**
+     * Get unread notifications Data
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function notifications_unread(Request $request) {
+        $notificationsData = [];
+        $userID = $request->user_id;
+        $notification_status = NotificationStatus::where('user_id', $userID)->orderBy('created_at', 'desc')->first();
+        if ($notification_status) {
+            $userCreDate = $notification_status->updated_at;
+            $notifications = Notification::where('user_id', $userID)
+                            ->where('created_at', '>=', $userCreDate)->orderBy('id', 'desc');
+            $notificationsData = $notifications->limit(5)->get();
+            $notMaxID = $notifications->max('id');
+            $notification_status->not_id = $notMaxID;
+            $notification_status->save();
+            $notificationsData->map(function ($notificationsData) {
+                $notificationsData['notification_url'] = Notification::createNotificationUrlForAdmin($notificationsData->id);
+            });
+            $notificationData = $notificationsData->toArray();
+        }
+        return response()->json([
+                    'data' => [
+                        'success' => TRUE,
+                        'notifications' => $notificationsData,
                     ]
         ]);
     }

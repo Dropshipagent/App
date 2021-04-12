@@ -14,6 +14,7 @@ use App\UserProvider;
 use App\Invoice;
 use App\StoreInvoice;
 use App\AdminSetting;
+use App\News;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -71,7 +72,8 @@ class SellerOrderController extends Controller {
         $flagProducts = Product::where(['store_domain' => $login_user, 'product_status' => 3])->count();
         $adminAcceptedProducts = Product::where(['store_domain' => $login_user, 'product_status' => 2])->count();
         $adminSettings = AdminSetting::select('store_news')->first();
-        return view('home', ['storeInvoices' => $storeInvoices, 'uploadedTracking' => $uploadedTracking, 'orders' => $orders, 'flagProducts' => $flagProducts, 'adminAcceptedProducts' => $adminAcceptedProducts, 'adminSettings' => $adminSettings]);
+        $news = News::orderBy("id", "desc")->get();
+        return view('home', ['storeInvoices' => $storeInvoices, 'uploadedTracking' => $uploadedTracking, 'orders' => $orders, 'flagProducts' => $flagProducts, 'adminAcceptedProducts' => $adminAcceptedProducts, 'adminSettings' => $adminSettings, 'news_data' => $news]);
     }
 
     /**

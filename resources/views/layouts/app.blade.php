@@ -39,12 +39,59 @@
         @yield('script')
         <script type="text/javascript">
             $(document).ready(function () {
+<?php
+$settingData = getAdminSettingData();
+if (auth()->user()->status == 1 && auth()->user()->intro_video_status == 0 && $settingData['intro_video_url']) {
+    ?>
+                    showIntroPopup('<?php echo $settingData['intro_video_url']; ?>');
+<?php } ?>
+
                 notDelaySuccess();
                 var delay = 10000;
                 setInterval(function () {
                     notDelaySuccess();
                 }, delay);
+                $(".notifications-menu").click(function () {
+                    var userID = '{{ auth()->user()->id }}';
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ url("notifications_unread") }}',
+                        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                        data: {"user_id": userID},
+                        success: function (data) {
+                            if (data.data.success) {
+                                if (data.data.notifications && data.data.notifications.length > 0) {
+                                    $("#notification_list_header").html('');
+                                    $.each(data.data.notifications, function (i, item) {
+                                        if(item.notification_url!="") {
+                                            url = "{!!url('"+ item.notification_url +"')!!}";
+                                        } else {
+                                            url = "{{ url('storenotifications')}}";
+                                        }
+                                        $("#notification_list_header").append('<li><a href="' + url + '">' + item.notifications + '</a></li>');
+                                    });
+                                }
+                            }
+                        }
+                    });
+                });
             });
+            function showIntroPopup(video_url) {
+                showAlertMessage('<iframe width="560" height="315" src="' + video_url + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', 'Intro Video');
+                $("#alertMessageModal").on('hidden.bs.modal', function (e) {
+                    $("#alertMessageModal iframe").attr("src", $("#alertMessageModal iframe").attr("src"));
+                });
+                var userID = '{{ auth()->user()->id }}';
+                 $.ajax({
+                 type: 'POST',
+                 url: '{{ url("intro_video_status_change") }}',
+                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                 data: {"user_id": userID},
+                 success: function (data) {
+                 
+                 }
+                 });
+            }
             function notDelaySuccess() {
                 var userID = '{{ auth()->user()->id }}';
                 $.ajax({

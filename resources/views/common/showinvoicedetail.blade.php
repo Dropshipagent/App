@@ -1,4 +1,5 @@
-@extends('layouts.app')
+<?php $layout = 'layouts.app'; if(auth()->user()->role == 1) { $layout = 'admin.layouts.app';  } if(auth()->user()->role == 3) { $layout = 'supplier.layouts.app';  } ?>
+@extends($layout)
 @section('title', 'Invoice Detail')
 @section('main-content')
 <!-- Content Header (Page header) -->

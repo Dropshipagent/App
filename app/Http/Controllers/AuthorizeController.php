@@ -450,9 +450,11 @@ We would like to thank you and say it's a pleasure doing business with you. If y
                         // Never reached
                     }
 
-                    //send notification to admin and supplier
-                    Notification::addNotificationFromAllPanel(helGetSupplierID(auth()->user()->id), 'New invoice paid :: ' . $invoiceData->id, auth()->user()->id);
-                    Notification::addNotificationFromAllPanel(helGetAdminID(), 'New invoice paid :: ' . $invoiceData->id, auth()->user()->id);
+                    //send notification to store owner
+                    Notification::addNotificationFromAllPanel(auth()->user()->id, 'Invoice paid successfully', helGetAdminID(), $invoiceData->id, 'INVOICE_PAID');
+
+                    //send notification to admin
+                    Notification::addNotificationFromAllPanel(helGetAdminID(), 'Invoice (' . $invoiceData->id . ') paid successfully', auth()->user()->id, $invoiceData->id, 'INVOICE_PAID');
 
                     //send email to admin
                     $data = [];

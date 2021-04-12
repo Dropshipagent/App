@@ -9,6 +9,7 @@ use App\OrderItem;
 use App\CronorderLog;
 use App\StoreMapping;
 use App\Invoice;
+use App\Notification;
 use App\StoreInvoice;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailable;
 use PDF;
+use Session;
 
 class OrdersController extends Controller {
 
@@ -259,6 +261,15 @@ class OrdersController extends Controller {
             } catch (\Exception $e) {
                 // Never reached
             }
+            $adminNotification = "New Invoice Created for (" . $user->username . ").";
+            if ($main_invoice->other_charges > 0) {
+                $adminNotification .= " A supplier added on charges on the invoice Other charges:: " . $main_invoice->other_charges;
+            }
+            //send notification to store owner
+            Notification::addNotificationFromAllPanel($user->id, "Invoice Received", auth()->user()->id, $main_invoice->id, 'INVOICE_CREATED');
+
+            //send notification to admin 
+            Notification::addNotificationFromAllPanel(helGetAdminID(), $adminNotification, auth()->user()->id, $main_invoice->id, 'INVOICE_CREATED');
 
             return redirect('supplier/bluckinvoice/' . $user->id)->with('success', 'Invoice created successfully of selected orders!');
         }
@@ -667,7 +678,7 @@ class OrdersController extends Controller {
             }
 
             foreach ($sheetData as $dataSingle) {
-                if (is_numeric($dataSingle[0]) && $dataSingle[0] > 0 && !empty(trim($dataSingle[1])) && !empty(trim($dataSingle[2])) && !empty(trim($dataSingle[3]))) {
+                if (!empty(trim($dataSingle[0])) && !empty(trim($dataSingle[1])) && !empty(trim($dataSingle[2])) && !empty(trim($dataSingle[3]))) {
                     //get invoice data of uploaded order id
                     $getInvoice = StoreInvoice::where("order_number", $dataSingle[0])->where("fulfillment_status", "!=", "fulfilled")->where("paid_status", 2)->whereIn('store_domain', $storeArr)->first();
                     if ($getInvoice) {
@@ -717,6 +728,9 @@ class OrdersController extends Controller {
                             }
                         }
 
+                        //Send notifiction to store owner
+                        Notification::addNotificationFromAllPanel($uUser->id, "Tracking has been uploaded for order (" . $dataSingle[0] . ")", helGetAdminID(), 0, 'TRACKING_UPLOADED');
+
                         //send email code
                         $email_data['message'] = $data;
                         $email_data['subject'] = 'Tracking info for order :: ' . $dataSingle[0];
@@ -729,6 +743,12 @@ class OrdersController extends Controller {
                     }
                 }
             }
+            //Send notifiction to supplier ownself
+            Notification::addNotificationFromAllPanel(auth()->user()->id, "Tracking uploaded successfully", Session::get('selected_store_id'), 0, 'TRACKING_UPLOADED');
+
+            //Send notifiction to admin
+            Notification::addNotificationFromAllPanel(helGetAdminID(), "Tracking uploaded for (" . helGetUsernameById(Session::get('selected_store_id')) . ")", auth()->user()->id, 0, 'TRACKING_UPLOADED');
+
             return redirect('supplier/uploadtracking')->with('success', 'Tracking Updated Successfully!');
         } else {
             return redirect('supplier/uploadtracking')->with('error', 'Accept only .csv/.xls file format!');

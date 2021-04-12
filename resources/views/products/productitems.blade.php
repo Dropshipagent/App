@@ -1,8 +1,7 @@
 <table class="table table-hover">
     <tr>
         <th>Item Name</th>
-        <th>Sell Price</th>
-        <th>Buy Price</th>
+        <th>Sourced Price</th>
     </tr>
     <?php
     $variantsArr = json_decode($store_product->variants);
@@ -17,7 +16,7 @@
             $basePrice = 0;
             $adminComisonPrice = 0;
         }
-        echo '<tr><td>' . $variant->title . '</td><td>' . $variant->price . '</td><td>' . number_format(($basePrice + $adminComisonPrice), 2) . '</td></tr>';
+        echo '<tr><td>' . $variant->title . '</td><td>' . number_format(($basePrice + $adminComisonPrice), 2) . '</td></tr>';
     }
     ?>
 </table>

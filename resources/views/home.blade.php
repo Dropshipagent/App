@@ -104,8 +104,30 @@
         <div class="box-body">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="text-uppercase text-center">LATEST <span class="color_ye">DROPSHIP</span>AGENT NEWS</h1>
-                    {!!$adminSettings->store_news!!}
+                    <h1 class="text-uppercase text-center mb-3">LATEST <span class="color_ye">DROPSHIP</span>AGENT NEWS</h1>
+
+                    @foreach($news_data as $news)
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="card">
+                            <div class="view overlay">
+                                <?php $imageurl = ($news->image) ?  url('storage/news/images/'.$news->image) :  url('img/no-mage.jpg'); ?>
+                                <img class="card-img-top img-fluid img-thumbnail" src="{{ $imageurl }}" alt="Card image cap">
+                                <a href="#!">
+                                    <div class="mask rgba-white-slight waves-effect waves-light"></div>
+                                </a>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title">{{ $news->title }}</h4>
+                                <?php if($news->title) { ?>
+                                <div class="card-text"><?php echo $news->description; ?></div>
+                                <?php } ?>
+                                
+                                <a href="{{ $news->link }}" class="btn btn-primary waves-effect waves-light" target="_blank">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    @endforeach
                 </div>
             </div>
         </div>

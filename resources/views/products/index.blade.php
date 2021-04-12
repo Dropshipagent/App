@@ -11,11 +11,31 @@
             <div class="panel panel-default credit-card-box">
                 <div class="panel-body">
                     <div>
-                        <h3>Dear store owner, </h3>
-                        <p>DS Admin has approved your request and suggested the following price. Once you approve, you can complete the last step of registration by paying the initiation fee.</p>
+                        <h3>You have been accepted!</h3>
+                        <p>We have approved your request. Please see the quoted price below.<br>You can complete the sign up by clicking the "accept product" button.</p>
+                        <?php
+                        $totalPrice = 0.00;
+                        if ($adminApprovedLastProduct) {
+                            $variantsArr = json_decode($adminApprovedLastProduct->variants);
+                            $basePriceArr = json_decode($adminApprovedLastProduct->base_price, true);
+                            $adminComisonPriceArr = json_decode($adminApprovedLastProduct->admin_commission, true);
+                            foreach ($variantsArr as $variant) {
+                                //print_r($basePriceArr); die;
+                                if (isset($basePriceArr[$variant->id])) {
+                                    $basePrice = $basePriceArr[$variant->id];
+                                    $adminComisonPrice = $adminComisonPriceArr[$variant->id];
+                                } else {
+                                    $basePrice = 0;
+                                    $adminComisonPrice = 0;
+                                }
+                                $totalPrice += number_format(($basePrice + $adminComisonPrice), 2);
+                            }
+                        }
+                        ?>
+                        <p>Sourced Price: ${{ $totalPrice }}</p>
+                        <p>Shipping Time: <?php echo ($adminApprovedLastProduct && $adminApprovedLastProduct->shipping_time) ? $adminApprovedLastProduct->shipping_time : "" ?></p>
                         <p>We look forward to having you onboard.</p>
-                        <p>Regards,<br>
-                            Team Dropship Agent</p>
+                        <p>Regards,<br>Dropship Agent Team</p>
                     </div>
                 </div>
             </div>        

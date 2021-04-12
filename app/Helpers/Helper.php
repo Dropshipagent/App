@@ -2,6 +2,7 @@
 
 use App\StoreMapping;
 use App\User;
+use App\AdminSetting;
 use Twilio\Rest\Client;
 
 if (!function_exists('helGetAdminID')) {
@@ -42,6 +43,15 @@ if (!function_exists('helGetStoreDATA')) {
     function helGetStoreDATA($storeDomain) {
         $storeDATA = User::where(['username' => $storeDomain])->first();
         return $storeDATA;
+    }
+
+}
+
+if (!function_exists('helGetUsernameById')) {
+
+    function helGetUsernameById($id) {
+        $user = User::select('username')->where(['id' => $id])->first();
+        return $user->username;
     }
 
 }
@@ -105,6 +115,15 @@ if (!function_exists('helGetShippingTimeOption')) {
 
     function helGetShippingTimeOption() {
         return ['5-7 Days' => '5-7 Days', 'Regular 7-12 Days' => 'Regular 7-12 Days'];
+    }
+
+}
+
+if (!function_exists('getAdminSettingData')) {
+
+    function getAdminSettingData() {
+        $setting = AdminSetting::where('setting_id', 1)->first()->toArray();
+        return $setting;
     }
 
 }

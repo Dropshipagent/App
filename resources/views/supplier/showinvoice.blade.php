@@ -111,12 +111,9 @@
     $(document).ready(function () {
         //metod to do sum of all tax and other prices
         var subTotalVal = "{{ $main_invoice_total }}";
-        $('.tax_rate_box, .sales_tax_box, .other_charges_box').on('keyup', function () {
-            //alert(subTotalVal);
-            var taxRateBox = $('.tax_rate_box').val();
-            var salesTaxBox = $('.sales_tax_box').val();
+        $('.other_charges_box').on('keyup', function () {
             var otherChargesBox = $('.other_charges_box').val();
-            var totalVal = parseFloat(subTotalVal) + parseFloat(taxRateBox) + parseFloat(salesTaxBox) + parseFloat(otherChargesBox);
+            var totalVal = parseFloat(subTotalVal) + parseFloat(otherChargesBox);
             $('.invoice_total_box').text(totalVal.toFixed(2));
         });
 

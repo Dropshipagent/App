@@ -53,6 +53,9 @@ Route::post('messages_status', 'ChatsController@read_messages');
 Route::post('user_not_status', 'NotificationsController@read_notifications');
 Route::post('user_not_count', 'NotificationsController@notifications_count');
 Route::resource('storenotifications', 'NotificationsController');
+Route::post('notifications_unread', 'NotificationsController@notifications_unread');
+
+Route::post('intro_video_status_change', 'HomeController@intro_video_status_change');
 
 
 ######################## sopify store related routs ###################################
@@ -185,6 +188,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     Route::resource('notifications', 'Admin\NotificationsController');
     Route::post('user_not_status', 'Admin\NotificationsController@read_notifications');
     Route::post('user_not_count', 'Admin\NotificationsController@notifications_count');
+    Route::post('notifications_unread', 'Admin\NotificationsController@notifications_unread');
 
     Route::post('products/product-status', 'Admin\ProductsController@product_status');
     Route::get('products/index/{storeId}', 'Admin\ProductsController@index');
@@ -192,10 +196,13 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
 
     Route::any('/setting', 'Admin\SettingController@index');
     Route::any('/setting/{id}', 'Admin\SettingController@update');
+
+    Route::resource('/news', 'Admin\NewsController');
 });
 
 Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], function() {
     Route::get('home', 'Supplier\OrdersController@index');
+
     Route::get('set_store_session/{storeId}', 'Supplier\PageController@setStoreSession');
 
     Route::get('showcsvlogs/{storeId}', 'Supplier\OrdersController@showcsvlogs'); //csv list of store orders which is created only for loggedin supplier
@@ -216,4 +223,5 @@ Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], fun
     Route::resource('suppliernotifications', 'Supplier\NotificationsController');
     Route::post('user_not_status', 'Supplier\NotificationsController@read_notifications');
     Route::post('user_not_count', 'Supplier\NotificationsController@notifications_count');
+    Route::post('notifications_unread', 'Supplier\NotificationsController@notifications_unread');
 });

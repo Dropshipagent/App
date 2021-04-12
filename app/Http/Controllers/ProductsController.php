@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Product;
+use App\Notification;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -71,7 +72,11 @@ class ProductsController extends Controller {
                 }
                 $u['product_image'] = $imageData;
                 if ($product_action == 1) {
-                    $u['product_action'] = '<a href="javascript:void(0)" data-id="' . $product->id . '" class="btn btn-block btn-danger btn-sm accept_product">Accept Product</a>';
+                    if (auth()->user()->status == 1) {
+                        $u['product_action'] = '<a href="' . url('checkout') . '" class="btn btn-block btn-danger btn-sm">Accept Product</a>';
+                    } else {
+                        $u['product_action'] = '<a href="javascript:void(0)" data-id="' . $product->id . '" class="btn btn-block btn-danger btn-sm accept_product">Accept Product</a>';
+                    }
                 } else {
                     $u['product_action'] = "";
                 }
@@ -87,7 +92,8 @@ class ProductsController extends Controller {
             ];
             return $return;
         }
-        return view('products.index', ['store_domain' => $store_domain]);
+        $adminApprovedLastProduct = Product::where(['store_domain' => $store_domain, 'product_status' => 2])->orderBy('updated_at', 'desc')->first();
+        return view('products.index', ['store_domain' => $store_domain, 'adminApprovedLastProduct' => $adminApprovedLastProduct]);
     }
 
     /**
@@ -146,6 +152,8 @@ class ProductsController extends Controller {
                 ]);
             }
         }
+        //send notification to admin 
+        Notification::addNotificationFromAllPanel(helGetAdminID(), "You have a new quote request", auth()->user()->id, auth()->user()->id, 'NEW_PRODUCT_REQUEST');
         //get the all remainig temp product and delete based on id array
         $tempProducts = Product::where(['store_domain' => auth()->user()->username, 'product_status' => 0])->get(['id']);
         Product::destroy($tempProducts->toArray());
@@ -161,6 +169,8 @@ class ProductsController extends Controller {
     public function product_status(Request $request) {
         $product = Product::findOrFail($request->product_id);
         $product->product_status = 3;
+        //send notification to admin 
+        Notification::addNotificationFromAllPanel(helGetAdminID(), 'Quoted product [' . $product->title . '] accepted!', auth()->user()->id, auth()->user()->id, 'PRODUCT_ACCEPTED_BY_STORE');
 
         return response()->json([
                     'data' => [

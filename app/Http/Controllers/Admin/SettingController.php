@@ -23,6 +23,15 @@ class SettingController extends Controller {
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create() {
+        return view('admin.notifications.create');
+    }
+    
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -32,7 +41,7 @@ class SettingController extends Controller {
     public function update(Request $request, $id) {
         //dd($request->all());
         $validator = Validator::make($request->all(), [
-                    'store_news' => 'required',
+                    'intro_video_url' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -41,7 +50,7 @@ class SettingController extends Controller {
         } else {
 
             $AdminSetting = AdminSetting::find($id);
-            $AdminSetting->store_news = $request->store_news;
+            $AdminSetting->intro_video_url = $request->intro_video_url;
             $AdminSetting->save();
 
             $request->session()->flash('success', "Setting Update successfully.");

@@ -12,6 +12,7 @@ use App\StoreMapping;
 use App\CronorderLog;
 use App\Currency;
 use App\Product;
+use App\Notification;
 use App\ExportOrderCsvLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -204,6 +205,7 @@ class UsersController extends Controller {
                         } catch (\Exception $e) {
                             // Never reached
                         }
+                        Notification::addNotificationFromAllPanel($user->id, 'Store [' . $user->username . ']  approved by admin', auth()->user()->id, $user->id, 'NEW_STORE_ACCEPTED');
                         $response = ['success' => true, 'message' => 'Store approve successfully!'];
                     } else {
                         $response = ['success' => false, 'message' => 'Error to approve store!'];
@@ -257,41 +259,48 @@ class UsersController extends Controller {
                 $fileNameResponse = Order::create_orders_csv($request->store_domain, null, 0);
                 $fileNameRespoArr = json_decode($fileNameResponse);
                 if ($fileNameRespoArr) {
-                    $cronorder_log = new CronorderLog;
-                    $cronorder_log->store_id = $request->store_id;
-                    $cronorder_log->supplier_id = $request->supplier_id;
-                    $cronorder_log->store_domain = $request->store_domain;
-                    if ($fileNameRespoArr->maxIDVal) {
-                        $cronorder_log->cron_last_order = $fileNameRespoArr->maxIDVal;
-                    } else {
-                        $cronorder_log->cron_last_order = 0;
-                    }
-                    $cronorder_log->csv_file_name = "$fileNameRespoArr->csvFileName";
-                    $cronorder_log->save();
+                    //Get Supplier Data
+                    $getSupplierData = User::find($request->supplier_id);
 
-                    //save order to csv logs
-                    ExportOrderCsvLog::createNewLog($request->store_id, $request->supplier_id, $request->store_domain, $fileNameRespoArr->csvFileName);
+                    //Get Store Data
+                    $getStoreData = User::find($request->store_id);
+
+                    /* $cronorder_log = new CronorderLog;
+                      $cronorder_log->store_id = $request->store_id;
+                      $cronorder_log->supplier_id = $request->supplier_id;
+                      $cronorder_log->store_domain = $request->store_domain;
+                      if ($fileNameRespoArr->maxIDVal) {
+                      $cronorder_log->cron_last_order = $fileNameRespoArr->maxIDVal;
+                      } else {
+                      $cronorder_log->cron_last_order = 0;
+                      }
+                      $cronorder_log->csv_file_name = "$fileNameRespoArr->csvFileName";
+                      $cronorder_log->save();
+
+                      //save order to csv logs
+                      ExportOrderCsvLog::createNewLog($request->store_id, $request->supplier_id, $request->store_domain, $fileNameRespoArr->csvFileName); */
 
                     //send email to supplier
-                    $getSupplierData = User::find($request->supplier_id);
-                    $attachFileURL = url('/storage/ordercsv/' . $fileNameRespoArr->csvFileName);
+                    /* $attachFileURL = url('/storage/ordercsv/' . $fileNameRespoArr->csvFileName);
 
-                    $data = [];
-                    $data['supplier_name'] = $getSupplierData->name;
-                    $data['message_body'] = "<strong>Export:</strong> Your orders have finished exporting and are ready to download.";
-                    $data['file_url'] = $attachFileURL;
+                      $data = [];
+                      $data['supplier_name'] = $getSupplierData->name;
+                      $data['message_body'] = "<strong>Export:</strong> Your orders have finished exporting and are ready to download.";
+                      $data['file_url'] = $attachFileURL;
 
-                    $email_data['message'] = env('MAIL_FROM_NAME');
-                    $email_data['subject'] = 'Your export is ready';
-                    $email_data['layout'] = 'emails.assignorder';
-                    try {
-                        Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
-                    } catch (\Exception $e) {
-                        // Never reached
-                    }
+                      $email_data['message'] = env('MAIL_FROM_NAME');
+                      $email_data['subject'] = 'Your export is ready';
+                      $email_data['layout'] = 'emails.assignorder';
+                      try {
+                      Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
+                      } catch (\Exception $e) {
+                      // Never reached
+                      } */
+
+                    //send notification to admin 
+                    Notification::addNotificationFromAllPanel($getSupplierData->id, "You have been assigned to (" . $getStoreData->username . ")", helGetAdminID(), $getStoreData->id, 'ASSIGNED_TO_STORE');
 
                     //send email to new signup store
-                    $getStoreData = User::find($request->store_id);
                     $data = [];
                     $data['receiver_name'] = $getStoreData->name;
                     $data['receiver_message'] = "A new supplier assign by admin for your store :: " . $getStoreData->username;

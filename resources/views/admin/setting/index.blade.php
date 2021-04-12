@@ -11,7 +11,7 @@
 
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Setting Form</h3>
+                        <h3 class="card-title">Setting</h3>
                     </div>
                     <!-- /.card-header -->
                     <!-- form start -->
@@ -28,11 +28,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label>Store News</label>
-                                        <textarea name="store_news" class="form-control" rows="10">{{ (!empty($setting) && $setting->store_news!='')? $setting->store_news : old('store_news') }}</textarea>
-                                        @if ($errors->has('store_news'))
+                                        <label>Intro Video Url</label>
+                                        <input type="text" class="form-control" value="{{ (!empty($setting) && $setting->intro_video_url!='')? $setting->intro_video_url : old('intro_video_url') }}" name="intro_video_url" />
+                                        @if ($errors->has('intro_video_url'))
                                         <span class="help-block">
-                                            <strong>{{ $errors->first('store_news') }}</strong>
+                                            <strong class="text-danger">{{ $errors->first('intro_video_url') }}</strong>
                                         </span>
                                         @endif
                                     </div>

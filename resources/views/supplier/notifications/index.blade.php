@@ -9,34 +9,14 @@
         <div class="col-xs-12">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs">
-                    <li class="active"><a href="#sent_noti" data-toggle="tab">Sent</a></li>
-                    <li><a href="#received_noti" data-toggle="tab">Received</a></li>
+                    <li class="active"><a href="#received_noti" data-toggle="tab">Received</a></li>
+                    <li><a href="#sent_noti" data-toggle="tab">Sent</a></li>
                 </ul>
                 <div class="pull-right" style="position: absolute; right:20px; top:6px;">
                     <a href="{{ url('/supplier/suppliernotifications/create') }}" class="btn btn-block btn-danger btn-sm">Send Notification</a>
                 </div>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="sent_noti">
-                        <table id="sent_notiData" class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Notification For</th>
-                                    <th>Notification</th>
-                                    <th>Created</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($notifications as $notification)
-                                <tr>
-                                    <td>{{ $notification->userdetail->username }}</td>
-                                    <td>{{ $notification->notifications }}</td>
-                                    <td>{{ $notification->created_at }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tab-pane" id="received_noti">
+                    <div class="tab-pane active" id="received_noti">
                         <table id="received_notiData" class="table table-hover">
                             <thead>
                                 <tr>
@@ -51,12 +31,32 @@
                                     <td>
                                         <?php
                                         if (isset($notification->senduserdetail->username) && $notification->notification_by != 1) {
-                                            echo "From " . $notification->senduserdetail->username;
+                                            echo $notification->senduserdetail->username;
                                         } else {
-                                            echo "From Admin";
+                                            echo env('FOUNDER_NAME');
                                         }
                                         ?>
                                     </td>
+                                    <td><?php echo ($notification->notification_url != "") ? '<a href="' . url($notification->notification_url) . '">' . $notification->notifications . '</a>' : $notification->notifications ?></td>
+                                    <td>{{ $notification->created_at }}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tab-pane" id="sent_noti">
+                        <table id="sent_notiData" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Notification For</th>
+                                    <th>Notification</th>
+                                    <th>Created</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($notifications as $notification)
+                                <tr>
+                                    <td>{{ $notification->userdetail->username }}</td>
                                     <td>{{ $notification->notifications }}</td>
                                     <td>{{ $notification->created_at }}</td>
                                 </tr>

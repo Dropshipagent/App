@@ -22,7 +22,7 @@ class NotificationsController extends Controller {
         $userCreDate = auth()->user()->created_at;
         $notifications = Notification::with(["userdetail"])->where(['notification_by' => $store_id])->orderBy('created_at', 'desc')->get();
 
-        $recNotifications = Notification::with(["userdetail"])
+        $recNotifications = Notification::with(["senduserdetail"])
                 ->where('user_id', $store_id)
                 ->where('created_at', '>=', $userCreDate)
                 ->orWhere(function($query) use($userCreDate) {
@@ -35,9 +35,11 @@ class NotificationsController extends Controller {
                 })
                 ->orderBy('created_at', 'desc');
         $notMaxID = $recNotifications->max('id');
-        $recNotifications = $recNotifications->paginate(15);
-
-
+        $recNotifications = $recNotifications->get();
+        $recNotifications->map(function ($recNotifications) {
+            $recNotifications['notification_url'] = Notification::createNotificationUrlForStore($recNotifications->id);
+        });
+        
         return view('notifications.index', ['notifications' => $notifications, 'notMaxID' => $notMaxID, 'recNotifications' => $recNotifications]);
     }
 
@@ -165,6 +167,46 @@ class NotificationsController extends Controller {
                         'success' => TRUE,
                         'not_count' => $notificationsCount,
                         'msg_count' => $messagesCount,
+                    ]
+        ]);
+    }
+
+    /**
+     * Get unread notifications data
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function notifications_unread(Request $request) {
+        $notificationsData = [];
+        $userID = $request->user_id;
+        $notification_status = NotificationStatus::where('user_id', $userID)->orderBy('created_at', 'desc')->first();
+        if ($notification_status) {
+            $userCreDate = $notification_status->updated_at;
+            $notifications = Notification::where('user_id', $userID)
+                    ->where('created_at', '>=', $userCreDate)
+                    ->orWhere(function($query) use($userCreDate) {
+                        $query->where('user_role', 2);
+                        $query->where('created_at', '>=', $userCreDate);
+                    })
+                    ->orWhere(function($query) use($userCreDate) {
+                        $query->where('user_role', 1);
+                        $query->where('created_at', '>=', $userCreDate);
+                    })
+                    ->orderBy('id', 'desc');
+            $notificationsData = $notifications->limit(5)->get();
+            $notMaxID = $notifications->max('id');
+            $notification_status->not_id = $notMaxID;
+            $notification_status->save();
+            $notificationsData->map(function ($notificationsData) {
+                $notificationsData['notification_url'] = Notification::createNotificationUrlForStore($notificationsData->id);
+            });
+            $notificationData = $notificationsData->toArray();
+        }
+        return response()->json([
+                    'data' => [
+                        'success' => TRUE,
+                        'notifications' => $notificationsData,
                     ]
         ]);
     }

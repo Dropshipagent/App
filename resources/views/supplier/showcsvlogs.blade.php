@@ -16,17 +16,19 @@
                     <th>Store Domain</th>
                     <th>Log file</th>
                 </tr>
+                <?php $i=1; ?>
                 @foreach($cronorder_logs as $cronorder_log)
                 <?php /*
                   echo "<pre>";
                   echo  count($user->storemap); die;
                  */ ?>
                 <tr>
-                    <td>{{ $cronorder_log->id }}</td>
+                    <td>{{ $i }}</td>
                     <td>{{ date("d/M/Y", strtotime($cronorder_log->created_at)) }}</td>
                     <td>{{ $cronorder_log->store_domain }}</td>
                     <td><a target="_blank" href="{{ URL::to('/').Storage::url('ordercsv/'.$cronorder_log->csv_file_name) }}">{{ $cronorder_log->csv_file_name }}</a></td>
                 </tr>
+                <?php $i++; ?>
                 @endforeach
             </table>
         </div>

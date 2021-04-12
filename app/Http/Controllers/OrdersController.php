@@ -8,6 +8,7 @@ use Config;
 use URL;
 use Storage;
 use App\Order;
+use App\Notification;
 use App\OrderItem;
 use App\CronorderLog;
 use App\ExportOrderCsvLog;
@@ -268,6 +269,12 @@ class OrdersController extends Controller {
 
         //send email to supplier
         $getSupplierData = helGetSupplierDATA(Auth::user()->username);
+        //send notification to admin
+        Notification::addNotificationFromAllPanel(helGetAdminID(), "Orders Exported", auth()->user()->id, auth()->user()->id, 'ORDERS_EXPORTED');
+
+        //send notification to supplier
+        Notification::addNotificationFromAllPanel($getSupplierData->id, "Orders have been exported", auth()->user()->id, auth()->user()->id, 'ORDERS_EXPORTED');
+
         $attachFileURL = url('/storage/ordercsv/' . $fileNameCsv);
 
         //save order to csv logs

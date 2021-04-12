@@ -82,9 +82,6 @@
             <?php
             if ($quickChat > 0) {
                 ?>
-                <a href="{{ url('/supplier/suppliernotifications') }}" class="tablinks {{ Request::is('supplier/suppliernotifications*') ? 'active' : '' }}">Notifications 
-                    <span data-toggle="tooltip" title="" class="badge bg-red notCountShow">0</span>
-                </a>
                 <a href="javascript::void(0)" target="_blank" onClick="window.open('<?php echo url("chats", $storeIDVal); ?>', 'pagename', 'resizable,height=600,width=500'); return false;" class="btn btn-info margin2px">Quick Chat <span data-toggle="tooltip" title="" class="badge bg-red msgCountShow">0</span></a>
                 <?php
             }
@@ -92,28 +89,3 @@
         </div>  
     </div>
 </div>
-<script type="text/javascript">
-    $(document).ready(function () {
-        notDelaySuccess();
-        var delay = 10000;
-        setInterval(function () {
-            notDelaySuccess();
-        }, delay);
-    });
-    function notDelaySuccess() {
-        var userID = '{{ auth()->user()->id }}';
-        var storeID = '{{ $storeIDVal }}';
-        $.ajax({
-            type: 'POST',
-            url: '{{ url("supplier/user_not_count") }}',
-            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-            data: {"user_id": userID, "store_id": storeID},
-            success: function (data) {
-                if (data.data.success) {
-                    $('.notCountShow').html(data.data.not_count);
-                    $('.msgCountShow').html(data.data.msg_count);
-                }
-            }
-        });
-    }
-</script>

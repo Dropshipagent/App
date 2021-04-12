@@ -26,6 +26,30 @@
                 setInterval(function () {
                     notDelaySuccess();
                 }, delay);
+                $(".notifications-menu").click(function () {
+                    var userID = '{{ auth()->user()->id }}';
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ url("admin/notifications_unread") }}',
+                        headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                        data: {"user_id": userID},
+                        success: function (data) {
+                            if (data.data.success) {
+                                if (data.data.notifications && data.data.notifications.length > 0) {
+                                    $("#notification_list_header").html('');
+                                    $.each(data.data.notifications, function (i, item) {
+                                        if (item.notification_url != "") {
+                                            url = "{!!url('" + item.notification_url + "')!!}";
+                                        } else {
+                                            url = "{{ url('admin/notifications')}}";
+                                        }
+                                        $("#notification_list_header").append('<li><a href="' + url + '">' + item.notifications + '</a></li>');
+                                    });
+                                }
+                            }
+                        }
+                    });
+                });
             });
             function notDelaySuccess() {
                 var userID = '{{ auth()->user()->id }}';
