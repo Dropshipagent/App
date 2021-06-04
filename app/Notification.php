@@ -41,7 +41,7 @@ class Notification extends Model {
         if ($notification->notification_type == "NEW_STORE_CREATED" || $notification->notification_type == "NEW_PRODUCT_REQUEST" || $notification->notification_type == "PRODUCT_ACCEPTED_BY_STORE") {
             $storeUserName = helGetUsernameById($notification->item_id);
             return 'admin/products/index/' . $storeUserName;
-        } else if ($notification->notification_type == "ORDERS_EXPORTED") {
+        } else if ($notification->notification_type == "ORDERS_EXPORTED" || $notification->notification_type == "STORE_GET_PAID") {
             $storeUserName = helGetUsernameById($notification->item_id);
             return 'admin/users/set_store_session/' . $storeUserName;
         } else if ($notification->notification_type == "INVOICE_CREATED" || $notification->notification_type == "INVOICE_PAID") {

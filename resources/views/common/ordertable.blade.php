@@ -1,6 +1,6 @@
 <!-- Default box -->
-<div class="box">
-    <div class="box-body table-responsive no-padding">
+<div class="">
+    <div class="table-responsive">
         <table class="table table-hover">
             <tr>
                 <th>ID</th>

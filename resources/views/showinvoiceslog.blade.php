@@ -6,14 +6,18 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-
-    <div class="nav-tabs-custom">
+    <div class="col-md-12 heading_sections">
+            <!-- <h1 class="heading">Dropship <span style="color: #FFF;">Agent</span></h1> -->
+            <img src="{{ asset('img/dropship.png') }}" class="logo-dropship">
+            <p class="subheading"></p>
+        </div>
+    <div class="col-md-12 nav-tabs-custom invoices_page" style="box-shadow: none;">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#unpaid_invoice" id="unpaid_invoice_tab" data-toggle="tab">Unpaid</a></li>
             <li><a href="#paid_invoice" data-toggle="tab" id="paid_invoice_tab">Paid</a></li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane active" id="unpaid_invoice">
+            <div class="tab-pane active table-responsive" id="unpaid_invoice">
                 <table class="table table-hover table-striped table-bordered datatable" id="unpaid_invoice_table">
                     <thead>
                         <tr>
@@ -27,7 +31,7 @@
 
                 </table>
             </div>
-            <div class="tab-pane" id="paid_invoice">
+            <div class="tab-pane table-responsive" id="paid_invoice">
                 <table class="table table-hover table-striped table-bordered datatable" id="paid_invoice_table">
                     <thead>
                         <tr>
@@ -63,24 +67,26 @@
                             {!! Form::hidden('invoiceID', null, array('class' => 'invoice_id')) !!}
                             {!! Form::hidden('camount', null, array('class' => 'invoice_amount')) !!}
                             @if(count($userCardProfiles)>0)
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>&nbsp;</th>
-                                        <th>Card</th>
-                                        <th>Ending With</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($userCardProfiles as $key => $val)
-                                    <tr>
-                                        <td><label for="card_type{{ $val['item_profile_id'] }}">{!! Form::radio('payment_option', $val['item_profile_id'], false, ['class' => 'select_card', 'id' => 'card_type'.$val['item_profile_id']]) !!} </label></td>
-                                        <td>{{ $val['card_type'] }}</td>
-                                        <td>{{ $val['card_4_digit'] }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>&nbsp;</th>
+                                            <th>Card</th>
+                                            <th>Ending With</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($userCardProfiles as $key => $val)
+                                        <tr>
+                                            <td><label for="card_type{{ $val['item_profile_id'] }}">{!! Form::radio('payment_option', $val['item_profile_id'], false, ['class' => 'select_card', 'id' => 'card_type'.$val['item_profile_id']]) !!} </label></td>
+                                            <td>{{ $val['card_type'] }}</td>
+                                            <td>{{ $val['card_4_digit'] }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                             @endif
                             <label for="custom_card">{!! Form::checkbox('card_option', 'custom_card', false, ['class' => 'custom_card', 'id' => 'custom_card']) !!} Add new card</label><br/><br/>
                             <div class="addNewCard" {{ (count($userCardProfiles) > 0)?"style=display:none;":"" }}>

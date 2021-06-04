@@ -16,12 +16,12 @@
             <li><a href="#previous_export" data-toggle="tab" id="previous_export_tab">Previous Export</a></li>
         </ul>
         @if(helGetSupplierID(Auth::user()->id) > 0)
-        <div class="pull-right" style="position: absolute; right:10px; top:6px;">
+        <div class="pull-right" style="position: absolute; right:40px; top:30px;">
             <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm assign_supplier_btn">Export to supplier</a>
         </div>
         @endif
         <div class="tab-content">
-            <div class="tab-pane active" id="all">
+            <div class="tab-pane active table-responsive" id="all">
                 <div class="datatablefilters">
                     <div class="searchfilter">                            
                         <div class="input-group">
@@ -548,7 +548,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'log_file'},
+                {mData: 'csv_file_name'},
                 {mData: 'created_at'},
             ],
             "aoColumnDefs": [

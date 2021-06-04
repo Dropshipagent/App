@@ -110,9 +110,9 @@ class Order extends Model {
 
         //get orders list for csv export
         if ($minlimit) {
-            $orderItems = OrderItem::where('store_domain', $store_domain)->where('id', '>', $minlimit)->with(['orderdetail'])->get();
+            $orderItems = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $store_domain)->where('orders.assign_supplier', 0)->where('id', '>', $minlimit)->with(['orderdetail'])->get();
         } else {
-            $orderItems = OrderItem::where(['store_domain' => $store_domain])->with(['orderdetail'])->get();
+            $orderItems = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $store_domain)->where('orders.assign_supplier', 0)->with(['orderdetail'])->get();
         }
         //update assign supplier 
         $odrIdArr = [];

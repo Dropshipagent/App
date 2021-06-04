@@ -18,10 +18,10 @@
             <?php
             if (isset($item->productdetail->base_price) && $item->productdetail->product_status == 3) {
                 $basePriceArr = json_decode($item->productdetail->base_price, true);
-                $variantPriceByAdmin = $basePriceArr[$item->variant_id];
+                $variantPriceByAdmin = (isset($basePriceArr[$item->variant_id])) ? $basePriceArr[$item->variant_id] : 0;
 
                 $adminComisonArr = json_decode($item->productdetail->admin_commission, true);
-                $variantCommissionByAdmin = $adminComisonArr[$item->variant_id];
+                $variantCommissionByAdmin = (isset($adminComisonArr[$item->variant_id])) ? $adminComisonArr[$item->variant_id] : 0;
             } else {
                 $variantPriceByAdmin = 0;
                 $variantCommissionByAdmin = 0;

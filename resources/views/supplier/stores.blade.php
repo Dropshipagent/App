@@ -5,8 +5,8 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive no-padding">
+    <div class="">
+        <div class="table-responsive supplier_page">
             <table class="table table-hover">
                 <tr>
                     <th>ID</th>
@@ -31,7 +31,7 @@
             </table>
         </div>
         <!-- /.box-body -->
-        <div class="box-footer">
+        <div class="footer-tablee">
             <div class="pull-right">
                 {{ $mapped_stores->links() }}
             </div>

@@ -2,6 +2,7 @@
 @section('title', 'Dashboard')
 @section('main-content')
 <!-- Content Header (Page header) -->
+@include('admin.layouts.header-tabs')
 <section class="content-header">
     <h1>
         Tracking Lists
@@ -14,30 +15,30 @@
 </section>
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive">
+    <div class="">
+        <div class="table-responsive">
             <div class="datatablefilters">
-                        <div class="searchfilter">                            
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-search"></i></span>
-                                <input type="text" id="searchbox" class="form-control" placeholder="Search">
-                            </div>                            
-                        </div>
-                        
-                    </div>
-             <table class="table table-striped table-bordered datatable tracking">
+                <div class="searchfilter">                            
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                        <input type="text" id="searchbox" class="form-control" placeholder="Search">
+                    </div>                            
+                </div>
+
+            </div>
+            <table class="table table-striped table-bordered datatable tracking">
                 <thead> 
                     <tr>
                         <th>Invoice-ID</th>
                         <th>Store Domain</th>
-                        <th>Order-ID</th>
+                        <th>Order Number</th>
                         <th>Tracking Number</th>
                         <th>Tracking Url</th>
                         <th>Tracking Company</th>
                         <th>Uploaded</th>
                     </tr>
                 </thead>
-                   
+
             </table>
         </div>
     </div>
@@ -49,15 +50,15 @@
 @section('script')
 <script type="text/javascript">
     $(document).ready(function () {
-        
-        $('#searchbox').keyup( function() { 
-            tracking.search($(this).val()).draw() ;
-        });  
-        
+
+        $('#searchbox').keyup(function () {
+            tracking.search($(this).val()).draw();
+        });
+
         var tracking = $('.tracking').DataTable({
             "responsive": true,
             "bProcessing": true,
-            "serverSide": true, 
+            "serverSide": true,
             "ordering": true,
             "order": [[0, "desc"]],
             "ajax": {
@@ -72,7 +73,7 @@
             "aoColumns": [
                 {mData: 'id'},
                 {mData: 'store_domain'},
-                {mData: 'order_id'},
+                {mData: 'order_number'},
                 {mData: 'tracking_number'},
                 {mData: 'tracking_url'},
                 {mData: 'tracking_company'},
@@ -89,6 +90,6 @@
                 }
             }
         });
- })
+    })
 </script>
 @endsection

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use Auth;
 use Config;
 use View;
+use URL;
+use Storage;
 use App\User;
 use App\Order;
 use App\OrderItem;
@@ -24,6 +26,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailable;
+use Session;
 
 class UsersController extends Controller {
 
@@ -33,11 +36,6 @@ class UsersController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request) {
-        //$pending_reqData = User::where(['role' => 2, 'status' => 0])->with(['storemap'])->get();
-        //$app_and_unpaidData = User::where(['role' => 2, 'status' => 1])->with(['storemap'])->get();
-        //$app_and_paidData = User::where(['role' => 2, 'status' => 2])->with(['storemap'])->get();
-        //$suppliers = User::where('role', 3)->get();
-        //return view('admin.users.index', ['pending_reqData' => $pending_reqData, 'app_and_unpaidData' => $app_and_unpaidData, 'app_and_paidData' => $app_and_paidData, 'suppliers' => $suppliers]);
         if ($request->ajax()) {
             $role = $request['role'];
             $status = $request['status'];
@@ -330,9 +328,67 @@ class UsersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showcsvlogs($id) {
-        $cronorder_logs = CronorderLog::where(['store_id' => $id])->orderBy('created_at', 'desc')->get();
-        return view('admin.users.showcsvlogs', ['cronorder_logs' => $cronorder_logs]);
+    public function showcsvlogs(Request $request) {
+        if ($request->ajax()) {
+            $selectedStoreDomain = Session::get('selected_store_id');
+            $extraSearch = array();
+            $q = CronorderLog::where('store_domain', $selectedStoreDomain);
+            $TotalOrderData = $q->count();
+
+            $responsedata = $q;
+            $search = $request['search']['value'];
+            if ($search && !empty($search)) {
+                $q->where(function($query) use ($search) {
+                    $query->where('id', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('csv_file_name', 'LIKE', '%' . $search . '%');
+                });
+                $responsedata = $q;
+                $TotalOrderData = $q->count();
+            }
+
+            $limit = $request->input('length');
+            $start = $request->input('start');
+
+            $columnindex = $request['order']['0']['column'];
+            $orderby = $request['columns'][$columnindex]['data'];
+            $order = $orderby != "" ? $request['order']['0']['dir'] : "";
+            $draw = $request['draw'];
+
+            $response = $responsedata->orderBy($orderby, $order)
+                    ->offset($start)
+                    ->limit($limit)
+                    ->get();
+
+            if (!$response) {
+                $exportCsvData = [];
+                $paging = [];
+            } else {
+                $exportCsvData = $response;
+                $paging = $response;
+            }
+
+            $Data = array();
+            $i = 1;
+            foreach ($exportCsvData as $csv_data) {
+                $fileURL = URL::to('/') . Storage::url('ordercsv/' . $csv_data->csv_file_name);
+                $u['store_domain'] = $csv_data->store_domain;
+                $u['csv_file_name'] = '<a target="_blank" href="' . $fileURL . '">' . $csv_data->csv_file_name . '</a>';
+                $u['created_at'] = date('M d, Y H:i:s', strtotime($csv_data->created_at));
+
+                $Data[] = $u;
+                $i++;
+                unset($u);
+            }
+            $return = [
+                "draw" => intval($draw),
+                "recordsFiltered" => intval($TotalOrderData),
+                "recordsTotal" => intval($TotalOrderData),
+                "data" => $Data
+            ];
+            return $return;
+        }
+        return view('admin.users.showcsvlogs');
     }
 
     /**
@@ -343,7 +399,9 @@ class UsersController extends Controller {
      */
     public function destroy($id) {
         $user = User::find($id);
-        if ($user->delete()) {
+        $user->is_deleted = 1;
+        $user->status = 1;
+        if ($user->save()) {
             return redirect('admin/users')->with('success', 'User deleted successfully!');
         } else {
             return redirect()->back()->with('danger', 'Failed to Delete, Please try again!');
@@ -359,6 +417,17 @@ class UsersController extends Controller {
     public function setStoreSession(Request $request, $storeDomain) {
         $request->session()->put('selected_store_id', $storeDomain);
         return redirect('admin/orders');
+    }
+
+    /**
+     * 
+     * @param Request $request
+     * @param type $userID
+     * @return type
+     */
+    public function getSupplierMappedStores(Request $request, $userID) {
+        $mapped_stores = StoreMapping::where('supplier_id', $userID)->orderBy('created_at', 'desc')->get();
+        return view('admin.users.stores', ['mapped_stores' => $mapped_stores]);
     }
 
 }

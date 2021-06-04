@@ -12,12 +12,12 @@
                     <li><a href="#sent_noti" data-toggle="tab">Sent</a></li>
                 </ul>
                 @if(helGetSupplierID(Auth::user()->id) > 0)
-                <div class="pull-right" style="position: absolute; right:20px; top:6px;">
+                <div class="pull-right" style="position: absolute; right:40px; top:30px;">
                     <a href="{{ url('/storenotifications/create') }}" class="btn btn-block btn-danger btn-sm">Send Notification</a>
                 </div>
                 @endif
                 <div class="tab-content">
-                    <div class="tab-pane active" id="received_noti">
+                    <div class="tab-pane active table-responsive" id="received_noti">
                         <table id="received_notiData" class="table table-hover">
                             <thead>
                                 <tr>
@@ -31,7 +31,8 @@
                                 <tr>
                                     <td><?php
                                         if (isset($notification->senduserdetail->username) && $notification->notification_by != 1) {
-                                            echo $notification->senduserdetail->username;
+                                            //echo $notification->senduserdetail->username;
+                                            echo "Supplier";
                                         } else {
                                             echo env('FOUNDER_NAME');
                                         }
@@ -43,7 +44,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane" id="sent_noti">
+                    <div class="tab-pane table-responsive" id="sent_noti">
                         <table id="sent_notiData" class="table table-hover">
                             <thead>
                                 <tr>
@@ -55,7 +56,7 @@
                             <tbody>
                                 @foreach($notifications as $notification)
                                 <tr>
-                                    <td>{{ $notification->userdetail->username }}</td>
+                                    <td>{{ ($notification->user_id == 1) ? env('FOUNDER_NAME') : "Supplier" }}</td>
                                     <td>{{ $notification->notifications }}</td>
                                     <td>{{ $notification->created_at }}</td>
                                 </tr>

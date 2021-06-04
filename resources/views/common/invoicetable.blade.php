@@ -7,7 +7,7 @@
             <li><a href="#paid_invoice" data-toggle="tab">Paid</a></li>
         </ul>
         <div class="tab-content">
-            <div class="tab-pane active" id="unpaid_invoice">
+            <div class="tab-pane active table-responsive" id="unpaid_invoice">
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -85,7 +85,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="tab-pane" id="paid_invoice">
+            <div class="tab-pane table-responsive" id="paid_invoice">
                 <table class="table table-hover">
                     <thead>
                         <tr>

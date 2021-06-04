@@ -3,7 +3,7 @@
 @section('main-content')
 <!-- Content Header (Page header) -->
 @include('admin.layouts.header-tabs')
-<section class="content-header">
+<section class="content-header onl_bread_nav">
     <h1>
         Store [{{ Session::get('selected_store_id') }}] Orders
         <small>list of all orders from shopify</small>
@@ -20,8 +20,8 @@
     <div class="cal-md-12"  style="text-align: right; margin-bottom: 5px;">
         <!--        <a href="{{ url('/admin/orders/export_csv') }}" class="btn btn-danger">Export CSV</a>-->
     </div>
-    <div class="box">
-        <div class="box-body table-responsive">
+    <div class="">
+        <div class="table-responsive">
             <div class="datatablefilters">
                 <div class="searchfilter">                            
                     <div class="input-group">

@@ -5,8 +5,8 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive no-padding">
+    <div class="">
+        <div class="table-responsive">
             <div class="container-fluid">
 
                 <div class="card card-primary">

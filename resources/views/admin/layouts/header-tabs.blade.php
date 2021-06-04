@@ -2,35 +2,38 @@
     /* Style the tab */
     .tab {
         overflow: hidden;
-        border: 1px solid #ccc;
-        background-color: #fff;
+        border: 0;
+        background-color: transparent;
     }
-
     /* Style the buttons inside the tab */
     .tab a {
-        background-color: inherit;
-        float: left;
         border: none;
         outline: none;
         cursor: pointer;
-        padding: 14px 16px;
+        padding: 8px 16px;
         transition: 0.3s;
         font-size: 14px;
-        color:#101010
-
+        color:#FFF;
+        display: inline-block;
+    }
+    .tab_links_btn {
+        margin: 15px 0;
+        padding: 0 15px;
     }
 
     /* Change background color of buttons on hover */
     .tab a:hover {
         background-color: #ddd;
     }
+    .tab a.active, .tab a:hover {
+        background-color: #d7b441;
+        color: #ffffff;
+        font-weight: normal;
+        border-radius: 100px;
+    }
 
     /* Create an active/current tablink class */
-    .tab a.active {
-        background-color: #fff;
-        color:#d7b441;
-        font-weight: bold;
-    }
+
 
     /* Style the tab content */
     .tabcontent {
@@ -52,16 +55,22 @@
             $viewProducts = url('admin/products/index', $storeNameVal);
             $viewOrders = url('/admin/orders');
             $viewInvoicesLogs = url('/admin/showinvoiceslog');
+            $viewTrackingLogs = url('/admin/trackinglogs');
+            $viewCsvLogs = url('/admin/users/showcsvlogs');
         } else {
             $viewProducts = '#';
             $viewOrders = '#';
             $viewInvoicesLogs = '#';
+            $viewTrackingLogs = '#';
+            $viewCsvLogs = '#';
         }
         ?>
-        <div>
+        <div class="tab_links_btn">
             <a href="{{ $viewProducts }}" class="tablinks {{ Request::is('admin/products/index*') ? 'active' : '' }}">View Products</a>
             <a href="{{ $viewOrders }}" class="tablinks {{ Request::is('admin/orders') ? 'active' : '' }}">View Orders</a>
             <a href="{{ $viewInvoicesLogs }}" class="tablinks {{ Request::is('admin/showinvoiceslog') ? 'active' : '' }}">View Invoices</a>
+            <a href="{{ $viewTrackingLogs }}" class="tablinks {{ Request::is('admin/trackinglogs') ? 'active' : '' }}">View Tracking Logs</a>
+            <a href="{{ $viewCsvLogs }}" class="tablinks {{ Request::is('admin/users/showcsvlogs') ? 'active' : '' }}">View CSV Logs</a>
         </div>  
     </div>
 </div>

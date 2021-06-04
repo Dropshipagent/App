@@ -23,4 +23,8 @@ class OrderItem extends Model {
         return $this->belongsTo('App\Product', 'product_id', 'product_id');
     }
 
+    public static function check_fulfillment_status($orderID) {
+        return self::where(['order_id' => $orderID, 'fulfillment_status' => 'fulfilled'])->count();
+    }
+
 }

@@ -7,8 +7,8 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive">
+    <div class="">
+        <div class="table-responsive">
             <div class="datatablefilters">
                         <div class="searchfilter">                            
                             <div class="input-group">
@@ -23,7 +23,7 @@
                     <tr>
                         <th>Invoice-ID</th>
                         <th>Store Domain</th>
-                        <th>Order-ID</th>
+                        <th>Order Number</th>
                         <th>Tracking Number</th>
                         <th>Tracking Url</th>
                         <th>Tracking Company</th>
@@ -64,7 +64,7 @@
             "aoColumns": [
                 {mData: 'id'},
                 {mData: 'store_domain'},
-                {mData: 'order_id'},
+                {mData: 'order_number'},
                 {mData: 'tracking_number'},
                 {mData: 'tracking_url'},
                 {mData: 'tracking_company'},

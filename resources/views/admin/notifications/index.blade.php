@@ -22,11 +22,11 @@
                     <li class="active"><a href="#received_noti" data-toggle="tab">Received</a></li>
                     <li><a href="#sent_noti" data-toggle="tab">Sent</a></li>
                 </ul>
-                <div class="pull-right" style="position: absolute; right:20px; top:6px;">
+                <div class="pull-right" style="position: absolute; right:50px; top:30px;">
                     <a href="{{ url('/admin/notifications/create') }}" class="btn btn-block btn-danger btn-sm">Send Notification</a>
                 </div>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="received_noti">
+                    <div class="tab-pane active table-responsive" id="received_noti">
                         <table id="received_notiData" class="table table-hover">
                             <thead>
                                 <tr>
@@ -38,7 +38,11 @@
                             <tbody>
                                 @foreach($recNotifications as $notification)
                                 <tr>
+                                    @if(isset($notification->senduserdetail->username))         
                                     <td>{{ $notification->senduserdetail->username }}</td>
+                                    @else
+                                    <td>Unknown</td>        
+                                    @endif
                                     <td><?php echo ($notification->notification_url != "") ? '<a href="' . url($notification->notification_url) . '">' . $notification->notifications . '</a>' : $notification->notifications ?></td>
                                     <td>{{ $notification->created_at }}</td>
                                 </tr>
@@ -64,7 +68,11 @@
                                 ?>
                                 <tr>
                                     @if($notification->user_role == 0)
+                                    @if(isset($notification->userdetail->username))         
                                     <td>{{ $notification->userdetail->username }}</td>
+                                    @else
+                                    <td>Unknown</td>        
+                                    @endif
                                     @else
                                     <td>{{ $notifor[$notification->user_role] }}</td>
                                     @endif

@@ -73,7 +73,7 @@ class ProductsController extends Controller {
                 $u['product_image'] = $imageData;
                 if ($product_action == 1) {
                     if (auth()->user()->status == 1) {
-                        $u['product_action'] = '<a href="' . url('checkout') . '" class="btn btn-block btn-danger btn-sm">Accept Product</a>';
+                        $u['product_action'] = '<a href="' . url('checkout') . '" class="btn btn-block btn-danger btn-sm">Proceed</a>';
                     } else {
                         $u['product_action'] = '<a href="javascript:void(0)" data-id="' . $product->id . '" class="btn btn-block btn-danger btn-sm accept_product">Accept Product</a>';
                     }

@@ -7,15 +7,17 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive no-padding">
+    <div class="">
+        <div class="table-responsive">
             <table class="table table-hover">
-                <tr>
-                    <th>Export #</th>
-                    <th>Date Exported</th>
-                    <th>Store Domain</th>
-                    <th>Log file</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>Export #</th>
+                        <th>Date Exported</th>
+                        <th>Store Domain</th>
+                        <th>Log file</th>
+                    </tr>
+                </thead>
                 @foreach($cronorder_logs as $cronorder_log)
                 <?php /*
                   echo "<pre>";

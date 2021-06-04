@@ -13,7 +13,7 @@ $invoiceTotal = 0
 @endphp
 <!-- Main content -->
 <section class="content">
-    <div class="box box-warning">
+    <div class="box-warning">
         <div class="box-header with-border">
             <table border="0" width="100%">
                 <tr>

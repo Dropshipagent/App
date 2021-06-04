@@ -18,11 +18,14 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="nav-tabs-custom">
-                <div class="pull-right" style="position: absolute; right:20px; top:6px;">
+                <ul class="nav nav-tabs" style="min-height: 45px;">
+                </ul>
+                <div class="pull-right" style="position: absolute; right:50px; top:30px;">
                     <a href="{{ url('/admin/news/create') }}" class="btn btn-block btn-danger btn-sm">Add News</a>
                 </div>
+                <div class="clear"></div>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="sent_noti">
+                    <div class="tab-pane active table-responsive" id="sent_noti">
                         <table class="table table-hover">
                             <thead>
                                 <tr>

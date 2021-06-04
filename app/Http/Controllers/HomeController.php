@@ -165,7 +165,7 @@ class HomeController extends Controller {
                 $q->where(function($query) use ($search) {
                     $query->where('id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
-                    $query->orWhere('order_id', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('order_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_url', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_company', 'LIKE', '%' . $search . '%');
@@ -202,7 +202,7 @@ class HomeController extends Controller {
 
                 $u['id'] = $tracking->id;
                 $u['store_domain'] = $tracking->store_domain;
-                $u['order_id'] = $tracking->order_id;
+                $u['order_number'] = $tracking->order_number;
                 $u['tracking_number'] = $tracking->tracking_number;
                 $u['tracking_url'] = '<a href="' . $tracking->tracking_url . '" target="_balnk">' . $tracking->tracking_url . '</a>';
                 $u['tracking_company'] = $tracking->tracking_company;

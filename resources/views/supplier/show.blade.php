@@ -6,8 +6,8 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive">
+    <div class="">
+        <div class="table-responsive">
             <div class="datatablefilters">
                 <div class="searchfilter">                            
                     <div class="input-group">

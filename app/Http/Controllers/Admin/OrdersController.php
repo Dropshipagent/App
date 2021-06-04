@@ -18,6 +18,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailable;
+use Session;
 
 class OrdersController extends Controller {
 
@@ -32,7 +33,7 @@ class OrdersController extends Controller {
             //dd($request->all());
             $extraSearch = array();
             $assign_supplier = 1;
-            $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr']);
+            $q = Order::select('store_invoices.fulfillment_status', 'orders.*')->join('users', 'username', '=', 'store_domain')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where('users.status', 2);
             $TotalOrderData = $q->count();
 
             $responsedata = $q;
@@ -149,8 +150,9 @@ class OrdersController extends Controller {
      */
     public function trackinglogs(Request $request) {
         if ($request->ajax()) {
+            $selectedStoreDomain = Session::get('selected_store_id');
             $extraSearch = array();
-            $q = StoreInvoice::where('tracking_number', '!=', "");
+            $q = StoreInvoice::where('tracking_number', '!=', "")->where('store_domain', $selectedStoreDomain);
             $TotalOrderData = $q->count();
 
             $responsedata = $q;
@@ -159,7 +161,7 @@ class OrdersController extends Controller {
                 $q->where(function($query) use ($search) {
                     $query->where('id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
-                    $query->orWhere('order_id', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('order_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_url', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_company', 'LIKE', '%' . $search . '%');
@@ -196,7 +198,7 @@ class OrdersController extends Controller {
 
                 $u['id'] = $tracking->id;
                 $u['store_domain'] = $tracking->store_domain;
-                $u['order_id'] = $tracking->order_id;
+                $u['order_number'] = $tracking->order_number;
                 $u['tracking_number'] = $tracking->tracking_number;
                 $u['tracking_url'] = '<a href="' . $tracking->tracking_url . '" target="_balnk">' . $tracking->tracking_url . '</a>';
                 $u['tracking_company'] = $tracking->tracking_company;

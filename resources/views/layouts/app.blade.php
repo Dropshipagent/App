@@ -22,6 +22,27 @@
             </div>
         </div>
 
+        <!-- Intro Video Modal Popup Start  -->
+        <div id="introVideoModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="introPopupHeading">
+                            <h4 class="modal-title">You Have Been Accepted!</h4>
+                            <span>You are just a few steps away from automating your fulfillment</span>
+                        </div>
+                    </div>
+                    <div class="modal-body"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">Let’s Get Started!</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- Intro Video Modal Popup End  -->
+
         <div class="wrapper">
             @include('layouts.header')
             @include('layouts.sidebar')
@@ -41,7 +62,7 @@
             $(document).ready(function () {
 <?php
 $settingData = getAdminSettingData();
-if (auth()->user()->status == 1 && auth()->user()->intro_video_status == 0 && $settingData['intro_video_url']) {
+if (auth()->user()->status == 1 && isset(auth()->user()->intro_video_status) && auth()->user()->intro_video_status == 0 && $settingData['intro_video_url']) {
     ?>
                     showIntroPopup('<?php echo $settingData['intro_video_url']; ?>');
 <?php } ?>
@@ -63,8 +84,8 @@ if (auth()->user()->status == 1 && auth()->user()->intro_video_status == 0 && $s
                                 if (data.data.notifications && data.data.notifications.length > 0) {
                                     $("#notification_list_header").html('');
                                     $.each(data.data.notifications, function (i, item) {
-                                        if(item.notification_url!="") {
-                                            url = "{!!url('"+ item.notification_url +"')!!}";
+                                        if (item.notification_url != "") {
+                                            url = "{!!url('" + item.notification_url + "')!!}";
                                         } else {
                                             url = "{{ url('storenotifications')}}";
                                         }
@@ -75,22 +96,25 @@ if (auth()->user()->status == 1 && auth()->user()->intro_video_status == 0 && $s
                         }
                     });
                 });
+                //call function to open corresponding tab
+                explodeAndTrigerClick();
             });
             function showIntroPopup(video_url) {
-                showAlertMessage('<iframe width="560" height="315" src="' + video_url + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>', 'Intro Video');
-                $("#alertMessageModal").on('hidden.bs.modal', function (e) {
-                    $("#alertMessageModal iframe").attr("src", $("#alertMessageModal iframe").attr("src"));
+                $('#introVideoModal .modal-body').html('<iframe width="560" height="315" src="' + video_url + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
+                $('#introVideoModal').modal('show');
+                $("#introVideoModal").on('hidden.bs.modal', function (e) {
+                    $("#introVideoModal iframe").attr("src", $("#introVideoModal iframe").attr("src"));
                 });
                 var userID = '{{ auth()->user()->id }}';
-                 $.ajax({
-                 type: 'POST',
-                 url: '{{ url("intro_video_status_change") }}',
-                 headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                 data: {"user_id": userID},
-                 success: function (data) {
-                 
-                 }
-                 });
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ url("intro_video_status_change") }}',
+                    headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                    data: {"user_id": userID},
+                    success: function (data) {
+
+                    }
+                });
             }
             function notDelaySuccess() {
                 var userID = '{{ auth()->user()->id }}';
@@ -106,6 +130,14 @@ if (auth()->user()->status == 1 && auth()->user()->intro_video_status == 0 && $s
                         }
                     }
                 });
+            }
+            explodeAndTrigerClick = () => {
+                let currentURL = window.location.href;
+                let urlData = currentURL.split("#");
+                if (urlData[1]) {
+                    let tabIDdata = urlData[1] + "_tab";
+                    document.getElementById(tabIDdata).click();
+                }
             }
         </script>
         @yield('style')

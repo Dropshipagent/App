@@ -3,6 +3,7 @@
 @section('main-content')
 <link rel="stylesheet" href="{{ asset('admin/bower_components/jquery-ui/themes/base/jquery-ui.css') }}">
 <!-- Content Header (Page header) -->
+@include('admin.layouts.header-tabs')
 <section class="content-header">
     <h1>
         Csv Logs
@@ -17,32 +18,72 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive no-padding">
-            <table class="table table-hover">
-                <tr>
-                    <th>ID</th>
-                    <th>Store Domain</th>
-                    <th>Log file</th>
-                </tr>
-                @foreach($cronorder_logs as $cronorder_log)
-                <?php /*
-                  echo "<pre>";
-                  echo  count($user->storemap); die;
-                 */ ?>
-                <tr>
-                    <td>{{ $cronorder_log->id }}</td>
-                    <td>{{ $cronorder_log->store_domain }}</td>
-                    <td><a target="_blank" href="{{ URL::to('/').Storage::url('ordercsv/'.$cronorder_log->csv_file_name) }}">{{ $cronorder_log->csv_file_name }}</a></td>
-                </tr>
-                @endforeach
+    <div class="">
+        <div class="table-responsive">
+            <div class="datatablefilters">
+                <div class="searchfilter">                            
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                        <input type="text" id="searchbox" class="form-control" placeholder="Search">
+                    </div>                            
+                </div>
+
+            </div>
+            <table class="table table-striped table-bordered datatable csv_logs">
+                <thead> 
+                    <tr>
+                        <th>Store Domain</th>
+                        <th>Order Number</th>
+                        <th>Created at</th>
+                    </tr>
+                </thead>
+
             </table>
         </div>
-        <!-- /.box-body -->
-        <!-- /.box-footer-->
     </div>
-    <!-- /.box -->
-
 </section>
 <!-- /.content -->
+@endsection
+
+@section('script')
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#searchbox').keyup(function () {
+            csvLogs.search($(this).val()).draw();
+        });
+
+        var csvLogs = $('.csv_logs').DataTable({
+            "responsive": true,
+            "bProcessing": true,
+            "serverSide": true,
+            "ordering": true,
+            "order": [[2, "desc"]],
+            "ajax": {
+                url: "",
+                data: function (d) {
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('Something went wrong');
+                }
+            },
+            "aoColumns": [
+                {mData: 'store_domain'},
+                {mData: 'csv_file_name'},
+                {mData: 'created_at'}
+            ],
+            "aoColumnDefs": [
+                {"bSortable": false, "aTargets": ['action']}
+            ],
+            "language": {
+                "zeroRecords": "No csv available",
+                "paginate": {
+                    "previous": "< ",
+                    "next": " >"
+                }
+            }
+        });
+    })
+</script>
 @endsection

@@ -81,6 +81,21 @@
 //    echo "<pre>"; print_r($total_discount_set); die;
     if ($odrName !== $allOData->name) {
         $odrName = $allOData->name;
+        $discountCodes = json_decode(json_encode($allOData->discount_codes), true);
+        $discountCodesString = '';
+        if (count($discountCodes) > 0) {
+            foreach ($discountCodes as $discountCode) {
+                $discountCodesString .= implode(",", $discountCode) . ',';
+            }
+        }
+
+        $noteAttributes = json_decode(json_encode($allOData->note_attributes), true);
+        $noteAttributesString = '';
+        if (count($noteAttributes) > 0) {
+            foreach ($noteAttributes as $noteAttribute) {
+                $noteAttributesString .= $noteAttribute['name'] . ' = ' . $noteAttribute['value'] . ',';
+            }
+        }
         ?>
         <tr>
             <td>{{ $allOData->name }}</td>
@@ -95,7 +110,7 @@
             <td>{{ "0" }}</td>
             <td>{{ $allOData->total_tax }}</td>
             <td>{{ $allOData->total_price }}</td>
-            <td>{{ implode(",",$allOData->discount_codes) }}</td>
+            <td>{{ $discountCodesString }}</td>
             <td>{{ $allOData->total_discounts }}</td>
             <td>{{ $orderItem->shipping_method }}</td>
             <td>{{ $orderItem->created_at }}</td>
@@ -107,28 +122,28 @@
             <td>{{ ($orderItem->requires_shipping == 1)? "true" : "false" }}</td>
             <td>{{ ($orderItem->taxable == 1)? "true" : "false" }}</td>
             <td>{{ (empty($orderItem->fulfillment_status))? "pending" : $orderItem->fulfillment_status }}</td>
-            <td>{{ $allOData->billing_address->name }}</td>
-            <td>{{ $allOData->billing_address->city }}</td>
-            <td>{{ $allOData->billing_address->address1  }}</td>
-            <td>{{ $allOData->billing_address->address2 }}</td>
-            <td>{{ $allOData->billing_address->company }}</td>
-            <td>{{ $allOData->billing_address->city }}</td>
-            <td>{{ $allOData->billing_address->zip }}</td>
-            <td>{{ $allOData->billing_address->province_code }}</td>
-            <td>{{ $allOData->billing_address->country_code }}</td>
-            <td>{{ $allOData->billing_address->phone }}</td>
-            <td>{{ $allOData->shipping_address->name }}</td>
-            <td>{{ $allOData->shipping_address->city }}</td>
-            <td>{{ $allOData->shipping_address->address1  }}</td>
-            <td>{{ $allOData->shipping_address->address2 }}</td>
-            <td>{{ $allOData->shipping_address->company }}</td>
-            <td>{{ $allOData->shipping_address->city }}</td>
-            <td>{{ $allOData->shipping_address->zip }}</td>
-            <td>{{ $allOData->shipping_address->province_code }}</td>
-            <td>{{ $allOData->shipping_address->country_code }}</td>
-            <td>{{ $allOData->shipping_address->phone }}</td>
+            <td>{{ (isset($allOData->billing_address->name)) ? $allOData->billing_address->name : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->city)) ? $allOData->billing_address->city : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->address1)) ? $allOData->billing_address->address1 : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->address2)) ? $allOData->billing_address->address2 : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->company)) ? $allOData->billing_address->company : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->city)) ? $allOData->billing_address->city : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->zip)) ? $allOData->billing_address->zip : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->province_code)) ? $allOData->billing_address->province_code : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->country_code)) ? $allOData->billing_address->country_code : '' }}</td>
+            <td>{{ (isset($allOData->billing_address->phone)) ? $allOData->billing_address->phone : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->name)) ? $allOData->shipping_address->name : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->city)) ? $allOData->shipping_address->city : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->address1)) ? $allOData->shipping_address->address1 : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->address2)) ? $allOData->shipping_address->address2 : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->company)) ? $allOData->shipping_address->company : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->city)) ? $allOData->shipping_address->city : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->zip)) ? $allOData->shipping_address->zip : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->province_code)) ? $allOData->shipping_address->province_code : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->country_code)) ? $allOData->shipping_address->country_code : '' }}</td>
+            <td>{{ (isset($allOData->shipping_address->phone)) ? $allOData->shipping_address->phone : '' }}</td>
             <td>{{ $allOData->note }}</td>
-            <td>{{ implode(",",$allOData->note_attributes) }}</td>
+            <td>{{ $noteAttributesString }}</td>
             <td>{{ $allOData->cancelled_at }}</td>
             <td>{{ $allOData->gateway }}</td>
             <td>{{ $allOData->reference }}</td>

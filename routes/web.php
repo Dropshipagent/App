@@ -96,6 +96,9 @@ Route::get('stores/{storeId}/shopify/subscribe', function(\Illuminate\Http\Reque
         'trial_ends_at' => array_get($response, 'trial_ends_on'),
     ]);
 
+    //send notification to administrator
+    \App\Notification::addNotificationFromAllPanel(helGetAdminID(), 'Store get paid successfully', $uUser->id, $uUser->id, 'STORE_GET_PAID');
+
     return redirect('/home');
 })->name('shopify.subscribe');
 
@@ -178,11 +181,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     Route::post('supplierpaidstatus_change', 'Admin\OrdersController@supplier_paid_status_change');
 
     Route::get('users/set_store_session/{storeId}', 'Admin\UsersController@setStoreSession');
-    Route::get('users/showcsvlogs/{storeId}', 'Admin\UsersController@showcsvlogs');
+    Route::get('users/showcsvlogs', 'Admin\UsersController@showcsvlogs');
     Route::post('users/email_csv', 'Admin\UsersController@email_csv');
     Route::get('users/search_users', 'Admin\UsersController@searchUsers');
     Route::get('users/profile/{id}', 'Admin\UsersController@userProfile');
     Route::post('users/user-status', 'Admin\UsersController@user_status');
+    Route::get('users/supplier-mapped-stores/{userID}', 'Admin\UsersController@getSupplierMappedStores');
     Route::resource('users', 'Admin\UsersController');
 
     Route::resource('notifications', 'Admin\NotificationsController');
@@ -205,7 +209,7 @@ Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], fun
 
     Route::get('set_store_session/{storeId}', 'Supplier\PageController@setStoreSession');
 
-    Route::get('showcsvlogs/{storeId}', 'Supplier\OrdersController@showcsvlogs'); //csv list of store orders which is created only for loggedin supplier
+    Route::get('showcsvlogs', 'Supplier\OrdersController@showcsvlogs'); //csv list of store orders which is created only for loggedin supplier
     Route::get('bluckinvoice/{storeId}', 'Supplier\OrdersController@bluckinvoice'); //show list of all pendig invoice orders
     Route::post('showbluckinvoice/{storeId}', 'Supplier\OrdersController@showbluckinvoice'); //show list of all pendig invoice orders
     Route::post('createbluckinvoice/{storeId}', 'Supplier\OrdersController@createbluckinvoice'); //show list of all pendig invoice orders

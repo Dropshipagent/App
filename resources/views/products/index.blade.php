@@ -3,37 +3,75 @@
 @section('main-content')
 
 <!-- Main content -->
-<section class="content">
+<section class="content product_page">
+    <div class="col-md-12 heading_sections">
+        <!-- <h1 class="heading">Dropship <span style="color: #FFF;">Agent</span></h1> -->
+        <img src="{{ asset('img/dropship.png') }}" class="logo-dropship">
+        <p class="subheading"></p>
+    </div>
     <!-- Default box -->
     @if(app('request')->input('pdstatus') == 1)
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-12">
             <div class="panel panel-default credit-card-box">
                 <div class="panel-body">
                     <div>
-                        <h3>You have been accepted!</h3>
-                        <p>We have approved your request. Please see the quoted price below.<br>You can complete the sign up by clicking the "accept product" button.</p>
-                        <?php
-                        $totalPrice = 0.00;
-                        if ($adminApprovedLastProduct) {
-                            $variantsArr = json_decode($adminApprovedLastProduct->variants);
-                            $basePriceArr = json_decode($adminApprovedLastProduct->base_price, true);
-                            $adminComisonPriceArr = json_decode($adminApprovedLastProduct->admin_commission, true);
-                            foreach ($variantsArr as $variant) {
-                                //print_r($basePriceArr); die;
-                                if (isset($basePriceArr[$variant->id])) {
-                                    $basePrice = $basePriceArr[$variant->id];
-                                    $adminComisonPrice = $adminComisonPriceArr[$variant->id];
-                                } else {
-                                    $basePrice = 0;
-                                    $adminComisonPrice = 0;
-                                }
-                                $totalPrice += number_format(($basePrice + $adminComisonPrice), 2);
-                            }
-                        }
-                        ?>
-                        <p>Sourced Price: ${{ $totalPrice }}</p>
-                        <p>Shipping Time: <?php echo ($adminApprovedLastProduct && $adminApprovedLastProduct->shipping_time) ? $adminApprovedLastProduct->shipping_time : "" ?></p>
+                        <h3 class="heading">You have been accepted!</h3>
+                        <p>We have approved your request. Please see the quoted price below. You can complete the sign up by clicking the "Proceed" button.</p>
+                        <div class="row">
+                            <div class="col-md-5">
+                                <p class="accept-order"><img class="side-bar-icon" src="{{asset('img/receipt-dollar.png')}}" alt="side-bar-icon"> 
+                                    <?php
+                                    $totalPrice = 0.00;
+                                    if ($adminApprovedLastProduct) {
+                                        $variantsArr = json_decode($adminApprovedLastProduct->variants);
+                                        $basePriceArr = json_decode($adminApprovedLastProduct->base_price, true);
+                                        $adminComisonPriceArr = json_decode($adminApprovedLastProduct->admin_commission, true);
+                                        $totalVariants = count($variantsArr);
+                                        $variantsDataArray = [];
+                                        foreach ($variantsArr as $variant) {
+                                            //print_r($basePriceArr); die;
+                                            if (isset($basePriceArr[$variant->id])) {
+                                                $basePrice = $basePriceArr[$variant->id];
+                                                $adminComisonPrice = $adminComisonPriceArr[$variant->id];
+                                            } else {
+                                                $basePrice = 0;
+                                                $adminComisonPrice = 0;
+                                            }
+                                            $priceSubtotal = number_format(($basePrice + $adminComisonPrice), 2);
+                                            $variantsDataArray[] = [
+                                                'title' => $variant->title,
+                                                'price' => $priceSubtotal
+                                            ];
+
+                                            $totalPrice += $priceSubtotal;
+                                        }
+                                    }
+                                    if ($totalVariants == 1) {
+                                        echo 'Sourced Price: $' . $totalPrice;
+                                    } else {
+                                        echo 'Sourced Price: See price below';
+                                    }
+                                    ?>
+                                    @if($totalVariants == -1)
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>Item Name</th>
+                                        <th>Sourced Price($)</th>
+                                    </tr>
+                                    <?php
+                                    foreach ($variantsDataArray as $key => $val) {
+                                        echo '<tr><td>' . $val['title'] . '</td><td>' . $val['price'] . '</td></tr>';
+                                    }
+                                    ?>
+                                </table>
+                                @endif
+                                </p>
+                            </div>
+                            <div class="col-md-5">
+                                <p class="accept-order"><img class="side-bar-icon" src="{{asset('img/shipping-icon.png')}}" alt="side-bar-icon"> Shipping Time: <?php echo ($adminApprovedLastProduct && $adminApprovedLastProduct->shipping_time) ? $adminApprovedLastProduct->shipping_time : "" ?></p>
+                            </div>
+                        </div>
                         <p>We look forward to having you onboard.</p>
                         <p>Regards,<br>Dropship Agent Team</p>
                     </div>
@@ -50,11 +88,11 @@
             <li><a href="#admin_approved" data-toggle="tab" id="admin_approved_tab">Admin Approved</a></li>
             <li><a href="#requested" data-toggle="tab" id="requested_tab">Requested</a></li>
         </ul>
-        <div class="pull-right" style="position: absolute; right:10px; top:6px;">
+        <div class="pull-right" style="position: absolute; right:40px; top:30px;">
             <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm btnSyncProducts">Sync Products</a>
         </div>
         <div class="tab-content">
-            <div class="tab-pane active" id="approved">
+            <div class="tab-pane active table-responsive" id="approved">
                 <table class="table table-striped table-bordered datatable approved">
                     <thead>
                         <tr>
@@ -68,7 +106,7 @@
                 </table>
             </div>
 
-            <div class="tab-pane" id="admin_approved">
+            <div class="tab-pane table-responsive" id="admin_approved">
                 <table class="table table-striped table-bordered datatable admin_approved">
                     <thead> 
                         <tr>
@@ -82,7 +120,7 @@
                 </table>
             </div>
 
-            <div class="tab-pane" id="requested">
+            <div class="tab-pane table-responsive" id="requested">
                 <table class="table table-striped table-bordered datatable requested">
                     <thead>
                         <tr>

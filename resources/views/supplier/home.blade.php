@@ -6,7 +6,6 @@
 <section class="content-header">
     <h1>
         Dashboard
-        <small>Control panel</small>
     </h1>
 </section>
 
@@ -18,7 +17,7 @@
             <div class="row">
                 <div class="col-lg-4 col-xs-8">
                     <!-- small box -->
-                    <div class="small-box bg-aqua">
+                    <div class="small-box bg-aqua qwe">
                         <div class="inner">
                             <h3>{{ $orders }}</h3>
 

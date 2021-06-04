@@ -6,7 +6,6 @@
 <section class="content-header">
     <h1>
         Dashboard
-        <small>Control panel</small>
     </h1>
 </section>
 
@@ -17,78 +16,87 @@
     <div class="box">
         <div class="box-body">
             <div class="row">
-                <div class="col-lg-3 col-xs-12">
+                <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->
                     <div class="small-box orders_bg">
-                        <div class="inner">
-                            <h3>{{ $orders }}</h3>
-
-                            <p>Total Orders</p>
+                        <div class="dislpay_flex_box">
+                            <div class="icon">
+                                <i class="ion ion-bag"></i>
+                            </div>
+                            <div class="inner">
+                                <h3>{{ $orders }}</h3>
+                                <p>Total Orders</p>
+                            </div>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-bag"></i>
-                        </div>
-                        <a href="{{ url('/admin/orders') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url('/admin/orders') }}" class="small-box-footer">More info</a>
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-12">
+                <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->
-                    <div class="small-box bg-green">
-                        <div class="inner">
-                            <h3>{{ $suppliers }}</h3>
+                    <div class="small-box">
+                        <div class="dislpay_flex_box">                            
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                            <div class="inner">
+                                <h3>{{ $suppliers }}</h3>
 
-                            <p>Total Suppliers</p>
+                                <p>Total Suppliers</p>
+                            </div>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-person-add"></i>
-                        </div>
-                        <a href="{{ url('/admin/users') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url('/admin/users#suppliers') }}" class="small-box-footer">More info</a>
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-12">
+                <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->
                     <div class="small-box source-product_store">
-                        <div class="inner">
-                            <h3>{{ $stores }}</h3>
+                        <div class="dislpay_flex_box">
+                            <div class="icon">
+                                <i class="ion ion-person-add"></i>
+                            </div>
+                            <div class="inner">
+                                <h3>{{ $stores }}</h3>
 
-                            <p>Total Stores</p>
+                                <p>Total Stores</p>
+                            </div>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-person-add"></i>
-                        </div>
-                        <a href="{{ url('/admin/users') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url('/admin/users#app_and_paid') }}" class="small-box-footer">More info</a>
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-12">
+                <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->
                     <div class="small-box invoices_bg">
-                        <div class="inner">
-                            <h3>{{ $storeInvoices }}</h3>
+                        <div class="dislpay_flex_box">                            
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                            <div class="inner">
+                                <h3>{{ $storeInvoices }}</h3>
 
-                            <p>Total Invoices</p>
+                                <p>Total Invoices</p>
+                            </div>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-pie-graph"></i>
-                        </div>
-                        <a href="{{ url('/admin/showinvoiceslog') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url('/admin/showinvoiceslog') }}" class="small-box-footer">More info</a>
                     </div>
                 </div>
                 <!-- ./col -->
-                <div class="col-lg-3 col-xs-12">
+                <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->
                     <div class="small-box traking_bg">
-                        <div class="inner">
-                            <h3>{{ $uploadedTrackings }}</h3>
+                        <div class="dislpay_flex_box">
+                            <div class="icon">
+                                <i class="ion ion-pie-graph"></i>
+                            </div>
+                            <div class="inner">
+                                <h3>{{ $uploadedTrackings }}</h3>
 
-                            <p>Total Tracking Info</p>
+                                <p>Total Tracking Info</p>
+                            </div>
                         </div>
-                        <div class="icon">
-                            <i class="ion ion-pie-graph"></i>
-                        </div>
-                        <a href="{{ url('/admin/trackinglogs') }}" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                        <a href="{{ url('/admin/trackinglogs') }}" class="small-box-footer">More info</a>
                     </div>
                 </div>
                 <!-- ./col -->

@@ -85,6 +85,24 @@ class RegisterUninstallShopifyWebhook implements ShouldQueue {
                 ]
             ]);
         }
+
+        // Get the current update order webhooks
+        $createOrderWebhook = array_get($shopify->get('webhooks', [
+                    'topic' => 'orders/updated',
+                    'limit' => 250,
+                    'fields' => 'id,address'
+                ]), 'webhooks', []);
+
+        // Check if the order create webhook has already been registered
+        if (collect($createOrderWebhook)->isEmpty()) {
+            $shopify->create('webhooks', [
+                'webhook' => [
+                    'topic' => 'orders/updated',
+                    'address' => env('APP_URL') . "api/webhook/shopify/orders/updated",
+                    'format' => 'json'
+                ]
+            ]);
+        }
     }
 
 }

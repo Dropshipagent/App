@@ -2,8 +2,8 @@
 <section class="content">
     {!! Form::open(array('url' => 'storeproducts/productflag','id' => 'flagRecForm','files'=>true,'method'=>'POST')) !!}
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body table-responsive no-padding">
+    <div class="">
+        <div class="table-responsive">
             <table class="table table-hover products-table">
                 <tr>
                     <th>Sourced</th>
@@ -52,8 +52,10 @@
                         }
                         ?>
                     </td>
-                    <td>
-                        <div class="row product_item_{{ $store_product->id }}" style="display: none;">
+                </tr>
+                <tr class="row product_item_{{ $store_product->id }}" style="display: none;">
+                    <td colspan="4">
+                        <div>
                             <div class="col-md-12 form-group">
                                 <label for="">What is your aliexpress product URL?</label>
                                 {!! Form::text('aliexpress_url['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control aliexpress_url_'.$store_product->id)) !!}
@@ -79,7 +81,7 @@
                                 {!! Form::text('shipping_time['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control shipping_time_'.$store_product->id)) !!}
                             </div>
                         </div>
-                    </td>
+                    </td> 
                 </tr>
                 @endforeach
             </table>
@@ -111,11 +113,26 @@
                 return false;
             } else {
                 var requiredField = false;
+                var checkValidURL = false;
+                var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+                        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+                        '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+                        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                        '(\\?[;&a-z\\d%_.~+=-]*)?', 'i'); // fragment locator
                 $('[required]').each(function () {
                     if ($(this).val() == '') {
                         requiredField = true;
                     }
                 });
+                $('.check_valid_url').each(function () {
+                    if (pattern.test($(this).val()) == false) {
+                        checkValidURL = true;
+                    }
+                });
+                if (checkValidURL == true) {
+                    alert("Please enter valid URL in product URL");
+                    return false;
+                }
                 if (requiredField == true) {
                     alert("Please fill all required fields");
                 } else {
@@ -132,6 +149,7 @@
             var productID = this.value;
             if (this.checked) {
                 $('.aliexpress_url_' + productID).attr("required", true);
+                $('.aliexpress_url_' + productID).addClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", true);
                 $('.variants_you_sell_' + productID).attr("required", true);
                 $('.countries_you_ship_' + productID).attr("required", true);
@@ -140,6 +158,7 @@
                 $('.product_item_' + productID).show();
             } else {
                 $('.aliexpress_url_' + productID).attr("required", false);
+                $('.aliexpress_url_' + productID).removeClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", false);
                 $('.variants_you_sell_' + productID).attr("required", false);
                 $('.countries_you_ship_' + productID).attr("required", false);

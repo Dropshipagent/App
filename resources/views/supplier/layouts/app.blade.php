@@ -53,6 +53,8 @@
                         }
                     });
                 });
+                //call function to open corresponding tab
+                explodeAndTrigerClick();
             });
             function notDelaySuccess() {
                 var userID = '{{ auth()->user()->id }}';
@@ -69,6 +71,14 @@
                         }
                     }
                 });
+            }
+            explodeAndTrigerClick = () => {
+                let currentURL = window.location.href;
+                let urlData = currentURL.split("#");
+                if (urlData[1]) {
+                    let tabIDdata = urlData[1] + "_tab";
+                    document.getElementById(tabIDdata).click();
+                }
             }
         </script>
         @yield('style')

@@ -15,10 +15,10 @@
             </li>
 <!--            <li class="{{ Request::is('admin/showinvoiceslog') ? 'active' : '' }}">
                 <a href="{{ url('/admin/showinvoiceslog') }}"><i class="fa fa-list"></i> <span>Invoices Logs</span></a>
-            </li>-->
+            </li>
             <li class="{{ Request::is('admin/trackinglogs') ? 'active' : '' }}">
                 <a href="{{ url('/admin/trackinglogs') }}"><i class="fa fa-bars"></i> <span>Tracking Logs</span></a>
-            </li>
+            </li>-->
             <li class="{{ Request::is('admin/notifications') ? 'active' : '' }}">
                 <a href="{{ url('/admin/notifications') }}"><i class="fa fa-bell"></i> <span>Notifications</span>
                     <span data-toggle="tooltip" title="" class="badge bg-red notCountShow">0</span>

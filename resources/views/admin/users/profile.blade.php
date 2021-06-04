@@ -14,6 +14,17 @@
     <!-- Default box -->
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
+            @if (count($errors) > 0)
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+            @endif
+            {!! Form::model($user, ['route' => ['users.update', $user->id],'files'=>true,'method'=>'PATCH']) !!}
             <div class="register-box-body">
                 <div class="box box-primary box-primary-box">
                     <!-- form start -->
@@ -21,12 +32,12 @@
                         <div class="col-md-6 form-group">
                             <label for="">Store Owner Name:</label>
                             <br>
-                            {{$user->name}}
+                            {!! Form::text('name', null, array('placeholder' => 'Name','class' => 'form-control')) !!}
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="">Email:</label>
                             <br>
-                            {{$user->email}}
+                            {!! Form::text('email', null, array('placeholder' => 'Email','class' => 'form-control')) !!}
                         </div>
                         <div class="col-md-6 form-group">
                             <label for="">Currency:</label>
@@ -59,9 +70,20 @@
                             {{$user->zip_code}}
                         </div>
                         <div class="col-md-12 form-group">
+                            <label for="">Status:</label>
+                            <select class="form-control" name="status">
+                                <option value="0" {{ ((isset($user->status) && $user->status== 0)? "selected":"") }}>Pending</option>
+                                <option value="1" {{ ((isset($user->status) && $user->status== 1)? "selected":"") }}>Confirmed and uninitiated</option>
+                                <option value="2" {{ ((isset($user->status) && $user->status== 2)? "selected":"") }}>Initiated</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
                             <label for="">Billing Address</label>
                             <br>
                             {{$user->billing_address}}
+                        </div>
+                        <div class="form-group text-right">
+                            <button type="submit" id="submitBtn" class="btn btn-primary">Submit</button> 
                         </div>
                         <table class="table table-hover products-table">
                             <tr>
@@ -143,6 +165,7 @@
                 </div>
             </div>
             <!-- /.form-box -->
+            {!! Form::close() !!}
         </div>
     </div>
 

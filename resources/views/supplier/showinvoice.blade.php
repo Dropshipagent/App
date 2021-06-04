@@ -12,15 +12,15 @@
     .invoiceDetails td {
         padding-left: 11px;
     }
-    .amount{background: #e7e8e9; text-align: right; padding-right: 15px; font-size: 18px;}
+    .amount{ text-align: right; padding-right: 15px; font-size: 18px;}
 </style>
 <section class="content">
     <div class="nav-tabs-custom invoiceDetails" style="width: 1000px; margin: auto; font-size: 16px; padding:25px;">
-        <div class="tab-content" >
+        <div class="tab-content table-responsive" >
 
             <table cellpadding="0" cellspacing="5" border="0" style="width:100% !important; margin-top: 25px;">  
                 <tr>
-                    <td colspan="2" class="text-center header_txtt"> <h1><span class="color_ye">DROPSHIP</span>AGENT<span class="sub_heads"><i>INVOICES</i></span></h1></td>
+                    <td colspan="2" class="text-center header_txtt"> <h1 class="heading color-white"><span class="color_ye">DROPSHIP</span>&nbsp; AGENT <span class="sub_heads"><i>INVOICES</i></span></h1></td>
                 </tr>  
                 <tr class="topheading">
                     <td valign="top" style="width:150px">
@@ -35,7 +35,7 @@
                     </td>
                 </tr>
             </table>
-            <main>
+            <main class="table-responsive">
                 {!! Form::open(array('url' => 'supplier/createbluckinvoice/'.$storeData->id,'id' => 'flag_submit','files'=>true,'method'=>'POST')) !!}
                 @foreach ($main_order_ids as $order_id)
                 <input type="hidden" class="flag_checkbox" name="flag[]" data-id="flagData" value="{{$order_id}}" />
@@ -46,7 +46,7 @@
                         <th style="width:400px; text-align: center;">Name</th>
                         <th style="width:100px; text-align: center;">Price</th>
                         <th style="width:120px; text-align: center;">Quantity</th>
-                        <th style="background: #e7e8e9; text-align: center; width: 70px;">Amount</th>
+                        <th style=" text-align: center; width: 70px;">Amount</th>
                     </tr>
                     <?php
                     $main_invoice_total = 0;
@@ -57,7 +57,7 @@
                             <td class="description">{{ $oVal['product_title'] }}</td>
                             <td class="price">{{ $oVal['product_admin_price'] }}</td>
                             <td class="quantity"> {{ $oVal['product_quantity'] }}</td>
-                            <td class="amount" style="background: #e7e8e9;">{{ number_format(($oVal['product_admin_price'] * $oVal['product_quantity']), 2) }}</td>
+                            <td class="amount" style="">{{ number_format(($oVal['product_admin_price'] * $oVal['product_quantity']), 2) }}</td>
                         </tr>
                         <?php
                         $main_invoice_total += ($oVal['product_admin_price'] * $oVal['product_quantity']);
@@ -69,9 +69,9 @@
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
                             <!-- <div style="width:50px; height:3px; position: absolute;top:136px; right:-10px; color: #e7e8e9; background: #ff7900"></div> -->
-                            <p style="font-size:16px; color:#000;font-weight: 600;">SUB TOTAL</p>
+                            <p style="font-size:16px;font-weight: 600;">SUB TOTAL</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($main_invoice_total,2)}}</b></p>
                         </td>
                     </tr>
@@ -80,9 +80,9 @@
                             {!! Form::text('other_charges_description', NULL, array('placeholder' => 'Enter other payment description here...', 'class' => 'form-control')) !!}     
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
-                            <p style="font-size:16px; color:#000;font-weight: 600;">OTHER</p>
+                            <p style="font-size:16px;font-weight: 600;">OTHER</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900 "><b>{!! Form::number('other_charges', '0', array('step' => 'any', 'min' => '1', 'class' => 'form-control other_charges_box')) !!}</b></p>
                         </td>
                     </tr>
@@ -91,9 +91,9 @@
 
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
-                            <p style="font-size:16px; color:#000;font-weight: 600;">TOTAL</p>
+                            <p style="font-size:16px;font-weight: 600;">TOTAL</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900"><b><span class="invoice_total_box">{{number_format($main_invoice_total,2)}}</span></b></p>
                         </td>
                     </tr>

@@ -101,10 +101,25 @@ class OrdersController extends Controller {
             $i = 1;
             foreach ($orderData as $order) {
                 $u['id'] = $order->id;
+
+                $totalItem = 0;
+                $fulfilled = 0;
+                foreach ($order->itemsarr as $item) {
+                    $totalItem += $item->quantity;
+                    if ($item->fulfillment_status == 'fulfilled') {
+                        $fulfilled = 1;
+                    }
+                }
+
+                $u['assign_supplier'] = "-";
+                if ($order->financial_status == 'paid') {
+                    $u['assign_supplier'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" />';
+                }
                 if ($order->assign_supplier == 1) {
                     $u['assign_supplier'] = "Already Assigned";
-                } else {
-                    $u['assign_supplier'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" />';
+                }
+                if ($fulfilled == 1) {
+                    $u['assign_supplier'] = "Already Fulfilled";
                 }
 
                 $u['order_id'] = $order->order_id;
@@ -118,10 +133,6 @@ class OrdersController extends Controller {
                 $u['created_at'] = date('M d, Y H:i:s', strtotime($order->created_at));
                 //$actionsStatus = view('seller.orderitems', ['order' => $order]);
                 //$u['items'] = $actionsStatus->render();
-                $totalItem = 0;
-                foreach ($order->itemsarr as $item) {
-                    $totalItem += $item->quantity;
-                }
                 $itesmText = ($totalItem) ? "Items" : "Item";
                 $u['items'] = '<a href="javascript:void(0)" data-id="' . $order->order_id . '" class="btn btn-success viewOrderDetail" title="View Detail"><i class="fa fa-eye"></i> View ' . $totalItem . " " . $itesmText . '</a>';
                 $Data[] = $u;
@@ -179,7 +190,7 @@ class OrdersController extends Controller {
             foreach ($exportCsvData as $csv_data) {
 
                 $fileURL = URL::to('/') . Storage::url('ordercsv/' . $csv_data->csv_file_name);
-                $u['log_file'] = '<a target="_blank" href="' . $fileURL . '">' . $csv_data->csv_file_name . '</a>';
+                $u['csv_file_name'] = '<a target="_blank" href="' . $fileURL . '">' . $csv_data->csv_file_name . '</a>';
                 $u['created_at'] = date('M d, Y H:i:s', strtotime($csv_data->created_at));
 
                 $Data[] = $u;
@@ -240,17 +251,19 @@ class OrdersController extends Controller {
      */
     public function export_csv_flag(Request $request) {
         $fileNameCsv = "orders_export_" . time() . ".csv";
+        $storeDomain = auth()->user()->username;
         //comma seprated order ids
         $odrIdArr = [];
         if ($request->result == "b") {
-            $orderIdLists = Order::where(['assign_supplier' => 0])->pluck('order_id');
+            $orderIdLists = Order::where(['assign_supplier' => 0, 'financial_status' => 'paid', 'store_domain' => $storeDomain])->pluck('order_id');
             foreach ($orderIdLists as $orderIdList) {
-                $odrIdArr[] = $orderIdList;
+                if (OrderItem::check_fulfillment_status($orderIdList) == 0)
+                    $odrIdArr[] = $orderIdList;
             }
         } else {
             $odrIdArr = explode("#", $request->order_ids);
         }
-        $odrIdArr = array_filter($odrIdArr);
+        $odrIdArr = array_filter(array_unique($odrIdArr));
 
         //get order list based on comma separated values
         $orderItems = OrderItem::whereIn('order_id', $odrIdArr)->with(['orderdetail'])->get();

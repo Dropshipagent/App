@@ -1,6 +1,8 @@
 <!-- Main content -->
 {!! Form::model($product, ['route' => ['products.update', $product->id], 'id'=>'confirmReqForm','files'=>true,'method'=>'PATCH']) !!}
+@if($product->product_status < 2)
 {!! Form::hidden('product_status',2) !!}
+@endif
 {!! Form::hidden('current_product_status',$product->product_status) !!}
 {!! Form::hidden('store_domain') !!}
 {!! Form::hidden('title') !!}
@@ -11,7 +13,7 @@
         <li><a href="#product_info" data-toggle="tab" id="product_info_tab">Product Info</a></li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active" id="product_quick_info">
+        <div class="tab-pane active table-responsive" id="product_quick_info">
             <table class="table table-hover">
                 <tr>
                     <th>Product Name</th>
@@ -32,7 +34,7 @@
         </div>
         <div class="tab-pane" id="product_variants">
             <!-- text input -->
-            <div class="form-group">
+            <div class="form-group table-responsive">
                 <table class="table table-hover">
                     <tr>
                         <th>Item Name</th>
@@ -56,7 +58,7 @@
             <div class="row product_item_{{ $product->id }}">
                 <div class="col-md-12 form-group">
                     What is your aliexpress product URL?
-                    <label for="">{{$product->aliexpress_url}}</label>
+                    <a class="" target="_blank" href="{{$product->aliexpress_url}}">View Product &RightTriangle;</a>
                 </div>
                 <div class="col-md-12 form-group">
                     How many orders per day?

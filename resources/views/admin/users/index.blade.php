@@ -27,7 +27,7 @@
                     <li><a href="#suppliers" id="suppliers_tab" data-toggle="tab">Suppliers</a></li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="pending_req">
+                    <div class="tab-pane active table-responsive" id="pending_req">
                         <table id="pending_reqData" class="table table-hover table-striped table-bordered datatable">
                             <thead>
                                 <tr>
@@ -42,7 +42,7 @@
                             </thead>
                         </table>
                     </div>
-                    <div class="tab-pane" id="app_and_unpaid">
+                    <div class="tab-pane table-responsive" id="app_and_unpaid">
                         <table id="app_and_unpaidData" class="table table-hover table-striped table-bordered datatable">
                             <thead>    
                                 <tr>
@@ -57,7 +57,7 @@
                             </thead>
                         </table>
                     </div>
-                    <div class="tab-pane" id="app_and_paid">
+                    <div class="tab-pane table-responsive" id="app_and_paid">
                         <table id="app_and_paidData" class="table table-hover table-striped table-bordered datatable">
                             <thead>    
                                 <tr>
@@ -72,7 +72,7 @@
                             </thead>
                         </table>
                     </div>
-                    <div class="tab-pane" id="suppliers">
+                    <div class="tab-pane table-responsive" id="suppliers">
                         <div class="box-tools pull-right">
                             <a href="{{ url('/admin/users/create') }}" class="btn btn-block btn-danger btn-sm">Add New Supplier</a>
                         </div>
@@ -383,6 +383,27 @@
                 });
             }
         });
+
+        //code to show popup of mapped stores of a supplier
+        $(document).on('click', '.showMappedStoreList', function (e) {
+            var userID = $(this).data('id');
+            // show Modal
+            $.ajax({
+                url: '{{ url("admin/users/supplier-mapped-stores") }}/' + userID,
+                type: "GET",
+                dataType: "html",
+                success: function (data) {
+                    showAlertMessage(data, "Mapped Stores");
+                },
+                error: function (xhr, status) {
+                    alert("Sorry, there was a problem!");
+                },
+                complete: function (xhr, status) {
+                    //$('#acceptProductsModal').modal('show');
+                }
+            });
+        });
+
     });
 </script>
 @endsection

@@ -30,7 +30,7 @@ class LoginShopifyController extends Controller {
 
         return Socialite::with('shopify')
                         ->setConfig($config)
-                        ->scopes(['read_products','read_orders', 'read_fulfillments', 'write_fulfillments', 'read_shipping', 'write_shipping'])
+                        ->scopes(['read_products', 'read_orders', 'write_orders', 'read_fulfillments', 'write_fulfillments', 'read_shipping', 'write_shipping'])
                         ->redirect();
     }
 

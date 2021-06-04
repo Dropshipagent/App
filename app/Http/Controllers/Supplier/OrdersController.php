@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailable;
 use PDF;
 use Session;
+use URL;
+use Storage;
 
 class OrdersController extends Controller {
 
@@ -129,7 +131,11 @@ class OrdersController extends Controller {
             foreach ($orderData as $order) {
                 $orderItems = OrderItem::with(['productdetail'])->where("order_id", $order->order_id)->get();
                 $u['id'] = $order->id;
-                $u['create_invoice'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" checked />';
+                if (OrderItem::check_fulfillment_status($order->order_id) == 0 && $order->financial_status == 'paid') {
+                    $u['create_invoice'] = '<input type="checkbox" class="flag_checkbox" name="flag[]" data-id="flagData" value="' . $order->order_id . '" checked />';
+                } else {
+                    $u['create_invoice'] = '-';
+                }
                 $u['order_id'] = $order->order_id;
                 $u['order_number'] = $order->order_number;
                 $u['email'] = $order->email;
@@ -386,10 +392,68 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showcsvlogs($id) {
-        $login_user = auth()->user()->id;
-        $cronorder_logs = CronorderLog::where(['store_id' => $id, 'supplier_id' => $login_user])->orderBy('created_at', 'desc')->get();
-        return view('supplier.showcsvlogs', ['cronorder_logs' => $cronorder_logs]);
+    public function showcsvlogs(Request $request) {
+        if ($request->ajax()) {
+            $login_user = auth()->user()->id;
+            $selectedStoreID = Session::get('selected_store_id');
+            $extraSearch = array();
+            $q = CronorderLog::where(['store_id' => $selectedStoreID, 'supplier_id' => $login_user]);
+            $TotalOrderData = $q->count();
+
+            $responsedata = $q;
+            $search = $request['search']['value'];
+            if ($search && !empty($search)) {
+                $q->where(function($query) use ($search) {
+                    $query->where('id', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('csv_file_name', 'LIKE', '%' . $search . '%');
+                });
+                $responsedata = $q;
+                $TotalOrderData = $q->count();
+            }
+
+            $limit = $request->input('length');
+            $start = $request->input('start');
+
+            $columnindex = $request['order']['0']['column'];
+            $orderby = $request['columns'][$columnindex]['data'];
+            $order = $orderby != "" ? $request['order']['0']['dir'] : "";
+            $draw = $request['draw'];
+
+            $response = $responsedata->orderBy($orderby, $order)
+                    ->offset($start)
+                    ->limit($limit)
+                    ->get();
+
+            if (!$response) {
+                $exportCsvData = [];
+                $paging = [];
+            } else {
+                $exportCsvData = $response;
+                $paging = $response;
+            }
+
+            $Data = array();
+            $i = 1;
+            foreach ($exportCsvData as $csv_data) {
+                $fileURL = URL::to('/') . Storage::url('ordercsv/' . $csv_data->csv_file_name);
+                $u['store_domain'] = $csv_data->store_domain;
+                $u['csv_file_name'] = '<a target="_blank" href="' . $fileURL . '">' . $csv_data->csv_file_name . '</a>';
+                $u['created_at'] = date('M d, Y H:i:s', strtotime($csv_data->created_at));
+
+                $Data[] = $u;
+                $i++;
+                unset($u);
+            }
+            $return = [
+                "draw" => intval($draw),
+                "recordsFiltered" => intval($TotalOrderData),
+                "recordsTotal" => intval($TotalOrderData),
+                "data" => $Data
+            ];
+            return $return;
+        }
+        return view('supplier.showcsvlogs');
     }
 
     /**
@@ -418,7 +482,7 @@ class OrdersController extends Controller {
                 $q->where(function($query) use ($search) {
                     $query->where('id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
-                    $query->orWhere('order_id', 'LIKE', '%' . $search . '%');
+                    $query->orWhere('order_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_url', 'LIKE', '%' . $search . '%');
                     $query->orWhere('tracking_company', 'LIKE', '%' . $search . '%');
@@ -453,7 +517,7 @@ class OrdersController extends Controller {
 
                 $u['id'] = $tracking->id;
                 $u['store_domain'] = $tracking->store_domain;
-                $u['order_id'] = $tracking->order_id;
+                $u['order_number'] = $tracking->order_number;
                 $u['tracking_number'] = $tracking->tracking_number;
                 $u['tracking_url'] = '<a href="' . $tracking->tracking_url . '" target="_balnk">' . $tracking->tracking_url . '</a>';
                 $u['tracking_company'] = $tracking->tracking_company;
@@ -671,19 +735,14 @@ class OrdersController extends Controller {
              * Get supplier assigned stores
              */
             $supplier_id = auth()->user()->id;
-            $user = User::with(['supplierstores'])->find($supplier_id);
-            $storeArr = [];
-            foreach ($user->supplierstores as $supplierstore) {
-                $storeArr[] = $supplierstore->store_domain;
-            }
-
+            $storeDomain = helGetUsernameById(Session::get('selected_store_id'));
             foreach ($sheetData as $dataSingle) {
                 if (!empty(trim($dataSingle[0])) && !empty(trim($dataSingle[1])) && !empty(trim($dataSingle[2])) && !empty(trim($dataSingle[3]))) {
                     //get invoice data of uploaded order id
-                    $getInvoice = StoreInvoice::where("order_number", $dataSingle[0])->where("fulfillment_status", "!=", "fulfilled")->where("paid_status", 2)->whereIn('store_domain', $storeArr)->first();
+                    $getInvoice = StoreInvoice::where("order_number", $dataSingle[0])->where("fulfillment_status", "!=", "fulfilled")->where("paid_status", 2)->where('store_domain', $storeDomain)->first();
                     if ($getInvoice) {
                         //get order data of uploaded order id
-                        $orderDtl = Order::with(['itemsarr'])->where("order_number", $dataSingle[0])->whereIn('store_domain', $storeArr)->first();
+                        $orderDtl = Order::with(['itemsarr'])->where("order_number", $dataSingle[0])->where('store_domain', $storeDomain)->first();
                         //code to check which items will be able to fullfill
                         $line_items = [];
                         $supplierPriceArr = json_decode($getInvoice->invoice_data, true);
@@ -728,9 +787,6 @@ class OrdersController extends Controller {
                             }
                         }
 
-                        //Send notifiction to store owner
-                        Notification::addNotificationFromAllPanel($uUser->id, "Tracking has been uploaded for order (" . $dataSingle[0] . ")", helGetAdminID(), 0, 'TRACKING_UPLOADED');
-
                         //send email code
                         $email_data['message'] = $data;
                         $email_data['subject'] = 'Tracking info for order :: ' . $dataSingle[0];
@@ -743,6 +799,9 @@ class OrdersController extends Controller {
                     }
                 }
             }
+            //Send notifiction to store owner
+            Notification::addNotificationFromAllPanel(Session::get('selected_store_id'), "Tracking has been uploaded", helGetAdminID(), 0, 'TRACKING_UPLOADED');
+
             //Send notifiction to supplier ownself
             Notification::addNotificationFromAllPanel(auth()->user()->id, "Tracking uploaded successfully", Session::get('selected_store_id'), 0, 'TRACKING_UPLOADED');
 

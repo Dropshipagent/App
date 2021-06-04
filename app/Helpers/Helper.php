@@ -51,7 +51,7 @@ if (!function_exists('helGetUsernameById')) {
 
     function helGetUsernameById($id) {
         $user = User::select('username')->where(['id' => $id])->first();
-        return $user->username;
+        return (isset($user->username)) ? $user->username : '';
     }
 
 }

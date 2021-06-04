@@ -18,5 +18,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::any('webhook/shopify/uninstall', 'SellerOrderController@uninstall_app');
-Route::any('webhook/shopify/orders/create', 'SellerOrderController@create');
+Route::any('webhook/shopify/orders/create', 'SellerOrderController@createOrder');
+Route::any('webhook/shopify/orders/updated', 'SellerOrderController@updateOrder');
 Route::any('shopify/seller/orders/csvexportcron', 'ExportController@csvexportcron');

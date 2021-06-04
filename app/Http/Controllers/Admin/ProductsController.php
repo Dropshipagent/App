@@ -102,6 +102,10 @@ class ProductsController extends Controller {
         $product = Product::findOrFail($request->product_id);
 
         $getStoreData = helGetStoreDATA($product->store_domain);
+        //Update user status with product approval
+        if ($getStoreData->status <= 1) {
+            $getStoreData->fill(['status' => -1])->save();
+        }
         //send email when admin update any product price after accept
         $data = [];
         $data['receiver_name'] = "Dear " . $getStoreData->name;
@@ -181,15 +185,7 @@ class ProductsController extends Controller {
         foreach ($input['variant_id'] as $key => $val) {
             $basePriceArr[$val] = $input['base_price_' . $val];
             $adminComisonPriceArr[$val] = number_format(1, 2);
-            /* if (($input['variant_price'][$key] - $input['base_price_' . $val]) >= 2) {
-              $percentage = 70;
-              $totalDifference = ($input['variant_price'][$key] - $input['base_price_' . $val]);
-              $adminComisonPrice = ($percentage / 100) * $totalDifference;
-              $adminComisonPriceArr[$val] = number_format($adminComisonPrice, 2);
-              } else {
-              $adminComisonPriceArr[$val] = number_format(1, 2);
-              } */
-
+            
             if (($basePriceArr[$val] <= 0) || ($adminComisonPriceArr[$val] < 0)) {
                 return redirect('admin/products/index/' . $input['store_domain'])->with('error', 'Product "' . $input['title'] . '", all price should be greater than "0"!');
             }

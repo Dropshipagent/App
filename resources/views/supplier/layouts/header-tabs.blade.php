@@ -1,13 +1,11 @@
 <style>
     /* Style the tab */
-    .tab {
-        overflow: hidden;
-        border: 1px solid #ccc;
-        background-color: #fff;
+    .header_tabs  {
+        margin:20px 0;
     }
 
     /* Style the buttons inside the tab */
-    .tab a {
+    .header_tabs a {
         background-color: inherit;
         float: left;
         border: none;
@@ -16,19 +14,21 @@
         padding: 14px 16px;
         transition: 0.3s;
         font-size: 14px;
-        color:#101010
+        color:#FFF;
+        border-radius: 30px;
 
     }
 
     /* Change background color of buttons on hover */
-    .tab a:hover {
-        background-color: #ddd;
+    .header_tabs a:hover {
+        background-color: #FFD301;
+        color: #000;
     }
 
     /* Create an active/current tablink class */
-    .tab a.active {
-        background-color: #fff;
-        color:#d7b441;
+    .header_tabs a.active {
+        background-color: #FFD301;
+        color:#000;
         font-weight: bold;
     }
 
@@ -40,7 +40,7 @@
         border-top: none;
     }
 </style>
-<div class="row tab">
+<div class="row header_tabs">
     <?php
     $mapped_stores = helGetMappedStores(auth()->user()->id);
     //get session value of selected store
@@ -61,7 +61,7 @@
             $viewOrders = route('orders.show', $storeIDVal);
             $viewInvoicesLogs = url('supplier/showinvoiceslog', $storeIDVal);
             $viewTrackingLogs = url('supplier/trackinglogs', $storeIDVal);
-            $viewCsvLogs = url('supplier/showcsvlogs', $storeIDVal);
+            $viewCsvLogs = url('supplier/showcsvlogs');
             $quickChat = $storeIDVal;
         } else {
             $createInvoices = '#';

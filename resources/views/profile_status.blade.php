@@ -10,7 +10,10 @@
 
     <div class="col-md-12 col-sm-12 col-xs-12 text-center">
         <p>Welcome {{ auth()->user()->name }}</p>
-        <p>Your     application is successfully submitted to Dropship Agent. One of our team members will reach out to you shortly with steps to verify your profile.<br />Please reach out to us at support@dropshipagent.co for any further queries/enquiries</p>
+        <p>Your application has been successfully submitted to Dropship Agent! <br/>
+            One of our team members will reach out to you shortly with steps to verify your profile. <br/>
+            Please reach out to us at <a href="mailto:support@dropshipagent.com">Support@dropshipagent.com</a> for any further questions!
+        </p>
     </div>
 
 </section>
@@ -41,7 +44,7 @@
             <p>On average, our clients make 25% extra immediately when sourcing with Dropship Agent</p>
         </div> 
 
-        </div>
+    </div>
 </section>
 <section class="greenBoxBg">
     <div class="row">

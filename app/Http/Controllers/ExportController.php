@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendMailable;
 
 class ExportController extends Controller {
 
@@ -40,7 +42,7 @@ class ExportController extends Controller {
                     //get highest orderitem id from CronorderLog table
                     $cronorder_log = CronorderLog::where(['supplier_id' => $storeMapping->supplier_id, 'store_domain' => $storeMapping->store_domain])->max('cron_last_order');
                     //get max id which will save into export csv log
-                    $maxIDVal = OrderItem::where(['store_domain' => $storeMapping->store_domain])->max('id');
+                    $maxIDVal = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $storeMapping->store_domain)->where('orders.assign_supplier', 0)->max('order_items.id');
                     if ($maxIDVal > $cronorder_log) {
                         $fileNameResponse = Order::create_orders_csv($storeMapping->store_domain, $cronorder_log);
                         $fileNameRespoArr = json_decode($fileNameResponse);

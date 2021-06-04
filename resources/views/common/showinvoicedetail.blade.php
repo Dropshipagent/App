@@ -1,3 +1,4 @@
+
 <?php $layout = 'layouts.app'; if(auth()->user()->role == 1) { $layout = 'admin.layouts.app';  } if(auth()->user()->role == 3) { $layout = 'supplier.layouts.app';  } ?>
 @extends($layout)
 @section('title', 'Invoice Detail')
@@ -23,15 +24,15 @@
     .invoiceDetails td {
         padding-left: 11px;
     }
-    .amount{background: #e7e8e9; text-align: right; padding-right: 15px; font-size: 18px;}
+    .amount{ text-align: right; padding-right: 15px; font-size: 18px;}
 </style>
 <section class="content">
     <div class="nav-tabs-custom invoiceDetails" style="width: 1000px; margin: auto; font-size: 16px; padding:25px;">
-        <div class="tab-content" >
+        <div class="tab-content table-responsive" >
 
             <table cellpadding="0" cellspacing="5" border="0" style="width:100% !important; margin-top: 25px;">  
                 <tr>
-                    <td colspan="2" class="text-center header_txtt"> <h1><span class="color_ye">DROPSHIP</span>AGENT<span class="sub_heads"><i>INVOICES</i></span></h1></td>
+                    <td colspan="2" class="text-center header_txtt"> <h1 class="heading color-white"><span class="color_ye">DROPSHIP</span>AGENT<span class="sub_heads"><i>INVOICES</i></span></h1></td>
                 </tr>  
                 <tr class="topheading">
                     <td valign="top" style="width:150px">
@@ -47,14 +48,14 @@
                     </td>
                 </tr>
             </table>
-            <main>                
+            <main class="table-responsive">                
                 <table cellpadding="0" cellspacing="0" border-color="#000" class="listdata table-bordered " style="width:100%;height:380px; margin-top: 25px;font-size: 16px;">    
                     <tr align="left">
                         <th style=" width:30px; text-align: center;">Item</th>
                         <th style="width:400px; text-align: center;">Name</th>
                         <th style="width:100px; text-align: center;">Price</th>
                         <th style="width:120px; text-align: center;">Quantity</th>
-                        <th style="background: #e7e8e9; text-align: center; width: 70px;">Amount</th>
+                        <th style=" text-align: center; width: 70px;">Amount</th>
                     </tr>
                     <?php
                     $main_invoice_total = 0;
@@ -66,7 +67,7 @@
                                 <td class="description">{{ $oVal['product_title'] }}</td>
                                 <td class="price">{{ ($oVal['product_admin_price']/$oVal['product_quantity']) }}</td>
                                 <td class="quantity"> {{ $oVal['product_quantity'] }}</td>
-                                <td class="amount" style="background: #e7e8e9;">{{ number_format(($oVal['product_admin_price']), 2) }}</td>
+                                <td class="amount" style="">{{ number_format(($oVal['product_admin_price']), 2) }}</td>
                             </tr>
                             <?php
                             $main_invoice_total += $oVal['product_admin_price'];
@@ -82,7 +83,7 @@
                                 <td class="description">{{ $oVal['product_title'] }}</td>
                                 <td class="price text-right" style="padding-right: 10px;">{{ $product_price }}</td>
                                 <td class="quantity text-right" style="padding-right: 10px;"> {{ $oVal['product_quantity'] }}</td>
-                                <td class="amount" style="background: #e7e8e9;">{{ number_format(($product_price*$oVal['product_quantity']), 2) }}</td>
+                                <td class="amount" style="">{{ number_format(($product_price*$oVal['product_quantity']), 2) }}</td>
                             </tr>
                             <?php
                             $main_invoice_total += ($product_price * $oVal['product_quantity']);
@@ -95,9 +96,9 @@
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
                             <!-- <div style="width:50px; height:3px; position: absolute;top:136px; right:-10px; color: #e7e8e9; background: #ff7900"></div> -->
-                            <p style="font-size:16px; color:#000;font-weight: 600;">SUB TOTAL</p>
+                            <p style="font-size:16px;font-weight: 600;">SUB TOTAL</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($main_invoice_total,2)}}</b></p>
                         </td>
                     </tr>
@@ -106,9 +107,9 @@
                             {{ $mainInvoice->other_charges_description }}
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
-                            <p style="font-size:16px; color:#000;font-weight: 600;">OTHER</p>
+                            <p style="font-size:16px;font-weight: 600;">OTHER</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($mainInvoice->other_charges,2)}}</b></p>
                         </td>
                     </tr>
@@ -117,9 +118,9 @@
 
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
-                            <p style="font-size:16px; color:#000;font-weight: 600;">TOTAL</p>
+                            <p style="font-size:16px;font-weight: 600;">TOTAL</p>
                         </td>
-                        <td style="background: #e7e8e9; text-align: right; font-size: 18px; color:#000;padding-top: 10px; padding-right: 15px;">
+                        <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
                             <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format(($main_invoice_total+$mainInvoice->tax_rate+$mainInvoice->sales_tax+$mainInvoice->other_charges),2)}}</b></p>
                         </td>
                     </tr>
@@ -155,24 +156,26 @@
                             {!! Form::hidden('invoiceID', null, array('class' => 'invoice_id')) !!}
                             {!! Form::hidden('camount', null, array('class' => 'invoice_amount')) !!}
                             @if(count($userCardProfiles)>0)
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>&nbsp;</th>
-                                        <th>Card</th>
-                                        <th>Ending With</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($userCardProfiles as $key => $val)
-                                    <tr>
-                                        <td><label for="card_type{{ $val['item_profile_id'] }}">{!! Form::radio('payment_option', $val['item_profile_id'], false, ['class' => 'select_card', 'id' => 'card_type'.$val['item_profile_id']]) !!} </label></td>
-                                        <td>{{ $val['card_type'] }}</td>
-                                        <td>{{ $val['card_4_digit'] }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>&nbsp;</th>
+                                            <th>Card</th>
+                                            <th>Ending With</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($userCardProfiles as $key => $val)
+                                        <tr>
+                                            <td><label for="card_type{{ $val['item_profile_id'] }}">{!! Form::radio('payment_option', $val['item_profile_id'], false, ['class' => 'select_card', 'id' => 'card_type'.$val['item_profile_id']]) !!} </label></td>
+                                            <td>{{ $val['card_type'] }}</td>
+                                            <td>{{ $val['card_4_digit'] }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                             @endif
                             <label for="custom_card">{!! Form::checkbox('card_option', 'custom_card', false, ['class' => 'custom_card', 'id' => 'custom_card']) !!} Add new card</label><br/><br/>
                             <div class="addNewCard" {{ (count($userCardProfiles) > 0)?"style=display:none;":"" }}>

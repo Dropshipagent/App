@@ -4,10 +4,7 @@
 
 <!-- Main content -->
 <section class="content textPage">
-    <div class="">
-
-
-        <div class="faq-section">
+        <div class="faq-section shipping_info_page">
             <div class="panel-group" id="accordion">
 
                 <div class="panel panel-default">
@@ -216,7 +213,12 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="clear"></div>
 
+        <div class="faq-section shipping_info_page_2">
+            <div class="panel-group" id="accordion">
                 <h2>International Shipping Policy</h2>
                 <p>We currently ship outside the U.S. We ship to all epacket countries.</p>
 
@@ -395,11 +397,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="clear"></div>
 
             </div>
         </div>
-    </div>
-    <!-- /.box -->
+
 
 </section>
 <!-- /.content -->

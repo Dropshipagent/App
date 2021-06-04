@@ -6,7 +6,7 @@
 <section class="content">
     <!-- Default box -->
     <div class="box">
-        <div class="box-body table-responsive no-padding">
+        <div class="box-body table-responsive">
             <div class="container-fluid">
 
                 <div class="card card-primary">

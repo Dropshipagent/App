@@ -5,8 +5,6 @@
 <!-- Main content -->
 <section class="content">
     <!-- Default box -->
-    <div class="box">
-        <div class="box-body">
             <div class="row">
                 <div class="col-sm-12">
                     <h1>Privacy Policy</h1>
@@ -181,11 +179,6 @@
                     </ul>
                 </div>
             </div>
-        </div>
-        <!-- /.box-body -->
-        <!-- /.box-footer-->
-    </div>
-    <!-- /.box -->
 
 </section>
 <!-- /.content -->
