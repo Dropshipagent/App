@@ -1,5 +1,12 @@
 
-<?php $layout = 'layouts.app'; if(auth()->user()->role == 1) { $layout = 'admin.layouts.app';  } if(auth()->user()->role == 3) { $layout = 'supplier.layouts.app';  } ?>
+<?php
+$layout = 'layouts.app';
+if (auth()->user()->role == 1) {
+    $layout = 'admin.layouts.app';
+} if (auth()->user()->role == 3) {
+    $layout = 'supplier.layouts.app';
+}
+?>
 @extends($layout)
 @section('title', 'Invoice Detail')
 @section('main-content')
@@ -136,115 +143,28 @@
         </div>
     </div>
 </section>
-
-<!-- Modal - this model will be shown only in the store owner case -->
-@if(auth()->user()->role == 2)
-<div id="payNowModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Pay Now</h4>
-            </div>
-            <div class="modal-body">
-                <div class="col-md-12">
-                    <div class="content">
-                        <form class="" action="{{ url('/invoice_checkout') }}" method="post">
-                            {{ csrf_field() }}
-                            {!! Form::hidden('invoiceID', null, array('class' => 'invoice_id')) !!}
-                            {!! Form::hidden('camount', null, array('class' => 'invoice_amount')) !!}
-                            @if(count($userCardProfiles)>0)
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>&nbsp;</th>
-                                            <th>Card</th>
-                                            <th>Ending With</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($userCardProfiles as $key => $val)
-                                        <tr>
-                                            <td><label for="card_type{{ $val['item_profile_id'] }}">{!! Form::radio('payment_option', $val['item_profile_id'], false, ['class' => 'select_card', 'id' => 'card_type'.$val['item_profile_id']]) !!} </label></td>
-                                            <td>{{ $val['card_type'] }}</td>
-                                            <td>{{ $val['card_4_digit'] }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            @endif
-                            <label for="custom_card">{!! Form::checkbox('card_option', 'custom_card', false, ['class' => 'custom_card', 'id' => 'custom_card']) !!} Add new card</label><br/><br/>
-                            <div class="addNewCard" {{ (count($userCardProfiles) > 0)?"style=display:none;":"" }}>
-                                <h3>Credit Card Information</h3>
-                                <div class="form-group">
-                                    <label for="cnumber">Card Number</label>
-                                    <input type="text" class="form-control cnumber" id="cnumber" name="cnumber" placeholder="Enter Card Number">
-                                </div>
-                                <div class="form-group">
-                                    <label for="card-expiry-month">Expiration Month</label>
-                                    {{ Form::selectMonth(null, null, ['name' => 'card_expiry_month', 'class' => 'form-control card_expiry_month']) }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="card-expiry-year">Expiration Year</label>
-                                    {{ Form::selectYear(null, date('Y'), date('Y') + 10, null, ['name' => 'card_expiry_year', 'class' => 'form-control card_expiry_year']) }}
-                                </div>
-                                <div class="form-group">
-                                    <label for="ccode">Card Code</label>
-                                    <input type="text" class="form-control ccode" id="ccode" name="ccode" placeholder="Enter Card Code">
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <!-- (c) 2005, 2020. Authorize.Net is a registered trademark of CyberSource Corporation --> <div style="margin-left: 30px; clear: both;" class="AuthorizeNetSeal"> <script type="text/javascript" language="javascript">var ANS_customer_id = "f3bc89f6-aaf8-4c87-b3c6-65b911c74055";</script> <script type="text/javascript" language="javascript" src="https://verify.authorize.net/anetseal/seal.js" ></script> </div>
-            </div>
-        </div>
-
-    </div>
-</div>
-@endif
 <script type="text/javascript">
-                    $(document).ready(function () {
-                        //show modal popup jquery
-                        $(document).on('click', '.pay_now_btn', function (e) {
-                            $('.invoice_id').val($(this).data("id"));
-                            $('.invoice_amount').val($(this).data("val"));
-                            // show Modal
-                            $('#payNowModal').modal('show');
-                        });
-
-                        jQuery('.select_card').change(function () {
-                            if (jQuery('.custom_card').is(':checked')) {
-                                jQuery('.custom_card').trigger("click");
-                            }
-                        });
-                        jQuery('.custom_card').change(function () {
-                            if (jQuery(this).is(':checked')) {
-                                jQuery(".select_card").each(function () {
-                                    jQuery(this).prop("checked", false);
-                                });
-                                jQuery('.cnumber').prop("required", true);
-                                jQuery('.card_expiry_month').prop("required", true);
-                                jQuery('.card_expiry_year').prop("required", true);
-                                jQuery('.ccode').prop("required", true);
-                                jQuery('.addNewCard').show();
-                            } else {
-                                jQuery('.cnumber').prop("required", false);
-                                jQuery('.card_expiry_month').prop("required", false);
-                                jQuery('.card_expiry_year').prop("required", false);
-                                jQuery('.ccode').prop("required", false);
-                                jQuery('.addNewCard').hide();
-                            }
-                        });
-
-                    });
+    $(document).ready(function () {
+        //show modal popup jquery
+        $(document).on('click', '.pay_now_btn', function (e) {
+            var invoiceID = $(this).data("id");
+            var invoiceAmount = $(this).data("val");
+            $.ajax({
+                url: '{{ url("payment-info-page") }}',
+                type: "GET",
+                dataType: "html",
+                data: {"invoice_id": invoiceID, "invoice_amount": invoiceAmount},
+                success: function (data) {
+                    showAlertMessage(data, "Pay Now");
+                },
+                error: function (xhr, status) {
+                    alert("Sorry, there was a problem!");
+                },
+                complete: function (xhr, status) {
+                    $('#acceptProductsModal').modal('show');
+                }
+            });
+        });
+    });
 </script>
 @endsection

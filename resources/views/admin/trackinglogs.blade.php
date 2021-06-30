@@ -26,7 +26,7 @@
                 </div>
 
             </div>
-            <table class="table table-striped table-bordered datatable tracking">
+            <table class="table table-striped table-bordered datatable tracking" data-page-length='50'>
                 <thead> 
                     <tr>
                         <th>Invoice-ID</th>

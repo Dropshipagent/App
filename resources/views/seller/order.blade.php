@@ -46,7 +46,7 @@
                 </div>
 
 
-                <table class="table table-striped table-bordered datatable all">
+                <table class="table table-striped table-bordered datatable all" data-page-length='50'>
                     <thead> 
                         <tr>
                             <th>Supplier assign</th>
@@ -89,7 +89,7 @@
                 </div>
 
 
-                <table class="table table-striped table-bordered datatable open">
+                <table class="table table-striped table-bordered datatable open" data-page-length='50'>
                     <thead> 
                         <tr>
                             <th>Supplier assign</th>
@@ -129,7 +129,7 @@
                         </select>                        
                     </div>
                 </div>
-                <table class="table table-striped table-bordered datatable sourcedandpending">
+                <table class="table table-striped table-bordered datatable sourcedandpending" data-page-length='50'>
                     <thead>
                         <tr>
                             <th>Supplier assign</th>
@@ -170,7 +170,7 @@
                         </select>                        
                     </div-->
                 </div>
-                <table class="table table-striped table-bordered datatable fulfilled">
+                <table class="table table-striped table-bordered datatable fulfilled" data-page-length='50'>
                     <thead>
                         <tr>
                             <th>Supplier assign</th>

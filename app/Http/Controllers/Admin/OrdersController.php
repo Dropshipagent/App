@@ -251,14 +251,16 @@ class OrdersController extends Controller {
             $Data = array();
             $i = 1;
             foreach ($InvoiceData as $Invoice) {
-                $u['id'] = $Invoice->id;
+                $u['id'] = $i;
                 $u['store_domain'] = $Invoice->store_domain;
                 $u['admin_price_total'] = '$' . $Invoice->admin_price_total;
                 $u['admin_commission_total'] = '$' . $Invoice->admin_commission_total;
                 if ($paid_status == 1) {
-                    $u['paid_status'] = '<input type="button" class="btn btn-primary supplierpaidbtn" value="Mark Paid" data-id="' . $Invoice->id . '" />';
+                    $u['payment_info'] = '<input type="button" class="btn btn-success view_payment_info" value="Payment Info" data-id="' . url('storage/invoice_payments/' . $Invoice->payment_image) . '" />';
+                    $u['decline_payment'] = '<input type="button" class="btn btn-danger update-invoice-status" style="background-color:red; border-color:red; color:#fff" value="Decline Payment" data-id="' . $Invoice->id . '" data-val="0" />';
+                    $u['paid_status'] = '<input type="button" class="btn btn-primary update-invoice-status" value="Mark Paid" data-id="' . $Invoice->id . '" data-val="2" />';
                 }
-                $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->created_at));
+                $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->updated_at));
                 $u['action'] = '<a href="' . url('admin/showinvoicedetail/' . $Invoice->id) . '" class="btn btn-warning margin2px" title="View Invoice Detail"><i class="fa fa-eye"></i> View Invoice Detail</a>';
 
                 $Data[] = $u;
@@ -290,40 +292,45 @@ class OrdersController extends Controller {
         return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
     }
 
-    public function supplier_paid_status_change(Request $request) {
+    public function updateInvoiceStatus(Request $request) {
         $invoice = Invoice::findOrFail($request->invoice_id);
         $invoice->paid_status = $request->status;
 
         //mark all store invoices paid
         $invoiceIDs = json_decode($invoice->store_invoice_ids, true);
         StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => $request->status]);
+        $message = "";
+        if ($request->status == 0) {
+            $message = "Invoice Declined!";
+            //send notification to admin 
+            $getStoreData = helGetStoreDATA($invoice->store_domain);
+            Notification::addNotificationFromAllPanel($getStoreData->id, "Invoice Declined!", helGetAdminID(), $invoice->id, 'INVOICE_DECLINED');
+        } else {
+            $message = "Invoice paid to supplier successfully!";
+            //get supplier data
+            $getSupplierData = helGetSupplierDATA($invoice->store_domain);
 
-        //get supplier data
-        $getSupplierData = helGetSupplierDATA($invoice->store_domain);
+            //send notification to admin 
+            Notification::addNotificationFromAllPanel($getSupplierData->id, "Invoice paid for (" . $invoice->store_domain . ")", helGetAdminID(), $invoice->id, 'INVOICE_PAID');
 
-        //send notification to admin 
-        Notification::addNotificationFromAllPanel($getSupplierData->id, "Invoice paid for (" . $invoice->store_domain . ")", helGetAdminID(), $invoice->id, 'INVOICE_PAID');
+            //send payment status email to supplier
+            $data = [];
+            $data['receiver_name'] = $getSupplierData->name;
+            $data['receiver_message'] = "Admin has changed invoice status paid of invoice id :: " . $invoice->id;
+            $data['sender_name'] = env('MAIL_FROM_NAME');
 
-        //send payment status email to supplier
-        $data = [];
-        $data['receiver_name'] = $getSupplierData->name;
-        $data['receiver_message'] = "Admin has changed invoice status paid of invoice id :: " . $invoice->id;
-        $data['sender_name'] = env('MAIL_FROM_NAME');
-
-        $email_data['message'] = $data;
-        $email_data['subject'] = 'Invoice paid successfully :: ' . $invoice->id;
-        $email_data['layout'] = 'emails.sendemail';
-        try {
-            Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
-        } catch (\Exception $e) {
-            // Never reached
+            $email_data['message'] = $data;
+            $email_data['subject'] = 'Invoice paid successfully :: ' . $invoice->id;
+            $email_data['layout'] = 'emails.sendemail';
+            try {
+                Mail::to($getSupplierData->email)->send(new SendMailable($email_data));
+            } catch (\Exception $e) {
+                // Never reached
+            }
         }
-
-
         return response()->json([
-                    'data' => [
-                        'success' => $invoice->save(),
-                    ]
+                    'success' => $invoice->save(),
+                    'message' => $message,
         ]);
     }
 

@@ -161,8 +161,12 @@ Route::group(['prefix' => '', 'middleware' => ['auth', 'front']], function() {
 
     Route::get('home', 'SellerOrderController@index')->name('home');
     Route::get('showinvoiceslog', 'AuthorizeController@showinvoiceslog')->name('Invoices');
-    Route::get('downloadinvoice/{invoiceID}', 'AuthorizeController@downloadinvoice'); //invoice download page
     Route::get('showinvoicedetail/{invoiceID}', 'AuthorizeController@showinvoicedetail')->name('Invoices');
+    Route::get('how-to-pay', 'AuthorizeController@howToPay');
+    Route::get('payment-info-page', 'AuthorizeController@paymentInfoPage');
+    Route::post('upload-payment-info', 'AuthorizeController@uploadPaymentInfo');
+
+    Route::get('downloadinvoice/{invoiceID}', 'AuthorizeController@downloadinvoice'); //invoice download page
     Route::get('showtrackinglog', 'HomeController@showtrackinglog');
     Route::get('showcsvlogs', 'OrdersController@showcsvlogs'); //csv list of export orders
     Route::get('orders', 'OrdersController@index');
@@ -178,7 +182,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin']], function(
     Route::get('showinvoiceslog', 'Admin\OrdersController@showinvoiceslog');
     Route::get('showinvoicedetail/{invoiceID}', 'Admin\OrdersController@showinvoicedetail');
 
-    Route::post('supplierpaidstatus_change', 'Admin\OrdersController@supplier_paid_status_change');
+    Route::post('update_invoice_status', 'Admin\OrdersController@updateInvoiceStatus');
 
     Route::get('users/set_store_session/{storeId}', 'Admin\UsersController@setStoreSession');
     Route::get('users/showcsvlogs', 'Admin\UsersController@showcsvlogs');

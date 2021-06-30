@@ -16,8 +16,8 @@
     <div class="box">
         <div class="box-body">
             <div class="row">
-                <div class="col-lg-3 col-md-6 col-sm-6">
-                    <!-- small box -->
+<!--                <div class="col-lg-3 col-md-6 col-sm-6">
+                     small box 
                     <div class="small-box orders_bg">
                         <div class="dislpay_flex_box">
                             <div class="icon">
@@ -30,7 +30,7 @@
                         </div>
                         <a href="{{ url('/admin/orders') }}" class="small-box-footer">More info</a>
                     </div>
-                </div>
+                </div>-->
                 <!-- ./col -->
                 <div class="col-lg-3 col-md-6 col-sm-6">
                     <!-- small box -->

@@ -46,6 +46,8 @@
                             <th>Store Domain</th>
                             <th>Supplier Price</th>
                             <th>Admin Commission</th>
+                            <th>Payment Info</th>
+                            <th>Decline Payment</th>
                             <th>Supplier Paid Status</th>
                             <th>Created</th>
                             <th>Action</th>
@@ -134,6 +136,8 @@
                 {mData: 'store_domain'},
                 {mData: 'admin_price_total'},
                 {mData: 'admin_commission_total'},
+                {mData: 'payment_info'},
+                {mData: 'decline_payment'},
                 {mData: 'paid_status'},
                 {mData: 'created_at'},
                 {mData: 'action'},
@@ -193,22 +197,29 @@
             paid_invoice_table.draw();
         });
         $('#supplier_paid_invoice_tab').click(function () {
-            paid_invoice_table.draw();
+            supplier_paid_invoice_table.draw();
         });
 
-        $(document).on('click', '.supplierpaidbtn', function () {
-            invoiceid = $(this).data("id");
+        //show modal popup jquery
+        $(document).on('click', '.view_payment_info', function (e) {
+            var imagePath = $(this).data("id");
+            showAlertMessage("<img src='" + imagePath + "' style='max-width:100%'>", "Payment Info");
+        });
+
+        $(document).on('click', '.update-invoice-status', function () {
+            var invoiceid = $(this).data("id");
+            var invoiceStatus = $(this).data("val");
             var r = confirm("Are you sure?");
             if (r == true) {
                 $.ajax({
                     type: 'POST',
-                    url: '{{ url("/admin/supplierpaidstatus_change") }}',
+                    url: '{{ url("/admin/update_invoice_status") }}',
                     headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                    data: {"invoice_id": invoiceid, "status": 2},
+                    data: {"invoice_id": invoiceid, "status": invoiceStatus},
                     success: function (data) {
-
-                        if (data.data.success) {
+                        if (data.success) {
                             paid_invoice_table.draw();
+                            showAlertMessage(data.message, "Payment Status");
                         }
                     }
                 });

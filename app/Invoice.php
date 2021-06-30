@@ -14,7 +14,7 @@ class Invoice extends Model {
      * @var array
      */
     protected $fillable = [
-        'supplier_id', 'store_domain', 'order_ids', 'store_invoice_ids', 'admin_price_total', 'admin_commission_total', 'invoice_total', 'other_charges_description', 'other_charges', 'paid_status', 'auth_code', 'trans_id', 'notes'];
+        'supplier_id', 'store_domain', 'order_ids', 'store_invoice_ids', 'admin_price_total', 'admin_commission_total', 'invoice_total', 'other_charges_description', 'other_charges', 'payment_image', 'paid_status', 'auth_code', 'trans_id', 'notes'];
 
     static function show_invoice_data($supplier_id, $invoiceIDs = NULL) {
         $InvoiceData = StoreInvoice::with(['orderdetail'])->where('supplier_id', $supplier_id)->whereIn('id', $invoiceIDs)->get();

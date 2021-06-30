@@ -16,6 +16,7 @@ use net\authorize\api\controller as AnetController;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMailable;
 use PDF;
+use Illuminate\Support\Facades\Validator;
 
 class AuthorizeController extends Controller {
 
@@ -66,7 +67,7 @@ class AuthorizeController extends Controller {
             $i = 1;
             foreach ($InvoiceData as $Invoice) {
                 $actionBtn = '';
-                $u['id'] = $Invoice->id;
+                $u['id'] = $i;
                 $u['store_domain'] = $Invoice->store_domain;
                 $u['admin_price_total'] = currency($Invoice->invoice_total, 'USD', currency()->getUserCurrency());
                 $u['other_charges'] = currency($Invoice->other_charges, 'USD', currency()->getUserCurrency());
@@ -75,7 +76,7 @@ class AuthorizeController extends Controller {
                 if ($paid_status == 0) {
                     $actionBtn .= ' <a href="javascript:void(0)" data-id="' . $Invoice->id . '" data-val="' . $invoice_grand_total . '" class="btn btn-danger pay_now_btn">Pay Now</a>';
                 }
-                $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->created_at));
+                $u['updated_at'] = date('M d, Y H:i:s', strtotime($Invoice->updated_at));
                 $u['action'] = $actionBtn;
 
                 $Data[] = $u;
@@ -128,6 +129,85 @@ class AuthorizeController extends Controller {
         return $pdf->download($invoiceID . '.pdf');
     }
 
+    public function howToPay(Request $request) {
+        return view('seller.how_to_pay');
+    }
+
+    public function paymentInfoPage(Request $request) {
+        return view('show_pay_invoices_popup', ['invoice_id' => $request->invoice_id, 'invoice_amount' => $request->invoice_amount]);
+    }
+
+    public function uploadPaymentInfo(Request $request) {
+        $validator = Validator::make($request->all(), [
+                    'invoice_id' => 'required',
+                    'payment_image' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $errors = $validator->errors();
+            return back()->withErrors($errors)->withInput();
+        } else {
+            $invoiceID = $request->invoice_id;
+            $invoiceArr = [];
+            $invoiceArr = $request->all();
+            $imageName = "";
+            if ($request->hasFile('payment_image')) {
+                $imageName = $invoiceID . time() . '.' . $request->payment_image->extension();
+                $request->payment_image->move(storage_path('app/public/invoice_payments'), $imageName);
+            }
+
+            unset($invoiceArr['_token']);
+            unset($invoiceArr['image']);
+            $invoiceArr['payment_image'] = $imageName;
+
+            $invoiceArr['paid_status'] = 1;
+            $invoiceData = Invoice::where('id', $invoiceID)->first();
+            if ($invoiceData->fill($invoiceArr)->save()) {
+                //update payment status of 
+                $invoiceIDs = json_decode($invoiceData->store_invoice_ids, true);
+                StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => 1]);
+                //send payment status email to store owner
+                $data = [];
+                $data['receiver_name'] = "Hello, " . auth()->user()->name;
+                $data['receiver_message'] = "You have paid your invoice!
+We would like to thank you and say it's a pleasure doing business with you. If you have any questions please contact us at <a href='mailto:support@dropshipagent.co'>support@dropshipagent.co</a>. We will get back to you as soon as possible.";
+                $data['sender_name'] = env('MAIL_FROM_NAME');
+
+                $email_data['message'] = $data;
+                $email_data['subject'] = 'Invoice paid successfully';
+                $email_data['layout'] = 'emails.sendemail';
+                try {
+                    Mail::to(auth()->user()->email)->send(new SendMailable($email_data));
+                } catch (\Exception $e) {
+                    // Never reached
+                }
+
+                //send notification to store owner
+                Notification::addNotificationFromAllPanel(auth()->user()->id, 'Invoice paid successfully', helGetAdminID(), $invoiceData->id, 'INVOICE_PAID');
+
+                //send notification to admin
+                Notification::addNotificationFromAllPanel(helGetAdminID(), 'Invoice (' . $invoiceData->id . ') paid successfully', auth()->user()->id, $invoiceData->id, 'INVOICE_PAID');
+
+                //send email to admin
+                $data = [];
+                $data['receiver_name'] = "Admin";
+                $data['receiver_message'] = "A user " . auth()->user()->username . " has maid payment for invoice ID :: " . $invoiceData->id;
+                $data['sender_name'] = "DSA Team";
+
+                $email_data['message'] = $data;
+                $email_data['subject'] = 'New invoice paid :: ' . $invoiceData->id;
+                $email_data['layout'] = 'emails.sendemail';
+                try {
+                    Mail::to(env('ADMIN_MAIL_ADDRESS', 'info@dropshipagent.co'))->send(new SendMailable($email_data));
+                } catch (\Exception $e) {
+                    // Never reached
+                }
+                return redirect('showinvoiceslog')->with('success', 'Invoice Paid successfully!');
+            } else {
+                return redirect()->back()->with('warning', 'Failed to Add , Please try again!');
+            }
+        }
+    }
+
     public function index() {
         return view('checkout.authorize');
     }
@@ -176,8 +256,14 @@ class AuthorizeController extends Controller {
         $expiry = $user_cc_data['card_expiry_year'] . '-' . $user_cc_data['card_expiry_month'];
         $creditCard->setExpirationDate($expiry);
         $creditCard->setCardCode($user_cc_data['ccode']);
+
         $paymentCreditCard = new AnetAPI\PaymentType();
         $paymentCreditCard->setCreditCard($creditCard);
+
+        // Create order information
+        $order = new AnetAPI\OrderType();
+        $order->setInvoiceNumber("10101");
+        $order->setDescription("Golf Shirts");
 
         // Create the Bill To info for new payment type
         $billTo = new AnetAPI\CustomerAddressType();
@@ -383,23 +469,50 @@ class AuthorizeController extends Controller {
         $merchantAuthentication->setTransactionKey(config('services.authorize.key'));
         if ($request->cnumber) {
             $refId = 'ref' . time();
+            $cardExpiryMonth = $request->card_expiry_month;
+            if ($cardExpiryMonth < 10) {
+                $cardExpiryMonth = "0" . $cardExpiryMonth;
+            }
+
+            $expiry = $request->card_expiry_year . '-' . $cardExpiryMonth;
             // Create the payment data for a credit card
             $creditCard = new AnetAPI\CreditCardType();
             $creditCard->setCardNumber($request->cnumber);
-            // $creditCard->setExpirationDate( "2038-12");
-            $expiry = $request->card_expiry_year . '-' . $request->card_expiry_month;
             $creditCard->setExpirationDate($expiry);
+            $creditCard->setCardCode($request->ccode);
+
             $paymentOne = new AnetAPI\PaymentType();
             $paymentOne->setCreditCard($creditCard);
+
+            // Create order information
+            $order = new AnetAPI\OrderType();
+            $order->setInvoiceNumber($invoiceID);
+            $order->setDescription("Invoice Payment");
+
+            // Set the customer's Bill To address
+            $customerAddress = new AnetAPI\CustomerAddressType();
+            $customerAddress->setFirstName(auth()->user()->name);
+            $customerAddress->setLastName("");
+            $customerAddress->setCompany(auth()->user()->username);
+            $customerAddress->setAddress(auth()->user()->billing_address);
+            $customerAddress->setCity(auth()->user()->city);
+            $customerAddress->setState(auth()->user()->state);
+            $customerAddress->setZip(auth()->user()->zip_code);
+            $customerAddress->setCountry(auth()->user()->country);
+
             // Create a transaction
             $transactionRequestType = new AnetAPI\TransactionRequestType();
             $transactionRequestType->setTransactionType("authCaptureTransaction");
             $transactionRequestType->setAmount($request->camount);
+            $transactionRequestType->setOrder($order);
             $transactionRequestType->setPayment($paymentOne);
+            $transactionRequestType->setBillTo($customerAddress);
+
             $request = new AnetAPI\CreateTransactionRequest();
             $request->setMerchantAuthentication($merchantAuthentication);
             $request->setRefId($refId);
             $request->setTransactionRequest($transactionRequestType);
+
             $controller = new AnetController\CreateTransactionController($request);
             $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
             if ($response != null) {

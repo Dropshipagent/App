@@ -60,7 +60,7 @@ class Notification extends Model {
                 return 'supplier/set_store_session/' . $notification->item_id;
             } else if ($notification->notification_type == "NEW_STORE_ACCEPTED") {
                 return 'home';
-            } else if ($notification->notification_type == "INVOICE_CREATED" || $notification->notification_type == "INVOICE_PAID") {
+            } else if ($notification->notification_type == "INVOICE_CREATED" || $notification->notification_type == "INVOICE_PAID" || $notification->notification_type == "INVOICE_DECLINED") {
                 return 'showinvoicedetail/' . $notification->item_id;
             }
         }

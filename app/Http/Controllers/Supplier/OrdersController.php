@@ -69,7 +69,7 @@ class OrdersController extends Controller {
             $assign_supplier = 1;
             $store_domain = $request->store_domain;
 
-            $q = Order::select('store_invoices.order_id', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where(['orders.store_domain' => $store_domain, 'assign_supplier' => $assign_supplier])->whereRaw('store_invoices.order_id is NULL');
+            $q = Order::select('store_invoices.order_id', 'orders.*')->leftjoin('store_invoices', 'store_invoices.order_id', 'orders.order_id')->with(['itemsarr'])->where(['orders.store_domain' => $store_domain, 'assign_supplier' => $assign_supplier])->whereRaw('store_invoices.order_id is NULL')->whereRaw("orders.financial_status = 'paid'")->whereRaw(DB::raw("(SELECT COUNT(*) FROM order_items as ot where orders.order_id=ot.order_id AND ot.fulfillment_status='fulfilled') = 0"));
 
             $TotalOrderData = $q->count();
 

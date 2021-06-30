@@ -25,12 +25,12 @@
                         <form class="form-horizontal" action="{{ url('/checkout/'.auth()->user()->username) }}" method="post">
                             {{ csrf_field() }}
                             <h3>Hi {{ auth()->user()->name }}</h3>
-<p>We are happy to inform you that the Dropship Agent team has approved your product source request and we’d be happy to serve your product needs. Please check the suggested prices for your requested products below:</p>
-<p><a class="btn btn-success" href="{{ url('storeproducts/index', auth()->user()->username) }}">View Products</a></p>
-<p>Please subscribe to a $59 monthly fee to start sourcing with Dropship Agent now.</p>
-<p><button type="submit" class="btn btn-primary">Pay Now</button></p>
-<p>Happy to have you onboard</p>
-<p>Team Dropship Agent</p>
+                            <p>We are happy to inform you that the Dropship Agent team has approved your product source request and we’d be happy to serve your product needs. Please check the suggested prices for your requested products below:</p>
+                            <p><a class="btn btn-success" href="{{ url('storeproducts/index', auth()->user()->username) }}">View Products</a></p>
+                            <p>Please subscribe to a $59 monthly fee to start sourcing with Dropship Agent now.</p>
+                            <p><button type="submit" class="btn btn-primary">Subscribe</button></p>
+                            <p>Happy to have you onboard</p>
+                            <p>Team Dropship Agent</p>
                         </form>
                     </div>
                 </div>

@@ -33,69 +33,81 @@ class Order extends Model {
         //dd($shopifyOrders);
         foreach ($shopifyOrders['orders'] as $webhook_content) {
             if (!empty($webhook_content['billing_address']['name'])) {
-                $orderData = Order::where(['store_domain' => $store_domain, 'order_id' => $webhook_content['id']])->first();
-                if (empty($orderData)) {
-                    $order = new Order;
-//            $order->store_domain = json_encode($webhook_header['x-shopify-shop-domain']);
-                    $order->store_domain = $store_domain;
-                    $order->order_id = (isset($webhook_content['id']) && $webhook_content['id'] !== '') ? $webhook_content['id'] : 0;
-                    $order->order_number = (isset($webhook_content['name']) && $webhook_content['name'] !== '') ? $webhook_content['name'] : '';
-                    $order->email = (isset($webhook_content['email']) && $webhook_content['email'] !== '') ? $webhook_content['email'] : null;
-                    $order->cust_fname = (isset(['billing_address']['name']) && ['billing_address']['name'] !== '') ? ['billing_address']['name'] : null;
-                    $order->payment_gateway = (isset($webhook_content['gateway']) && $webhook_content['gateway'] !== '') ? $webhook_content['gateway'] : null;
-                    $order->financial_status = (isset($webhook_content['financial_status']) && $webhook_content['financial_status'] !== '') ? $webhook_content['financial_status'] : null;
-                    $order->order_value = (isset($webhook_content['total_price']) && $webhook_content['total_price'] !== '') ? $webhook_content['total_price'] : 0;
-                    $order->order_status = 'NULL';
-                    $order->ship_to = (isset(['shipping_address']['province']) && ['shipping_address']['province'] !== '') ? ['shipping_address']['province'] : null;
-// I wanted to insert the variant_id's and quantity as a string in one column. With this i can unserialise and use when needed 
-                    $items = [];
-                    if (count($webhook_content["line_items"]) > 0) {
-                        foreach ($webhook_content["line_items"] as $item) {
-//print_r($item); die;
-//insert a new item
-                            $orderItem = new \App\OrderItem;
-                            $orderItem->store_domain = $store_domain;
-                            $orderItem->order_id = (isset($webhook_content['id']) && $webhook_content['id'] !== '') ? $webhook_content['id'] : 0;
-                            $orderItem->item_id = (isset($item['id']) && $item['id'] !== '') ? $item['id'] : 0;
-                            $orderItem->variant_id = (isset($item['variant_id']) && $item['variant_id'] !== '') ? $item['variant_id'] : 0;
-                            $orderItem->title = (isset($item['title']) && $item['title'] !== '') ? $item['title'] : null;
-                            $orderItem->quantity = (isset($item['quantity']) && $item['quantity'] !== '') ? $item['quantity'] : 0;
-                            $orderItem->sku = (isset($item['sku']) && $item['sku'] !== '') ? $item['sku'] : null;
-                            $orderItem->variant_title = (isset($item['variant_title']) && $item['variant_title'] !== '') ? $item['variant_title'] : null;
-                            $orderItem->vendor = (isset($item['vendor']) && $item['vendor'] !== '') ? $item['vendor'] : null;
-                            $orderItem->fulfillment_service = (isset($item['fulfillment_service']) && $item['fulfillment_service'] !== '') ? $item['fulfillment_service'] : null;
-                            $orderItem->product_id = (isset($item['product_id']) && $item['product_id'] !== '') ? $item['product_id'] : 0;
-                            $orderItem->requires_shipping = (isset($item['requires_shipping']) && $item['requires_shipping'] !== '') ? $item['requires_shipping'] : 0;
-                            $orderItem->taxable = (isset($item['taxable']) && $item['taxable'] !== '') ? $item['taxable'] : 0;
-                            $orderItem->gift_card = (isset($item['gift_card']) && $item['gift_card'] !== '') ? $item['gift_card'] : null;
-                            $orderItem->name = (isset($item['name']) && $item['name'] !== '') ? $item['name'] : null;
-                            $orderItem->variant_inventory_management = (isset($item['variant_inventory_management']) && $item['variant_inventory_management'] !== '') ? $item['variant_inventory_management'] : null;
-                            $orderItem->properties = (isset($item['properties']) && $item['properties'] !== '') ? json_encode($item['properties']) : null;
-                            $orderItem->product_exists = (isset($item['product_exists']) && $item['product_exists'] !== '') ? $item['product_exists'] : 0;
-                            $orderItem->fulfillable_quantity = (isset($item['fulfillable_quantity']) && $item['fulfillable_quantity'] !== '') ? $item['fulfillable_quantity'] : 0;
-                            $orderItem->grams = (isset($item['grams']) && $item['grams'] !== '') ? $item['grams'] : 0;
-                            $orderItem->price = (isset($item['price']) && $item['price'] !== '') ? $item['price'] : 0;
-                            $orderItem->total_discount = (isset($item['total_discount']) && $item['total_discount'] !== '') ? $item['total_discount'] : 0;
-                            $orderItem->fulfillment_status = (isset($item['fulfillment_status']) && $item['fulfillment_status'] !== '') ? $item['fulfillment_status'] : null;
-                            $orderItem->price_set = (isset($item['price_set']) && $item['price_set'] !== '') ? json_encode($item['price_set']) : null;
-                            $orderItem->total_discount_set = (isset($item['total_discount_set']) && $item['total_discount_set'] !== '') ? json_encode($item['total_discount_set']) : null;
-                            $orderItem->discount_allocations = (isset($item['discount_allocations']) && $item['discount_allocations'] !== '') ? json_encode($item['discount_allocations']) : null;
-                            $orderItem->admin_graphql_api_id = (isset($item['admin_graphql_api_id']) && $item['admin_graphql_api_id'] !== '') ? $item['admin_graphql_api_id'] : null;
-                            $orderItem->tax_lines = (isset($item['tax_lines']) && $item['tax_lines'] !== '') ? json_encode($item['tax_lines']) : null;
-                            $orderItem->save();
-
-                            $items[$item["variant_id"]]['quantity'] = (isset($item['quantity']) && $item['quantity'] !== '') ? $item['quantity'] : 0;
-                        }
-                    }
-                    unset($webhook_content['line_items']);
-                    $order->items = json_encode($webhook_content);
-                    $order->shipping_method = (isset($webhook_content['shipping_lines'][0]['title'])) ? $webhook_content['shipping_lines'][0]['title'] : "";
-
-                    $order->save();
-                }
+                self::createUpdateorder($store_domain, $webhook_content);
             }
         }
         return true;
+    }
+
+    /**
+     * Comman method to create and update order
+     */
+    static function createUpdateorder($store_domain, $webhook_content) {
+        $orderStatus = Order::where(['store_domain' => $store_domain, 'order_id' => $webhook_content['id']]);
+        $order = new Order;
+        if ($orderStatus->exists()) {
+            $order = $orderStatus->first();
+        }
+
+        $order->store_domain = $store_domain;
+        $order->order_id = (isset($webhook_content['id']) && $webhook_content['id'] !== '') ? $webhook_content['id'] : 0;
+        $order->order_number = (isset($webhook_content['name']) && $webhook_content['name'] !== '') ? $webhook_content['name'] : '';
+        $order->email = (isset($webhook_content['email']) && $webhook_content['email'] !== '') ? $webhook_content['email'] : null;
+        $order->cust_fname = (isset(['billing_address']['name']) && ['billing_address']['name'] !== '') ? ['billing_address']['name'] : null;
+        $order->payment_gateway = (isset($webhook_content['gateway']) && $webhook_content['gateway'] !== '') ? $webhook_content['gateway'] : null;
+        $order->financial_status = (isset($webhook_content['financial_status']) && $webhook_content['financial_status'] !== '') ? $webhook_content['financial_status'] : null;
+        $order->order_value = (isset($webhook_content['total_price']) && $webhook_content['total_price'] !== '') ? $webhook_content['total_price'] : 0;
+        $order->order_status = 'NULL';
+        $order->ship_to = (isset(['shipping_address']['province']) && ['shipping_address']['province'] !== '') ? ['shipping_address']['province'] : null;
+// I wanted to insert the variant_id's and quantity as a string in one column. With this i can unserialise and use when needed 
+        $items = [];
+        if (count($webhook_content["line_items"]) > 0) {
+            foreach ($webhook_content["line_items"] as $item) {
+//insert a new item
+                $orderItem = new \App\OrderItem;
+                $orderItemStatus = OrderItem::where(['store_domain' => $store_domain, 'order_id' => $webhook_content['id'], 'item_id' => $item['id']]);
+                if ($orderItemStatus->exists()) {
+                    $orderItem = $orderItemStatus->first();
+                }
+
+                $orderItem->store_domain = $store_domain;
+                $orderItem->order_id = (isset($webhook_content['id']) && $webhook_content['id'] !== '') ? $webhook_content['id'] : 0;
+                $orderItem->item_id = (isset($item['id']) && $item['id'] !== '') ? $item['id'] : 0;
+                $orderItem->variant_id = (isset($item['variant_id']) && $item['variant_id'] !== '') ? $item['variant_id'] : 0;
+                $orderItem->title = (isset($item['title']) && $item['title'] !== '') ? $item['title'] : null;
+                $orderItem->quantity = (isset($item['quantity']) && $item['quantity'] !== '') ? $item['quantity'] : 0;
+                $orderItem->sku = (isset($item['sku']) && $item['sku'] !== '') ? $item['sku'] : null;
+                $orderItem->variant_title = (isset($item['variant_title']) && $item['variant_title'] !== '') ? $item['variant_title'] : null;
+                $orderItem->vendor = (isset($item['vendor']) && $item['vendor'] !== '') ? $item['vendor'] : null;
+                $orderItem->fulfillment_service = (isset($item['fulfillment_service']) && $item['fulfillment_service'] !== '') ? $item['fulfillment_service'] : null;
+                $orderItem->product_id = (isset($item['product_id']) && $item['product_id'] !== '') ? $item['product_id'] : 0;
+                $orderItem->requires_shipping = (isset($item['requires_shipping']) && $item['requires_shipping'] !== '') ? $item['requires_shipping'] : 0;
+                $orderItem->taxable = (isset($item['taxable']) && $item['taxable'] !== '') ? $item['taxable'] : 0;
+                $orderItem->gift_card = (isset($item['gift_card']) && $item['gift_card'] !== '') ? $item['gift_card'] : null;
+                $orderItem->name = (isset($item['name']) && $item['name'] !== '') ? $item['name'] : null;
+                $orderItem->variant_inventory_management = (isset($item['variant_inventory_management']) && $item['variant_inventory_management'] !== '') ? $item['variant_inventory_management'] : null;
+                $orderItem->properties = (isset($item['properties']) && $item['properties'] !== '') ? json_encode($item['properties']) : null;
+                $orderItem->product_exists = (isset($item['product_exists']) && $item['product_exists'] !== '') ? $item['product_exists'] : 0;
+                $orderItem->fulfillable_quantity = (isset($item['fulfillable_quantity']) && $item['fulfillable_quantity'] !== '') ? $item['fulfillable_quantity'] : 0;
+                $orderItem->grams = (isset($item['grams']) && $item['grams'] !== '') ? $item['grams'] : 0;
+                $orderItem->price = (isset($item['price']) && $item['price'] !== '') ? $item['price'] : 0;
+                $orderItem->total_discount = (isset($item['total_discount']) && $item['total_discount'] !== '') ? $item['total_discount'] : 0;
+                $orderItem->fulfillment_status = (isset($item['fulfillment_status']) && $item['fulfillment_status'] !== '') ? $item['fulfillment_status'] : null;
+                $orderItem->price_set = (isset($item['price_set']) && $item['price_set'] !== '') ? json_encode($item['price_set']) : null;
+                $orderItem->total_discount_set = (isset($item['total_discount_set']) && $item['total_discount_set'] !== '') ? json_encode($item['total_discount_set']) : null;
+                $orderItem->discount_allocations = (isset($item['discount_allocations']) && $item['discount_allocations'] !== '') ? json_encode($item['discount_allocations']) : null;
+                $orderItem->admin_graphql_api_id = (isset($item['admin_graphql_api_id']) && $item['admin_graphql_api_id'] !== '') ? $item['admin_graphql_api_id'] : null;
+                $orderItem->tax_lines = (isset($item['tax_lines']) && $item['tax_lines'] !== '') ? json_encode($item['tax_lines']) : null;
+                $orderItem->save();
+
+                $items[$item["variant_id"]]['quantity'] = (isset($item['quantity']) && $item['quantity'] !== '') ? $item['quantity'] : 0;
+            }
+        }
+        unset($webhook_content['line_items']);
+        $order->items = json_encode($webhook_content);
+        $order->shipping_method = (isset($webhook_content['shipping_lines'][0]['title'])) ? $webhook_content['shipping_lines'][0]['title'] : "";
+
+        $order->save();
     }
 
     /**
@@ -154,10 +166,10 @@ class Order extends Model {
             foreach ($orderItems as $item) {
                 if (isset($item->productdetail->base_price) && $item->productdetail->product_status == 3) {
                     $basePriceArr = json_decode($item->productdetail->base_price, true);
-                    $variantPriceByAdmin = $basePriceArr[$item->variant_id];
+                    $variantPriceByAdmin = (isset($basePriceArr[$item->variant_id])) ? $basePriceArr[$item->variant_id] : 0;
 
                     $adminComisonArr = json_decode($item->productdetail->admin_commission, true);
-                    $variantCommissionByAdmin = $adminComisonArr[$item->variant_id];
+                    $variantCommissionByAdmin = (isset($adminComisonArr[$item->variant_id])) ? $adminComisonArr[$item->variant_id] : 0;
                 } else {
                     $variantPriceByAdmin = 0;
                     $variantCommissionByAdmin = 0;

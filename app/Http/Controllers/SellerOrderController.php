@@ -105,62 +105,7 @@ class SellerOrderController extends Controller {
         $store_domain = str_replace(array('["', '"]'), '', $webhook_header['x-shopify-shop-domain'][0]);
         $webhook_content = $request->all();
         if (!empty($webhook_content['billing_address']['name'])) {
-
-            $order = new \App\Order;
-//            $order->store_domain = json_encode($webhook_header['x-shopify-shop-domain']);
-            $order->store_domain = $store_domain;
-            $order->order_id = $webhook_content['id'];
-            $order->order_number = $webhook_content['name'];
-            $order->email = $webhook_content['email'];
-            $order->cust_fname = $webhook_content['billing_address']['name'];
-            $order->payment_gateway = $webhook_content['gateway'];
-            $order->financial_status = $webhook_content['financial_status'];
-            $order->order_value = $webhook_content['total_price'];
-            $order->order_status = 'NULL';
-            $order->ship_to = (isset($webhook_content['shipping_address']['province']) && $webhook_content['shipping_address']['province'] !== '') ? $webhook_content['shipping_address']['province'] : null;
-// I wanted to insert the variant_id's and quantity as a string in one column. With this i can unserialise and use when needed 
-            $items = [];
-            foreach ($webhook_content["line_items"] as $item) {
-//print_r($item); die;
-//insert a new item
-                $orderItem = new \App\OrderItem;
-                $orderItem->store_domain = $store_domain;
-                $orderItem->order_id = $webhook_content['id'];
-                $orderItem->item_id = $item['id'];
-                $orderItem->variant_id = $item['variant_id'];
-                $orderItem->title = $item['title'];
-                $orderItem->quantity = $item['quantity'];
-                $orderItem->sku = $item['sku'];
-                $orderItem->variant_title = $item['variant_title'];
-                $orderItem->vendor = $item['vendor'];
-                $orderItem->fulfillment_service = $item['fulfillment_service'];
-                $orderItem->product_id = $item['product_id'];
-                $orderItem->requires_shipping = $item['requires_shipping'];
-                $orderItem->taxable = $item['taxable'];
-                $orderItem->gift_card = $item['gift_card'];
-                $orderItem->name = $item['name'];
-                $orderItem->variant_inventory_management = $item['variant_inventory_management'];
-                $orderItem->properties = json_encode($item['properties']);
-                $orderItem->product_exists = $item['product_exists'];
-                $orderItem->fulfillable_quantity = $item['fulfillable_quantity'];
-                $orderItem->grams = $item['grams'];
-                $orderItem->price = $item['price'];
-                $orderItem->total_discount = $item['total_discount'];
-                $orderItem->fulfillment_status = $item['fulfillment_status'];
-                $orderItem->price_set = json_encode($item['price_set']);
-                $orderItem->total_discount_set = json_encode($item['total_discount_set']);
-                $orderItem->discount_allocations = json_encode($item['discount_allocations']);
-                $orderItem->admin_graphql_api_id = $item['admin_graphql_api_id'];
-                $orderItem->tax_lines = json_encode($item['tax_lines']);
-                $orderItem->save();
-
-                $items[$item["variant_id"]]['quantity'] = $item["quantity"];
-            }
-            unset($webhook_content['line_items']);
-            $order->items = json_encode($webhook_content);
-            $order->shipping_method = (isset($webhook_content['shipping_lines'][0]['title'])) ? $webhook_content['shipping_lines'][0]['title'] : "";
-
-            $order->save();
+            Order::createUpdateorder($store_domain, $webhook_content);
         }
         $response['status'] = true;
         $response['message'] = "Order Created Successfully";
@@ -184,62 +129,7 @@ class SellerOrderController extends Controller {
         $store_domain = str_replace(array('["', '"]'), '', $webhook_header['x-shopify-shop-domain'][0]);
         $webhook_content = $request->all();
         if (!empty($webhook_content['billing_address']['name'])) {
-
-            $order = Order::where(['store_domain' => $store_domain, 'order_id' => $webhook_content['id'], 'order_number' => $webhook_content['name']])->first();
-//            $order->store_domain = json_encode($webhook_header['x-shopify-shop-domain']);
-            $order->store_domain = $store_domain;
-            $order->order_id = $webhook_content['id'];
-            $order->order_number = $webhook_content['name'];
-            $order->email = $webhook_content['email'];
-            $order->cust_fname = $webhook_content['billing_address']['name'];
-            $order->payment_gateway = $webhook_content['gateway'];
-            $order->financial_status = $webhook_content['financial_status'];
-            $order->order_value = $webhook_content['total_price'];
-            $order->order_status = 'NULL';
-            $order->ship_to = (isset($webhook_content['shipping_address']['province']) && $webhook_content['shipping_address']['province'] !== '') ? $webhook_content['shipping_address']['province'] : null;
-// I wanted to insert the variant_id's and quantity as a string in one column. With this i can unserialise and use when needed 
-            $items = [];
-            foreach ($webhook_content["line_items"] as $item) {
-//print_r($item); die;
-//insert a new item
-                $orderItem = OrderItem::where(['store_domain' => $store_domain, 'order_id' => $webhook_content['id'], 'item_id' => $item['id']])->first();
-                $orderItem->store_domain = $store_domain;
-                $orderItem->order_id = $webhook_content['id'];
-                $orderItem->item_id = $item['id'];
-                $orderItem->variant_id = $item['variant_id'];
-                $orderItem->title = $item['title'];
-                $orderItem->quantity = $item['quantity'];
-                $orderItem->sku = $item['sku'];
-                $orderItem->variant_title = $item['variant_title'];
-                $orderItem->vendor = $item['vendor'];
-                $orderItem->fulfillment_service = $item['fulfillment_service'];
-                $orderItem->product_id = $item['product_id'];
-                $orderItem->requires_shipping = $item['requires_shipping'];
-                $orderItem->taxable = $item['taxable'];
-                $orderItem->gift_card = $item['gift_card'];
-                $orderItem->name = $item['name'];
-                $orderItem->variant_inventory_management = $item['variant_inventory_management'];
-                $orderItem->properties = json_encode($item['properties']);
-                $orderItem->product_exists = $item['product_exists'];
-                $orderItem->fulfillable_quantity = $item['fulfillable_quantity'];
-                $orderItem->grams = $item['grams'];
-                $orderItem->price = $item['price'];
-                $orderItem->total_discount = $item['total_discount'];
-                $orderItem->fulfillment_status = $item['fulfillment_status'];
-                $orderItem->price_set = json_encode($item['price_set']);
-                $orderItem->total_discount_set = json_encode($item['total_discount_set']);
-                $orderItem->discount_allocations = json_encode($item['discount_allocations']);
-                $orderItem->admin_graphql_api_id = $item['admin_graphql_api_id'];
-                $orderItem->tax_lines = json_encode($item['tax_lines']);
-                $orderItem->save();
-
-                $items[$item["variant_id"]]['quantity'] = $item["quantity"];
-            }
-            unset($webhook_content['line_items']);
-            $order->items = json_encode($webhook_content);
-            $order->shipping_method = (isset($webhook_content['shipping_lines'][0]['title'])) ? $webhook_content['shipping_lines'][0]['title'] : "";
-
-            $order->save();
+            Order::createUpdateorder($store_domain, $webhook_content);
         }
         $response['status'] = true;
         $response['message'] = "Order Updated Successfully";
@@ -257,6 +147,7 @@ class SellerOrderController extends Controller {
           $webhook->save(); */
         $user = User::where('username', $request->myshopify_domain)->first();
         $user->is_deleted = 1;
+        $user->get_order = 0;
         if ($user->status > 1) {
             $user->status = 1;
         }

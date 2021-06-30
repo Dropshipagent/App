@@ -47,7 +47,7 @@
                                             $totalPrice += $priceSubtotal;
                                         }
                                     }
-                                    if ($totalVariants == 1) {
+                                    if ($totalVariants == 1 && $adminApprovedProductsCount <= 1) {
                                         echo 'Sourced Price: $' . $totalPrice;
                                     } else {
                                         echo 'Sourced Price: See price below';

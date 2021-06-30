@@ -44,7 +44,7 @@
                     </select>                        
                 </div>
             </div>
-            <table class="table table-hover table-striped table-bordered datatable orderlist">
+            <table class="table table-hover table-striped table-bordered datatable orderlist" data-page-length='50'>
                 <thead> 
                     <tr>
                         <th>Order Number</th>

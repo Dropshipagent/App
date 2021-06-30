@@ -21,9 +21,7 @@
             <table class="table table-hover table-striped table-bordered datatable unsourced">
                 <thead> 
                     <tr>
-                        <th>ID</th>
                         <th>&nbsp;</th>
-                        <th>Order ID</th>
                         <th>Order Number</th>
                         <th>Customer Email</th>
                         <th>Customer Name</th>
@@ -73,7 +71,7 @@
             "bProcessing": true,
             "serverSide": true,
             "ordering": true,
-            "order": [[0, "desc"]],
+            "order": [[8, "desc"]],
             "ajax": {
                 url: "",
                 data: function (d) {
@@ -88,9 +86,7 @@
                 }
             },
             "aoColumns": [
-                {mData: 'id'},
                 {mData: 'create_invoice'},
-                {mData: 'order_id'},
                 {mData: 'order_number'},
                 {mData: 'email'},
                 {mData: 'cust_fname'},

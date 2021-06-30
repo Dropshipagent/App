@@ -92,8 +92,10 @@ class ProductsController extends Controller {
             ];
             return $return;
         }
-        $adminApprovedLastProduct = Product::where(['store_domain' => $store_domain, 'product_status' => 2])->orderBy('updated_at', 'desc')->first();
-        return view('products.index', ['store_domain' => $store_domain, 'adminApprovedLastProduct' => $adminApprovedLastProduct]);
+        $adminProductQuery = Product::where(['store_domain' => $store_domain, 'product_status' => 2])->orderBy('updated_at', 'desc');
+        $adminApprovedProductsCount = $adminProductQuery->count();
+        $adminApprovedLastProduct = $adminProductQuery->first();
+        return view('products.index', ['store_domain' => $store_domain, 'adminApprovedLastProduct' => $adminApprovedLastProduct, 'adminApprovedProductsCount' => $adminApprovedProductsCount]);
     }
 
     /**
