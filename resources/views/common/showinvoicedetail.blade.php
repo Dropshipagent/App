@@ -58,87 +58,97 @@ if (auth()->user()->role == 1) {
             <main class="table-responsive">                
                 <table cellpadding="0" cellspacing="0" border-color="#000" class="listdata table-bordered " style="width:100%;height:380px; margin-top: 25px;font-size: 16px;">    
                     <tr align="left">
-                        <th style=" width:30px; text-align: center;">Item</th>
+                        <!-- <th style=" width:30px; text-align: center;">Item</th> -->
                         <th style="width:400px; text-align: center;">Name</th>
                         <th style="width:100px; text-align: center;">Price</th>
                         <th style="width:120px; text-align: center;">Quantity</th>
                         <th style=" text-align: center; width: 70px;">Amount</th>
                     </tr>
                     <?php
-                    $main_invoice_total = 0;
-                    if (auth()->user()->role == 3) {
-                        foreach ($invoice_items as $oKey => $oVal) {
-                            ?>
-                            <tr valign="center">
-                                <td class="items">{{ $oKey }}</td>
-                                <td class="description">{{ $oVal['product_title'] }}</td>
-                                <td class="price">{{ ($oVal['product_admin_price']/$oVal['product_quantity']) }}</td>
-                                <td class="quantity"> {{ $oVal['product_quantity'] }}</td>
-                                <td class="amount" style="">{{ number_format(($oVal['product_admin_price']), 2) }}</td>
-                            </tr>
-                            <?php
-                            $main_invoice_total += $oVal['product_admin_price'];
+                    $main_invoice_total = 0;    
+                    if (auth()->user()->role == 1) {
+                        $invoice_items = json_decode($invoice->invoice_items, true) ;
+                        $invoiceSubTotal= 0;
+                        foreach ($invoice_items['item_name'] as $oKey => $oVal) {
+                            $item_price = ($invoice_items['item_price'][$oKey]+$invoice_items['admin_commission'][$oKey]);
+                            $main_invoice_total+= number_format(($item_price*$invoice_items['item_qty'][$oKey]), 2) ;  
+                        ?>
+                        <tr valign="center">
+                            <td class="description">{{ $oVal }}</td>
+                            <td class="price">{{ $item_price }}</td>
+                            <td class="quantity"> {{ $invoice_items['item_qty'][$oKey] }}</td>
+                            <td class="amount">{{ number_format(($item_price*$invoice_items['item_qty'][$oKey]), 2) }}</td>
+                        </tr>
+                        <?php
+                        }
+                    } else if (auth()->user()->role == 3) {
+                        $invoice_items = json_decode($invoice->invoice_items, true) ;
+                        $invoiceSubTotal= 0;
+                        foreach ($invoice_items['item_name'] as $oKey => $oVal) {
+                        $main_invoice_total+= number_format(($invoice_items['item_price'][$oKey]*$invoice_items['item_qty'][$oKey]), 2) ;  
+                        ?>
+                        <tr valign="center">
+                            <td class="description">{{ $oVal }}</td>
+                            <td class="price">{{ ($invoice_items['item_price'][$oKey]) }}</td>
+                            <td class="quantity"> {{ $invoice_items['item_qty'][$oKey] }}</td>
+                            <td class="amount">{{ number_format(($invoice_items['item_price'][$oKey]*$invoice_items['item_qty'][$oKey]), 2) }}</td>
+                        </tr>
+                        <?php
                         }
                     } else {
-                        foreach ($invoice_items as $oKey => $oVal) {
-                            $price_by_admin = ($oVal['product_admin_price'] / $oVal['product_quantity']);
-                            $admin_commission = ($oVal['product_admin_commission'] / $oVal['product_quantity']);
-                            $product_price = ($price_by_admin + $admin_commission);
-                            ?>
-                            <tr valign="center">
-                                <td class="items">{{ $oKey }}</td>
-                                <td class="description">{{ $oVal['product_title'] }}</td>
-                                <td class="price text-right" style="padding-right: 10px;">{{ $product_price }}</td>
-                                <td class="quantity text-right" style="padding-right: 10px;"> {{ $oVal['product_quantity'] }}</td>
-                                <td class="amount" style="">{{ number_format(($product_price*$oVal['product_quantity']), 2) }}</td>
-                            </tr>
-                            <?php
-                            $main_invoice_total += ($product_price * $oVal['product_quantity']);
+                        $invoice_items = json_decode($invoice->invoice_items, true) ;
+                        $invoiceSubTotal= 0;
+                        foreach ($invoice_items['item_name'] as $oKey => $oVal) {
+                        $main_invoice_total+= number_format(($invoice_items['item_price'][$oKey]*$invoice_items['item_qty'][$oKey]), 2) ;  
+                        ?>
+                        <tr valign="center">
+                            <td class="description">{{ $oVal }}</td>
+                            <td class="price">{{ ($invoice_items['item_price'][$oKey]) }}</td>
+                            <td class="quantity"> {{ $invoice_items['item_qty'][$oKey] }}</td>
+                            <td class="amount">{{ number_format(($invoice_items['item_price'][$oKey]*$invoice_items['item_qty'][$oKey]), 2) }}</td>
+                        </tr>
+                        <?php
                         }
                     }
                     ?>
                     <tr valign="top">
-                        <td colspan="3" style="">
-
-                        </td>
+                        <td colspan="2"></td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
-                            <!-- <div style="width:50px; height:3px; position: absolute;top:136px; right:-10px; color: #e7e8e9; background: #ff7900"></div> -->
                             <p style="font-size:16px;font-weight: 600;">SUB TOTAL</p>
                         </td>
                         <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
-                            <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($main_invoice_total,2)}}</b></p>
+                            <p style="font-size:16px !important; color: #ff7900 ">
+                                 <b>{{ $main_invoice_total }}</b>
+                            </p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <td colspan="3" style="padding:10px;">
+                        <td colspan="2" style="padding:10px;">
                             {{ $mainInvoice->other_charges_description }}
                         </td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
                             <p style="font-size:16px;font-weight: 600;">OTHER</p>
                         </td>
                         <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
-                            <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($mainInvoice->other_charges,2)}}</b></p>
+                            <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format($invoice->other_charges,2)}}</b></p>
                         </td>
                     </tr>
                     <tr valign="top">
-                        <td colspan="3" style="">
-
-                        </td>
+                        <td colspan="2"></td>
                         <td style="position: relative; padding-top: 10px; padding-right: 15px; " align="right" class="netamount">
                             <p style="font-size:16px;font-weight: 600;">TOTAL</p>
                         </td>
                         <td style=" text-align: right; font-size: 18px;padding-top: 10px; padding-right: 15px;">
-                            <p style="font-size:16px !important; color: #ff7900 "><b>{{number_format(($main_invoice_total+$mainInvoice->tax_rate+$mainInvoice->sales_tax+$mainInvoice->other_charges),2)}}</b></p>
+                            <p style="font-size:16px !important; color: #ff7900 "><b>{{ number_format(($main_invoice_total+$invoice->other_charges),2) }}
+                            </b></p>
                         </td>
                     </tr>
                 </table>
                 <br>
-
                 <p class="text-center text-uppercase" style="font-size: 16px; font-weight: 600;">Thank You for your business</p>
                 @if($mainInvoice->paid_status < 1 && auth()->user()->role == 2)
                 <button class="pay-invoice pay_now_btn" data-id="{{$mainInvoice->id}}" data-val="{{number_format(($main_invoice_total+$mainInvoice->other_charges),2)}}">PAY INVOICE</button>
                 @endif
-
             </main>
         </div>
     </div>

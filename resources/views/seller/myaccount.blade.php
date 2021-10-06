@@ -67,7 +67,7 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group phone_div">
-                            <label for="phone" class="required-field"><i class="fa fa-volume-control-phone" aria-hidden="true"></i> Contact Number:</label>
+                            <label for="phone"><i class="fa fa-volume-control-phone" aria-hidden="true"></i> Contact Number:</label>
                             {!! Form::tel('phone', null, array('placeholder' => 'Contact Number','class' => 'form-control','id' => 'phone', 'required' => 'required')) !!}
                             {!! Form::hidden('phone_code', null, array('id' => 'phone_code')) !!}
                             {!! Form::hidden('iso2', null, array('id' => 'iso2')) !!}
@@ -75,23 +75,23 @@
                         <div class="col-md-12">
                             <div class="row">
                                 <div class="col-md-6 form-group">
-                                    <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> City:</label>
+                                    <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> City:</label>
                                     {!! Form::text('city', null, array('placeholder' => 'City','class' => 'form-control city', 'required' => 'required')) !!}
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> State:</label>
+                                    <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> State:</label>
                                     {!! Form::text('state', null, array('placeholder' => 'State','class' => 'form-control state', 'required' => 'required')) !!}
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> Country:</label>
+                                    <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> Country:</label>
                                     {!! Form::text('country', null, array('placeholder' => 'Country','class' => 'form-control country_text', 'required' => 'required')) !!}
                                 </div>
                                 <div class="col-md-6 form-group">
-                                    <label for="" class="required-field"><i class="fa fa-code" aria-hidden="true"></i> Zip Code:</label>
+                                    <label for=""><i class="fa fa-code" aria-hidden="true"></i> Zip Code:</label>
                                     {!! Form::text('zip_code', null, array('placeholder' => 'Zip Code','class' => 'form-control zip_code', 'required' => 'required')) !!}
                                 </div>
                                 <div class="col-md-12 form-group">
-                                    <label for="" class="required-field"><i class="fa fa-address-card-o" aria-hidden="true"></i> Address</label>
+                                    <label for=""><i class="fa fa-address-card-o" aria-hidden="true"></i> Address</label>
                                     {!! Form::text('address', null, array('placeholder' => 'Address', 'class' => 'form-control address')) !!}
                                 </div>
                             </div>
@@ -101,28 +101,28 @@
                             <label for="same_address"> Billing address same as address</label></div>
                         <div class="form-group billing_address_fields" {!! ($user->is_same_address)?'style="display:none;"':"" !!}>
                             <div class="col-md-6 form-group">
-                                <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> City:</label>
+                                <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> City:</label>
                                 {!! Form::text('billing_city', null, array('placeholder' => 'City','class' => 'form-control billing_city', 'required' => 'required')) !!}
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> State:</label>
+                                <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> State:</label>
                                 {!! Form::text('billing_state', null, array('placeholder' => 'State','class' => 'form-control billing_state', 'required' => 'required')) !!}
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="" class="required-field"><i class="fa fa-flag-o" aria-hidden="true"></i> Country:</label>
+                                <label for=""><i class="fa fa-flag-o" aria-hidden="true"></i> Country:</label>
                                 {!! Form::text('billing_country', null, array('placeholder' => 'Country','class' => 'form-control billing_country', 'required' => 'required')) !!}
                             </div>
                             <div class="col-md-6 form-group">
-                                <label for="" class="required-field"><i class="fa fa-code" aria-hidden="true"></i> Zip Code:</label>
+                                <label for=""><i class="fa fa-code" aria-hidden="true"></i> Zip Code:</label>
                                 {!! Form::text('billing_zip_code', null, array('placeholder' => 'Zip Code','class' => 'form-control billing_zip_code', 'required' => 'required')) !!}
                             </div>
                             <div class="col-md-12 form-group">
-                                <label for="" class="required-field"><i class="fa fa-address-card-o" aria-hidden="true"></i> Billing Address</label>
+                                <label for=""><i class="fa fa-address-card-o" aria-hidden="true"></i> Billing Address</label>
                                 {!! Form::text('billing_address', null, array('placeholder' => 'Billing Address', 'class' => 'form-control billing_address', 'required' => 'required')) !!}
                             </div>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label for="" class="required-field"><i class="fa fa-file-excel-o"></i> Start my order exports from order number:</label>
+                            <label for=""><i class="fa fa-file-excel-o"></i> Start my order exports from order number:</label>
                             {!! Form::text('export_orders_from', null, array('placeholder' => 'Ex.: #1001','class' => 'form-control', 'required' => 'required')) !!}
                         </div>
                     </div>
@@ -287,19 +287,11 @@
                 $('.aliexpress_url_' + productID).attr("required", true);
                 $('.aliexpress_url_' + productID).addClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", true);
-                $('.variants_you_sell_' + productID).attr("required", true);
-                $('.countries_you_ship_' + productID).attr("required", true);
-                $('.cost_per_unit_' + productID).attr("required", true);
-                $('.shipping_time_' + productID).attr("required", true);
                 $('.product_item_' + productID).show();
             } else {
                 $('.aliexpress_url_' + productID).attr("required", false);
                 $('.aliexpress_url_' + productID).removeClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", false);
-                $('.variants_you_sell_' + productID).attr("required", false);
-                $('.countries_you_ship_' + productID).attr("required", false);
-                $('.cost_per_unit_' + productID).attr("required", false);
-                $('.shipping_time_' + productID).attr("required", false);
                 $('.product_item_' + productID).hide();
             }
         });
@@ -318,10 +310,13 @@
         //submit form first time
         $('.sendFlagRec').on('click', function () {
             var phoneVal = $('#phone').val();
-            if (!Number(phoneVal)) {
+            if(phoneVal != ''){
+                if (!Number(phoneVal)) {
                 alert("Please enter valid phone number");
                 return false;
             }
+            }
+            
 
             var validateData = false;
             $('.flag_checkbox').each(function () {
@@ -350,10 +345,10 @@
                         checkValidURL = true;
                     }
                 });
-                if (checkValidURL == true) {
-                    alert("Please enter valid URL in product URL");
-                    return false;
-                }
+                // if (checkValidURL == true) {
+                //     alert("Please enter valid URL in product URL");
+                //     return false;
+                // }
 
                 if (requiredField == true) {
                     alert("Please fill all required fields");

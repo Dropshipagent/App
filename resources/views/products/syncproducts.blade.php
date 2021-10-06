@@ -151,19 +151,11 @@
                 $('.aliexpress_url_' + productID).attr("required", true);
                 $('.aliexpress_url_' + productID).addClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", true);
-                $('.variants_you_sell_' + productID).attr("required", true);
-                $('.countries_you_ship_' + productID).attr("required", true);
-                $('.cost_per_unit_' + productID).attr("required", true);
-                $('.shipping_time_' + productID).attr("required", true);
                 $('.product_item_' + productID).show();
             } else {
                 $('.aliexpress_url_' + productID).attr("required", false);
                 $('.aliexpress_url_' + productID).removeClass("check_valid_url");
                 $('.orders_per_day_' + productID).attr("required", false);
-                $('.variants_you_sell_' + productID).attr("required", false);
-                $('.countries_you_ship_' + productID).attr("required", false);
-                $('.cost_per_unit_' + productID).attr("required", false);
-                $('.shipping_time_' + productID).attr("required", false);
                 $('.product_item_' + productID).hide();
             }
         });

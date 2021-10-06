@@ -21,7 +21,7 @@
                     <div class='form-row row'>
                         <div class='col-xs-12 form-group required'>
                             <label class='control-label'>Select a File</label> 
-                            {!! Form::file('file',['required'=>'required']) !!}
+                            {!! Form::file('file',['required'=>'required', 'class' => 'form-control']) !!}
                         </div>
                     </div>
 

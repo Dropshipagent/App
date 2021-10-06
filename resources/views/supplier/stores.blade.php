@@ -9,7 +9,7 @@
         <div class="table-responsive supplier_page">
             <table class="table table-hover">
                 <tr>
-                    <th>ID</th>
+                    <th>Name</th>
                     <th>Store</th>
                     <th>Created</th>
                     <th>Action</th>
@@ -20,7 +20,7 @@
                 $storeIDVal = Session::get('selected_store_id');
                 ?>
                 <tr>
-                    <td>{{ $mapped_store->id }}</td>
+                    <td>{{ $mapped_store->storeDetails->name }}</td>
                     <td>{{ $mapped_store->store_domain }}</td>
                     <td>{{ $mapped_store->created_at }}</td>
                     <td>

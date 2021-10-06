@@ -47117,7 +47117,7 @@ var render = function() {
         ? _c("li", { staticClass: "left clearfix" }, [
             message.user.id == _vm.senderid &&
             message.receiver_id == _vm.receiverid
-              ? _c("div", { staticClass: "chat-body leftbox clearfix" }, [
+              ? _c("div", { staticClass: "chat-body rightbox clearfix" }, [
                   _c("div", { staticClass: "header" }, [
                     _c("strong", { staticClass: "primary-font" }, [
                       _vm._v(
@@ -47146,7 +47146,7 @@ var render = function() {
             _vm._v(" "),
             message.user.id == _vm.receiverid &&
             message.receiver_id == _vm.senderid
-              ? _c("div", { staticClass: "chat-body rightbox clearfix" }, [
+              ? _c("div", { staticClass: "chat-body leftbox clearfix" }, [
                   _c("div", { staticClass: "header" }, [
                     _c("strong", { staticClass: "primary-font" }, [
                       _vm._v(

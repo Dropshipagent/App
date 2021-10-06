@@ -320,12 +320,11 @@ button.pay-invoice {
     background-color: #49c019;
     border: 1px solid #49c019;
     color: #FFF;
-    padding: 22px 60px;
-    font-size: 40px;
+    padding: 10px 12px;
+    font-size: 16px;
     border-radius: 10px;
     margin: 30px auto;
     display: block;
-    font-style: italic;
     font-weight: 600;
     transition: .5s ease-in-out;
 }
@@ -827,6 +826,40 @@ div#product_info label {
     word-break: break-all;
 }
 
+
+/**************  Sep 13 2021   ****************/
+
+.customInvoice-companyinfo input[type="text"]{
+    color: #000;
+    margin-top: 10px;
+    padding: 5px;
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+
+.customInvoice-companyinfo input#address { width:50%; margin-bottom: 30px; }
+
+#POITable input.product_name, #POITable input.price, #POITable input.quantity {     
+    color: #000!important;
+    width: 95%!important;
+    padding: 10px!important;
+    border: 1px solid #000!important;
+    border-radius: 5px!important; 
+}
+.spreadsheetdata .form-control{ background: #2a2a2a; }
+.spreadsheetdata .panel.panel-default.credit-card-box .panel-body {
+    padding: 15px 40px 20px;
+}
+.tracking-orderitems>tbody>tr>td, .tracking-orderitems>tbody>tr>th {
+    padding: 2px;
+}
+.spreadsheetdata-order-list .supplier_page {
+    margin-bottom: 12px;
+}
+.spreadsheetdata-order-list .panel.panel-default.credit-card-box .panel-body {
+    padding: 15px 40px 20px;
+}
+
 /*RESPONSIVE CSS*/
 @media only screen and (min-width: 1401px) and (max-width: 1900px) {
     .small-box .icon, .small-box:hover .icon {font-size: 60px;}
@@ -924,4 +957,9 @@ div#product_info label {
     .custom_checkbox_container {width: 100%;}
     .custom_checkbox_container .checkmark:after {left: 47%;}
     .faq-section .panel-heading {height: auto;}
+}
+
+.flag_checkbox { 
+    height: 21px; 
+    width: 22px; 
 }

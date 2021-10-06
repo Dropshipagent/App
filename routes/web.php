@@ -217,6 +217,13 @@ Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], fun
     Route::get('bluckinvoice/{storeId}', 'Supplier\OrdersController@bluckinvoice'); //show list of all pendig invoice orders
     Route::post('showbluckinvoice/{storeId}', 'Supplier\OrdersController@showbluckinvoice'); //show list of all pendig invoice orders
     Route::post('createbluckinvoice/{storeId}', 'Supplier\OrdersController@createbluckinvoice'); //show list of all pendig invoice orders
+    
+    Route::get('saveOldOrderinvoices/{start}', 'Supplier\OrdersController@saveOldOrderinvoices'); //save old invoice data custom invoice
+
+    Route::get('custominvoice', 'Supplier\OrdersController@showcustominvoice'); //show custom invoice
+    Route::post('custominvoice', 'Supplier\OrdersController@showbluckcustominvoice'); //save custom invoice data
+    
+
     Route::get('trackinglogs/{storeId}', 'Supplier\OrdersController@trackinglogs');
     Route::get('showinvoiceslog/{storeId}', 'Supplier\OrdersController@showinvoiceslog'); //invoices logs which is created by suppliers
     Route::get('showinvoicedetail/{invoiceID}', 'Supplier\OrdersController@showinvoicedetail'); //invoice detail page
@@ -225,6 +232,11 @@ Route::group(['prefix' => 'supplier', 'middleware' => ['auth', 'supplier']], fun
     Route::post('create_invoice', 'Supplier\OrdersController@create_invoice'); //invoice which is created for admin and for the store owner
     Route::get('uploadtracking', 'Supplier\OrdersController@uploadtracking');
     Route::post('uploadtracking', 'Supplier\OrdersController@uploadtrackingPost');
+    Route::get('showspreadsheetdata', 'Supplier\OrdersController@showspreadsheetdata'); //get upload csv file data
+    Route::post('showspreadsheetdata', 'Supplier\OrdersController@showuploadtrackingorderlist'); //get upload csv file data
+    Route::post('updatetrackingdata', 'Supplier\OrdersController@updatetrackingdata'); //get upload csv file data
+
+
     //Route::get('stores', 'Supplier\OrdersController@index'); //showing list of store which is assign to logged in supplier
     Route::resource('/orders', 'Supplier\OrdersController');
 

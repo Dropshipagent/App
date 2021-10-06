@@ -16,9 +16,11 @@
                     </div>                            
                 </div>&nbsp;&nbsp;&nbsp;
                 <a href="javascript:void(0)" class="btn btn-block btn-danger btn-sm create_invoice_btn">Create Invoice</a>
+                &nbsp;
+                <a href="{{ url('supplier/custominvoice') }}" class="btn btn-block btn-danger btn-sm">Create Custom Invoice</a>
             </div>
             {!! Form::open(array('url' => 'supplier/showbluckinvoice/'.$user->id,'id' => 'flag_submit','files'=>true,'method'=>'POST')) !!}
-            <table class="table table-hover table-striped table-bordered datatable unsourced">
+            <table class="table table-hover table-striped table-bordered datatable unsourced" data-page-length='10000000000'>
                 <thead> 
                     <tr>
                         <th>&nbsp;</th>

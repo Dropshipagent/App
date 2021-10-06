@@ -61,19 +61,19 @@
                     {!! Form::number('orders_per_day['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control orders_per_day_'.$store_product->id,  'min' => '0')) !!}
                 </div>
                 <div class="col-md-12 form-group">
-                    <label for="" class="required-field">What variants do you sell?(xx,xx)</label>
+                    <label for="">What variants do you sell?(xx,xx)</label>
                     {!! Form::text('variants_you_sell['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control variants_you_sell_'.$store_product->id)) !!}
                 </div>
                 <div class="col-md-12 form-group">
-                    <label for="" class="required-field">To what countries do you ship?(xx,xx)</label>
+                    <label for="">To what countries do you ship?(xx,xx)</label>
                     {!! Form::text('countries_you_ship['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control countries_you_ship_'.$store_product->id)) !!}
                 </div>
                 <div class="col-md-12 form-group">
-                    <label for="" class="required-field">What is your average cost per unit?($)</label>
+                    <label for="">What is your average cost per unit?($)</label>
                     {!! Form::number('cost_per_unit['.$store_product->id.']', null, array('placeholder' => '', 'step' => 'any', 'class' => 'form-control cost_per_unit_'.$store_product->id, 'min' => '0')) !!}
                 </div>
                 <div class="col-md-12 form-group">
-                    <label for="" class="required-field">Shipping time?</label>
+                    <label for="">Shipping time?</label>
                     {!! Form::text('shipping_time['.$store_product->id.']', null, array('placeholder' => '','class' => 'form-control shipping_time_'.$store_product->id)) !!}
                 </div>
             </div>

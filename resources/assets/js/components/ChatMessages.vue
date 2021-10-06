@@ -2,7 +2,7 @@
     <ul class="chat">
         <li class="left clearfix" v-for="message in messages" v-if="(message.user.id == senderid && message.receiver_id == receiverid) || (message.user.id == receiverid && message.receiver_id == senderid)">
             
-            <div class="chat-body leftbox clearfix" v-if="(message.user.id == senderid && message.receiver_id == receiverid)">
+            <div class="chat-body rightbox clearfix" v-if="(message.user.id == senderid && message.receiver_id == receiverid)">
                 <div class="header">
                     <strong class="primary-font">
                         {{ message.user.name }}
@@ -13,7 +13,7 @@
                     {{ message.message }}
                 </p>
             </div>
-            <div class="chat-body rightbox clearfix" v-if="(message.user.id == receiverid && message.receiver_id == senderid)">
+            <div class="chat-body leftbox clearfix" v-if="(message.user.id == receiverid && message.receiver_id == senderid)">
                 <div class="header">
                     <strong class="primary-font">
                         {{ message.user.name }}

@@ -30,7 +30,6 @@ class Order extends Model {
         $cUser = User::select('user_providers.provider_token')->join('user_providers', 'user_providers.user_id', 'users.id')->where('users.username', $store_domain)->where('user_providers.provider', 'shopify')->first();
         $shopify = \Shopify::retrieve($store_domain, $cUser->provider_token);
         $shopifyOrders = $shopify->get('orders');
-        //dd($shopifyOrders);
         foreach ($shopifyOrders['orders'] as $webhook_content) {
             if (!empty($webhook_content['billing_address']['name'])) {
                 self::createUpdateorder($store_domain, $webhook_content);
@@ -122,7 +121,7 @@ class Order extends Model {
 
         //get orders list for csv export
         if ($minlimit) {
-            $orderItems = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $store_domain)->where('orders.assign_supplier', 0)->where('id', '>', $minlimit)->with(['orderdetail'])->get();
+            $orderItems = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $store_domain)->where('orders.assign_supplier', 0)->where('order_items.id', '>', $minlimit)->with(['orderdetail'])->get();
         } else {
             $orderItems = OrderItem::join('orders', 'orders.order_id', '=', 'order_items.order_id')->where('order_items.store_domain', $store_domain)->where('orders.assign_supplier', 0)->with(['orderdetail'])->get();
         }

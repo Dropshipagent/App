@@ -18,14 +18,16 @@ use App\Mail\SendMailable;
 use PDF;
 use Illuminate\Support\Facades\Validator;
 
-class AuthorizeController extends Controller {
+class AuthorizeController extends Controller
+{
 
     /**
      * Invoices detail method.
      *
      * @return \Illuminate\Http\Response
      */
-    public function order_detail($orderID) {
+    public function order_detail($orderID)
+    {
         $orderData = Order::with(['itemsarr'])->where('order_id', $orderID)->first();
         $orderDataArr = json_decode($orderData->items, true);
         $shipping_phone = ($orderDataArr['shipping_address']['phone']) ? $orderDataArr['shipping_address']['phone'] : $orderDataArr['customer']['phone'];
@@ -37,7 +39,8 @@ class AuthorizeController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showinvoiceslog(Request $request) {
+    public function showinvoiceslog(Request $request)
+    {
         $login_user = auth()->user()->username;
         if ($request->ajax()) {
             $paid_status = $request['paid_status'];
@@ -106,7 +109,8 @@ class AuthorizeController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showinvoicedetail(Request $request, $invoiceID) {
+    public function showinvoicedetail(Request $request, $invoiceID)
+    {
         $userCardProfiles = [];
         $paymentProfiles = PaymentProfile::where(['store_domain' => auth()->user()->username])->orderBy('created_at', 'desc')->get();
         foreach ($paymentProfiles as $paymentProfile) {
@@ -114,33 +118,40 @@ class AuthorizeController extends Controller {
         }
         $mainInvoice = Invoice::find($invoiceID);
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
-        return view('common.showinvoicedetail', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice, 'userCardProfiles' => $userCardProfiles]);
+        //$invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
+        $invoice = Invoice::where(['supplier_id' => helGetSupplierID(auth()->user()->id), 'id' => $invoiceID])->first();
+        return view('common.showinvoicedetail', ['storeData' => auth()->user(), 'invoice' => $invoice, 'mainInvoice' => $mainInvoice, 'userCardProfiles' => $userCardProfiles]);
     }
 
-    public function downloadinvoice($invoiceID) {
+    public function downloadinvoice($invoiceID)
+    {
         $mainInvoice = Invoice::find($invoiceID);
-        $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
+        //$invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
+        //$invoice_items = Invoice::show_invoice_data(helGetSupplierID(auth()->user()->id), $invoiceIDs);
         // return view('downloadinvoice', ['storeData' => auth()->user(), 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
-        $pdf = PDF::loadView('common.downloadinvoice', ['storeData' => auth()->user(), 'mainInvoice' => $mainInvoice, 'invoice_items' => $invoice_items]);
+        $invoice = Invoice::where(['supplier_id' => helGetSupplierID(auth()->user()->id), 'id' => $invoiceID])->first();
+
+        $pdf = PDF::loadView('common.downloadinvoice', ['storeData' => auth()->user(), 'mainInvoice' => $mainInvoice, 'invoice' => $invoice]);
         $pdf->setPaper('a4')->setWarnings(false);
         //$pdf->setOptions(['defaultFont' => 'Arial']);
         return $pdf->download($invoiceID . '.pdf');
     }
 
-    public function howToPay(Request $request) {
+    public function howToPay(Request $request)
+    {
         return view('seller.how_to_pay');
     }
 
-    public function paymentInfoPage(Request $request) {
+    public function paymentInfoPage(Request $request)
+    {
         return view('show_pay_invoices_popup', ['invoice_id' => $request->invoice_id, 'invoice_amount' => $request->invoice_amount]);
     }
 
-    public function uploadPaymentInfo(Request $request) {
+    public function uploadPaymentInfo(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-                    'invoice_id' => 'required',
-                    'payment_image' => 'required',
+            'invoice_id' => 'required',
+            'payment_image' => 'required',
         ]);
         if ($validator->fails()) {
             $errors = $validator->errors();
@@ -163,8 +174,10 @@ class AuthorizeController extends Controller {
             $invoiceData = Invoice::where('id', $invoiceID)->first();
             if ($invoiceData->fill($invoiceArr)->save()) {
                 //update payment status of 
-                $invoiceIDs = json_decode($invoiceData->store_invoice_ids, true);
-                StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => 1]);
+                if ($invoiceData->store_invoice_ids) {
+                    $invoiceIDs = json_decode($invoiceData->store_invoice_ids, true);
+                    StoreInvoice::whereIn('id', $invoiceIDs)->update(['paid_status' => 1]);
+                }
                 //send payment status email to store owner
                 $data = [];
                 $data['receiver_name'] = "Hello, " . auth()->user()->name;
@@ -208,11 +221,13 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         }
     }
 
-    public function index() {
+    public function index()
+    {
         return view('checkout.authorize');
     }
 
-    public function chargeCreditCard(Request $request) {
+    public function chargeCreditCard(Request $request)
+    {
         die("You cannot access this page!");
         /* code verify through middelware
           $uUser = User::where('username', auth()->user()->username)->first();
@@ -231,7 +246,8 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         return redirect($reqResponse['application_charge']['confirmation_url']);
     }
 
-    public function createCustomerProfile($user_cc_data) {
+    public function createCustomerProfile($user_cc_data)
+    {
         /* Create a merchantAuthenticationType object with authentication details
           retrieved from the constants file */
         $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
@@ -345,7 +361,8 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         return $result;
     }
 
-    public function getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId, $itemProfileId) {
+    public function getCustomerPaymentProfile($customerProfileId, $customerPaymentProfileId, $itemProfileId)
+    {
         /* Create a merchantAuthenticationType object with authentication details
           retrieved from the constants file */
         $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
@@ -396,7 +413,8 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         return $profileResultArr;
     }
 
-    public function chargeCustomerProfile($profileid, $paymentprofileid, $amount) {
+    public function chargeCustomerProfile($profileid, $paymentprofileid, $amount)
+    {
         /* Create a merchantAuthenticationType object with authentication details
           retrieved from the constants file */
         $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
@@ -460,10 +478,11 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         return $response;
     }
 
-    public function invoiceChargeCC(Request $request) {
+    public function invoiceChargeCC(Request $request)
+    {
         $invoiceID = $request->invoiceID;
         $requestData = $request->all();
-// Common setup for API credentials
+        // Common setup for API credentials
         $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
         $merchantAuthentication->setName(config('services.authorize.login'));
         $merchantAuthentication->setTransactionKey(config('services.authorize.key'));
@@ -600,5 +619,4 @@ We would like to thank you and say it's a pleasure doing business with you. If y
         die;
         return redirect('/');
     }
-
 }

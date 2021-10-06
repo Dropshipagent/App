@@ -23,17 +23,20 @@ use PDF;
 use Session;
 use URL;
 use Storage;
+use App\ExportOrderCsvLog;
 
-class OrdersController extends Controller {
+class OrdersController extends Controller
+{
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
+    public function index()
+    {
         $u_id = \Auth::user()->id;
-        $mapped_stores = StoreMapping::where('supplier_id', $u_id)->orderBy('created_at', 'desc')->paginate(15);
+        $mapped_stores = StoreMapping::with(['storeDetails'])->where('supplier_id', $u_id)->orderBy('created_at', 'desc')->paginate(15);
         return view('supplier.stores', ['mapped_stores' => $mapped_stores]);
     }
 
@@ -42,7 +45,8 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function create() {
+    public function create()
+    {
         //
     }
 
@@ -52,7 +56,8 @@ class OrdersController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         //
     }
 
@@ -62,7 +67,8 @@ class OrdersController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function bluckinvoice(Request $request, $id) {
+    public function bluckinvoice(Request $request, $id)
+    {
         $user = User::find($id);
         if ($request->ajax()) {
             $extraSearch = array();
@@ -76,7 +82,7 @@ class OrdersController extends Controller {
             $responsedata = $q;
             $search = $request['search']['value'];
             if ($search && !empty($search)) {
-                $q->where(function($query) use ($search) {
+                $q->where(function ($query) use ($search) {
                     $query->where('orders.order_id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('orders.order_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('orders.email', 'LIKE', '%' . $search . '%');
@@ -89,7 +95,7 @@ class OrdersController extends Controller {
             }
             $extraSearch = array('date' => $request->date, 'financial_status' => $request->financial_status, 'order_status' => $request->order_status, 'fulfillmentstatus' => $request->fulfillment_status);
             if ($extraSearch && !empty($extraSearch)) {
-                $q->where(function($query) use ($extraSearch) {
+                $q->where(function ($query) use ($extraSearch) {
                     if ($extraSearch['financial_status']) {
                         $query->where('orders.financial_status', $extraSearch['financial_status']);
                     }
@@ -166,7 +172,8 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showbluckinvoice(Request $request, $id) {
+    public function showbluckinvoice(Request $request, $id)
+    {
         //dd($request->all());
         $storeData = User::find($id);
         $main_order_ids = $request->flag;
@@ -175,13 +182,75 @@ class OrdersController extends Controller {
     }
 
     /**
+     * Before creating the invoice show all invoice items
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function saveOldOrderinvoices(Request $request)
+    {
+
+        $order_items = [];
+        $limit = 10;
+        $start = $limit * $request->start;
+        $invoices = Invoice::selectRaw('id,order_ids')->offset($start)->limit($limit)->get();
+        foreach ($invoices as $invoice) {
+            $inviceid = $invoice->id;
+            $orderids = json_decode($invoice->order_ids);
+
+            $invoice_items = [];
+            $variant_id_arr = [];
+            $invoice_items_arr = [];
+            foreach ($orderids as $orderid) {
+                $orderItems = OrderItem::with(['productdetail'])->where("order_id", $orderid)->get();
+                foreach ($orderItems as $item) {
+                    if (isset($item->productdetail->base_price) && $item->productdetail->product_status == 3) {
+                        $basePriceArr = json_decode($item->productdetail->base_price, true);
+                        $variantPriceByAdmin = (isset($basePriceArr[$item->variant_id])) ? $basePriceArr[$item->variant_id] : 0;
+
+                        $adminComisonArr = json_decode($item->productdetail->admin_commission, true);
+                        $variantCommissionByAdmin = (isset($adminComisonArr[$item->variant_id])) ? $adminComisonArr[$item->variant_id] : 0;
+                    } else {
+                        $variantPriceByAdmin = 0;
+                        $variantCommissionByAdmin = 0;
+                    }
+                    if ($variantPriceByAdmin > 0) {
+                        if (in_array($item->variant_id, $variant_id_arr)) {
+                            $invoice_items_arr['item_name'][] =  $item->productdetail->title;
+                            $invoice_items_arr['item_price'][] = $item->price;
+                            $invoice_items_arr['product_admin_price'][] = $variantPriceByAdmin;
+                            $invoice_items_arr['admin_commission'][] = $variantCommissionByAdmin;
+                            $invoice_items_arr['item_qty'][] = ($invoice_items[$item->variant_id]['product_quantity'] + $item->quantity);
+                            $invoice_items[$item->variant_id]['product_quantity'] = ($invoice_items[$item->variant_id]['product_quantity'] + $item->quantity);
+                        } else {
+                            $invoice_items_arr['item_name'][] =  $item->productdetail->title;
+                            $invoice_items_arr['item_price'][] = $item->price;
+                            $invoice_items_arr['product_admin_price'][] = $variantPriceByAdmin;
+                            $invoice_items_arr['admin_commission'][] = $variantCommissionByAdmin;
+                            $invoice_items_arr['item_qty'][] = $item->quantity;
+                            $invoice_items[$item->variant_id]['product_quantity'] = $item->quantity;
+                        }
+                        $variant_id_arr[] = $item->variant_id;
+                    }
+                }
+            }
+
+            $main_invoice = Invoice::find($inviceid);
+            $main_invoice->invoice_items = json_encode($invoice_items_arr);
+            $main_invoice->save();
+        }
+        //dd($invoice_items_arr);
+
+    }
+
+
+    /**
      * Method use for create bluck invoices for a particular store
      *
      * @return \Illuminate\Http\Response
      */
-    public function createbluckinvoice(Request $request, $id) {
+    public function createbluckinvoice(Request $request, $id)
+    {
         $user = User::find($id);
-        //dd($request->all());
         $main_admin_price_total = 0;
         $main_admin_commission_total = 0;
         $main_invoice_total = 0;
@@ -189,7 +258,6 @@ class OrdersController extends Controller {
         $main_store_invoice_ids = [];
         foreach ($request->flag as $key => $val) {
             $order = Order::where("order_id", $val)->where("assign_supplier", 1)->where('store_domain', $user->username)->orderBy('created_at', 'desc')->first();
-            //dd($order);
             $orderItems = OrderItem::with(['productdetail'])->where("order_id", $val)->where('store_domain', $user->username)->get();
             if ($orderItems) {
                 $itemsWithPriceArr = [];
@@ -202,7 +270,6 @@ class OrdersController extends Controller {
                     if (isset($item->productdetail->base_price) && $item->productdetail->product_status == 3) {
                         $basePriceArr = json_decode($item->productdetail->base_price, true);
                         $variantPriceByAdmin = $basePriceArr[$item->variant_id];
-
                         $adminComisonArr = json_decode($item->productdetail->admin_commission, true);
                         $variantCommissionByAdmin = $adminComisonArr[$item->variant_id];
                     } else {
@@ -244,9 +311,10 @@ class OrdersController extends Controller {
         $main_invoice->store_domain = $user->username;
         $main_invoice->order_ids = json_encode($main_order_ids);
         $main_invoice->store_invoice_ids = json_encode($main_store_invoice_ids);
-        $main_invoice->admin_price_total = $main_admin_price_total;
-        $main_invoice->admin_commission_total = $main_admin_commission_total;
-        $main_invoice->invoice_total = $main_invoice_total;
+        $main_invoice->admin_price_total = $request->invoice_total;
+        $main_invoice->admin_commission_total = $request->admin_total_commission;
+        $main_invoice->invoice_items = json_encode($request->items);
+        $main_invoice->invoice_total = $request->invoice_total;
         $main_invoice->other_charges_description = $request->other_charges_description;
         $main_invoice->other_charges = $request->other_charges;
         $main_invoice->notes = null;
@@ -281,13 +349,67 @@ class OrdersController extends Controller {
         }
     }
 
+    public function showcustominvoice()
+    {
+        $storeuser = User::find(Session::get('selected_store_id'));
+        //dd($storeuser);
+        return view('supplier.showcustominvoice', ['storeuser' => $storeuser]);
+    }
+
+    public function showbluckcustominvoice(Request $request)
+    {
+        //save data into main invoice
+        $main_invoice = new Invoice;
+        $main_invoice->supplier_id = auth()->user()->id;
+        $main_invoice->store_domain = $request->store_domain;
+        $main_invoice->order_ids = $request->orderid;
+        $main_invoice->admin_price_total = $request->invoice_total;
+        $main_invoice->admin_commission_total = $request->admin_total_commission;;
+        $main_invoice->invoice_items = json_encode($request->items);
+        $main_invoice->invoice_total = $request->invoice_total;
+        $main_invoice->other_charges_description = $request->other_charges_description;
+        $main_invoice->other_charges = $request->other_charges;
+        $main_invoice->notes = null;
+        if ($main_invoice->save()) {
+            // echo "Insert Data Successfully";
+            $user = User::find(Session::get('selected_store_id'));
+            $getStoreData = helGetStoreDATA($user->username);
+            $data = [];
+            $data['receiver_name'] = "<strong>Invoice:</strong> Hello " . $getStoreData->name;
+            $data['receiver_message'] = "Your supplier has created an invoice for you. Send payment to complete order fulfillment.<br><br>After payment is sent and received, tracking will automatically be uploaded. You will receive email confirmation when tracking is uploaded.";
+
+            $data['sender_name'] = env('MAIL_FROM_NAME');
+            $email_data['message'] = $data;
+            $email_data['subject'] = 'Your invoice is ready';
+            $email_data['layout'] = 'emails.sendemail';
+            try {
+                Mail::to($getStoreData->email)->send(new SendMailable($email_data));
+            } catch (\Exception $e) {
+                // Never reached
+            }
+            $adminNotification = "New Invoice Created for (" . $user->username . ").";
+            if ($main_invoice->other_charges > 0) {
+                $adminNotification .= " A supplier added on charges on the invoice Other charges:: " . $main_invoice->other_charges;
+            }
+            //send notification to store owner
+            Notification::addNotificationFromAllPanel($user->id, "Invoice Received", auth()->user()->id, $main_invoice->id, 'INVOICE_CREATED');
+
+            //send notification to admin 
+            Notification::addNotificationFromAllPanel(helGetAdminID(), $adminNotification, auth()->user()->id, $main_invoice->id, 'INVOICE_CREATED');
+            return redirect('supplier/bluckinvoice/' . $user->id)->with('success', 'Invoice created Successfully');
+        }
+    }
+
+
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Request $request, $id) {
+    public function show(Request $request, $id)
+    {
         $user = User::find($id);
         if ($request->ajax()) {
             $extraSearch = array();
@@ -300,7 +422,7 @@ class OrdersController extends Controller {
             $responsedata = $q;
             $search = $request['search']['value'];
             if ($search && !empty($search)) {
-                $q->where(function($query) use ($search) {
+                $q->where(function ($query) use ($search) {
                     $query->where('orders.order_id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('orders.order_number', 'LIKE', '%' . $search . '%');
                     $query->orWhere('orders.email', 'LIKE', '%' . $search . '%');
@@ -313,7 +435,7 @@ class OrdersController extends Controller {
             }
             $extraSearch = array('date' => $request->date, 'financial_status' => $request->financial_status, 'order_status' => $request->order_status, 'fulfillmentstatus' => $request->fulfillment_status);
             if ($extraSearch && !empty($extraSearch)) {
-                $q->where(function($query) use ($extraSearch) {
+                $q->where(function ($query) use ($extraSearch) {
                     if ($extraSearch['financial_status']) {
                         $query->where('orders.financial_status', $extraSearch['financial_status']);
                     }
@@ -340,7 +462,7 @@ class OrdersController extends Controller {
             $order = $orderby != "" ? $request['order']['0']['dir'] : "";
             $draw = $request['draw'];
 
-            $response = $responsedata->orderBy($orderby, $order)->offset($start)->limit($limit)->get();
+            $response = $responsedata->orderBy($orderby, $order)->groupBy('store_invoices.order_id')->offset($start)->limit($limit)->get();
 
             if (!$response) {
                 $orderData = [];
@@ -392,18 +514,19 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showcsvlogs(Request $request) {
+    public function showcsvlogs(Request $request)
+    {
         if ($request->ajax()) {
             $login_user = auth()->user()->id;
             $selectedStoreID = Session::get('selected_store_id');
             $extraSearch = array();
-            $q = CronorderLog::where(['store_id' => $selectedStoreID, 'supplier_id' => $login_user]);
+            $q = ExportOrderCsvLog::where(['store_id' => $selectedStoreID, 'supplier_id' => $login_user]);
             $TotalOrderData = $q->count();
 
             $responsedata = $q;
             $search = $request['search']['value'];
             if ($search && !empty($search)) {
-                $q->where(function($query) use ($search) {
+                $q->where(function ($query) use ($search) {
                     $query->where('id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
                     $query->orWhere('csv_file_name', 'LIKE', '%' . $search . '%');
@@ -421,9 +544,9 @@ class OrdersController extends Controller {
             $draw = $request['draw'];
 
             $response = $responsedata->orderBy($orderby, $order)
-                    ->offset($start)
-                    ->limit($limit)
-                    ->get();
+                ->offset($start)
+                ->limit($limit)
+                ->get();
 
             if (!$response) {
                 $exportCsvData = [];
@@ -467,7 +590,8 @@ class OrdersController extends Controller {
       return view('supplier.trackinglogs', ['store_invoices' => $store_invoices]);
       } */
 
-    public function trackinglogs(Request $request, $storeId) {
+    public function trackinglogs(Request $request, $storeId)
+    {
         $login_user = auth()->user()->id;
         $mapped_stores = StoreMapping::select('store_domain')->where('store_id', $storeId)->first();
         $store_domain = $mapped_stores->store_domain;
@@ -479,7 +603,7 @@ class OrdersController extends Controller {
             $responsedata = $q;
             $search = $request['search']['value'];
             if ($search && !empty($search)) {
-                $q->where(function($query) use ($search) {
+                $q->where(function ($query) use ($search) {
                     $query->where('id', 'LIKE', '%' . $search . '%');
                     $query->orWhere('store_domain', 'LIKE', '%' . $search . '%');
                     $query->orWhere('order_number', 'LIKE', '%' . $search . '%');
@@ -543,7 +667,8 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function searchorder(Request $request) {
+    public function searchorder(Request $request)
+    {
         //dd($request);
         $supplier_id = auth()->user()->id;
         $user = User::with(['supplierstores'])->find($supplier_id);
@@ -576,7 +701,8 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function create_invoice(Request $request) {
+    public function create_invoice(Request $request)
+    {
         //dd($request);
         $getInvoice = StoreInvoice::where("order_id", $request->order_id)->first();
         if (!$getInvoice) {
@@ -627,7 +753,8 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showinvoiceslog(Request $request, $storeId) {
+    public function showinvoiceslog(Request $request, $storeId)
+    {
         $login_user = auth()->user()->id;
         $mapped_stores = StoreMapping::select('store_domain')->where('store_id', $storeId)->first();
         $domain = $mapped_stores->store_domain;
@@ -659,7 +786,7 @@ class OrdersController extends Controller {
             foreach ($InvoiceData as $Invoice) {
                 $u['id'] = $Invoice->id;
                 $u['store_domain'] = $Invoice->store_domain;
-                $u['admin_price_total'] = '$' . $Invoice->admin_price_total;
+                $u['admin_price_total'] = '$' . $Invoice->invoice_total;
                 $u['action'] = '<a href="' . url('supplier/showinvoicedetail/' . $Invoice->id) . '" class="btn btn-warning margin2px" title="View Invoice Detail"><i class="fa fa-eye"></i> View Invoice Detail</a> <a href="' . url('supplier/downloadinvoice/' . $Invoice->id) . '" class="btn btn-success margin2px" title="View Invoice Detail"><i class="fa fa-download"></i> Download Invoice</a>';
                 $u['created_at'] = date('M d, Y H:i:s', strtotime($Invoice->created_at));
                 $Data[] = $u;
@@ -682,64 +809,62 @@ class OrdersController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function showinvoicedetail(Request $request, $invoiceID) {
+    public function showinvoicedetail(Request $request, $invoiceID)
+    {
         $login_user = auth()->user()->id;
         $mainInvoice = Invoice::find($invoiceID);
         $storeData = User::where('username', $mainInvoice->store_domain)->first();
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data($login_user, $invoiceIDs);
-        return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
+        //$invoice_items = Invoice::show_invoice_data($login_user, $invoiceIDs);
+        $invoice = Invoice::where(['supplier_id' => $login_user, 'id' => $invoiceID])->first();
+        //dd($invoice);
+        return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice' => $invoice, 'mainInvoice' => $mainInvoice]);
     }
 
-    public function downloadinvoice(Request $request, $invoiceID) {
+    public function downloadinvoice(Request $request, $invoiceID)
+    {
         $login_user = auth()->user()->id;
         $mainInvoice = Invoice::find($invoiceID);
         $storeData = User::where('username', $mainInvoice->store_domain)->first();
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data($login_user, $invoiceIDs);
-        $pdf = PDF::loadView('common.downloadinvoice', ['storeData' => $storeData, 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
+        //$invoice_items = Invoice::show_invoice_data($login_user, $invoiceIDs);
+        $invoice = Invoice::where(['supplier_id' => $login_user, 'id' => $invoiceID])->first();
+        $pdf = PDF::loadView('common.downloadinvoice', ['storeData' => $storeData, 'invoice' => $invoice, 'mainInvoice' => $mainInvoice]);
         $pdf->setPaper('a4')->setWarnings(false);
         //$pdf->setOptions(['defaultFont' => 'Arial']);
         return $pdf->download($invoiceID . '.pdf');
     }
 
-    public function uploadtracking() {
-        //die;
+    public function uploadtracking()
+    {
         return view('supplier.uploadtracking');
     }
+    //Show showspreadsheet data
+    public function showspreadsheetdata()
+    {
+        return view('supplier.showspreadsheetdata');
+    }
 
-    /**
-     * success response method.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function uploadtrackingPost(Request $request) {
-        //dd($request);
-        $file_mimes = array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel', 'text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //Show showspreadsheet order list data
+    public function showuploadtrackingorderlist(Request $request)
+    {
+        return view('supplier.showuploadtrackingorderlist', ['requestdata' => $request]);
+    }
 
-        if (isset($_FILES['file']['name']) && in_array($_FILES['file']['type'], $file_mimes)) {
-
-            $arr_file = explode('.', $_FILES['file']['name']);
-            $extension = end($arr_file);
-
-            if ('csv' == $extension) {
-                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
-            } else {
-                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-            }
-
-            $spreadsheet = $reader->load($_FILES['file']['tmp_name']);
-
-            $sheetData = $spreadsheet->getActiveSheet()->toArray();
-            /*
-             * Get supplier assigned stores
-             */
-            $supplier_id = auth()->user()->id;
+    public function updatetrackingdata(Request $request)
+    {
+        $sheetData = Session::get('spreadsheetData');
+        
+        if ($sheetData) {
+            $order_number = $request->order_number;
+            $tracking_number = $request->tracking_number;
+            $tracking_url = $request->tracking_url;
+            $tracking_company = $request->tracking_company;
             $storeDomain = helGetUsernameById(Session::get('selected_store_id'));
             foreach ($sheetData as $dataSingle) {
-                if (!empty(trim($dataSingle[0])) && !empty(trim($dataSingle[1])) && !empty(trim($dataSingle[2])) && !empty(trim($dataSingle[3]))) {
+                if (!empty(trim($dataSingle[$order_number]))) {
                     //get invoice data of uploaded order id
-                    $getInvoice = StoreInvoice::where("order_number", $dataSingle[0])->where("fulfillment_status", "!=", "fulfilled")->where("paid_status", 2)->where('store_domain', $storeDomain)->first();
+                    $getInvoice = StoreInvoice::where("order_number", $dataSingle[$order_number])->where("fulfillment_status", "!=", "fulfilled")->where('store_domain', $storeDomain)->first();
                     if ($getInvoice) {
                         //get order data of uploaded order id
                         $orderDtl = Order::with(['itemsarr'])->where("order_number", $dataSingle[0])->where('store_domain', $storeDomain)->first();
@@ -754,12 +879,12 @@ class OrdersController extends Controller {
                         //update invoice status with tracking details
                         $data = [];
                         $data['fulfillment_status'] = "fulfilled";
-                        $data['tracking_number'] = $dataSingle[1];
-                        $data['tracking_url'] = $dataSingle[2];
-                        $data['tracking_company'] = $dataSingle[3];
+                        $data['tracking_number'] = $dataSingle[$tracking_number];
+                        $data['tracking_url'] = $dataSingle[$tracking_url];
+                        $data['tracking_company'] = $dataSingle[$tracking_company];
+                       
                         StoreInvoice::where('id', $getInvoice->id)->update($data);
                         $data['invoice_data'] = $getInvoice;
-
                         //update fulfillment status on sopify store with sms
                         $uUser = User::where('username', $orderDtl->store_domain)->first();
                         $cUser = $uUser->providers->where('provider', 'shopify')->first();
@@ -779,7 +904,7 @@ class OrdersController extends Controller {
                         //send sms code
                         if (!empty($uUser->phone_code) && !empty($uUser->phone)) {
                             $sNumber = $uUser->phone_code . $uUser->phone;
-                            $sMessage = "Tracking uploaded for order number: " . $dataSingle[0];
+                            $sMessage = "Tracking uploaded for order number: " . $dataSingle[$order_number];
                             try {
                                 helSendSMS($sNumber, $sMessage);
                             } catch (\Exception $e) {
@@ -789,7 +914,7 @@ class OrdersController extends Controller {
 
                         //send email code
                         $email_data['message'] = $data;
-                        $email_data['subject'] = 'Tracking info for order :: ' . $dataSingle[0];
+                        $email_data['subject'] = 'Tracking info for order :: ' . $dataSingle[$order_number];
                         $email_data['layout'] = 'emails.tracking';
                         try {
                             Mail::to($orderDtl->email)->send(new SendMailable($email_data));
@@ -799,6 +924,7 @@ class OrdersController extends Controller {
                     }
                 }
             }
+            
             //Send notifiction to store owner
             Notification::addNotificationFromAllPanel(Session::get('selected_store_id'), "Tracking has been uploaded", helGetAdminID(), 0, 'TRACKING_UPLOADED');
 
@@ -809,6 +935,34 @@ class OrdersController extends Controller {
             Notification::addNotificationFromAllPanel(helGetAdminID(), "Tracking uploaded for (" . helGetUsernameById(Session::get('selected_store_id')) . ")", auth()->user()->id, 0, 'TRACKING_UPLOADED');
 
             return redirect('supplier/uploadtracking')->with('success', 'Tracking Updated Successfully!');
+        }
+    }
+    /**
+     * success response method.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function uploadtrackingPost(Request $request)
+    {
+        //dd($request);
+        $file_mimes = array('text/x-comma-separated-values', 'text/comma-separated-values', 'application/octet-stream', 'application/vnd.ms-excel', 'application/x-csv', 'text/x-csv', 'text/csv', 'application/csv', 'application/excel', 'application/vnd.msexcel', 'text/plain', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+        if (isset($_FILES['file']['name']) && in_array($_FILES['file']['type'], $file_mimes)) {
+
+            $arr_file = explode('.', $_FILES['file']['name']);
+            $extension = end($arr_file);
+
+            if ('csv' == $extension) {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Csv();
+            } else {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+            }
+
+            $spreadsheet = $reader->load($_FILES['file']['tmp_name']);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray();
+            Session::put('spreadsheetData', $sheetData);
+            return redirect('supplier/showspreadsheetdata')->with('success', 'File upload Successfully. Please select file headers.');
+            //return redirect('supplier/uploadtracking')->with('success', 'Tracking Updated Successfully!');
         } else {
             return redirect('supplier/uploadtracking')->with('error', 'Accept only .csv/.xls file format!');
         }
@@ -820,7 +974,8 @@ class OrdersController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id) {
+    public function edit($id)
+    {
         //
     }
 
@@ -831,7 +986,8 @@ class OrdersController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         //
     }
 
@@ -841,8 +997,8 @@ class OrdersController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
+    public function destroy($id)
+    {
         //
     }
-
 }

@@ -156,7 +156,7 @@ class HomeController extends Controller {
 
         if ($request->ajax()) {
             $extraSearch = array();
-            $q = StoreInvoice::where(['store_domain' => $store_domain, 'paid_status' => 2,])->where('tracking_number', '!=', "");
+            $q = StoreInvoice::where(['store_domain' => $store_domain])->where('tracking_number', '!=', "");
             $TotalOrderData = $q->count();
 
             $responsedata = $q;

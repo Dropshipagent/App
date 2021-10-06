@@ -74,8 +74,8 @@
         ?>
         <div>
             <a href="{{ $createInvoices }}" class="tablinks {{ Request::is('supplier/bluckinvoice*') ? 'active' : '' }}">Create Invoices</a>
-            <a href="{{ $viewOrders }}" class="tablinks {{ Request::is('supplier/orders*') ? 'active' : '' }}">View Orders</a>
             <a href="{{ $viewInvoicesLogs }}" class="tablinks {{ Request::is('supplier/showinvoiceslog*') ? 'active' : '' }}">View Invoices Logs</a>
+            <a href="{{ $viewOrders }}" class="tablinks {{ Request::is('supplier/orders*') ? 'active' : '' }}">View Orders</a>
             <a href="{{ $viewTrackingLogs }}" class="tablinks {{ Request::is('supplier/trackinglogs*') ? 'active' : '' }}">View Tracking Logs</a>
             <a href="{{ url('/supplier/uploadtracking') }}" class="tablinks {{ Request::is('supplier/uploadtracking') ? 'active' : '' }}">Upload Tracking</a>
             <a href="{{ $viewCsvLogs }}" class="tablinks {{ Request::is('supplier/showcsvlogs*') ? 'active' : '' }}">Export History</a>

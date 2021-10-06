@@ -84,10 +84,7 @@ class OrdersController extends Controller {
             $draw = $request['draw'];
             //db($request);
 
-            $response = $responsedata->orderBy($orderby, $order)
-                    ->offset($start)
-                    ->limit($limit)
-                    ->get();
+            $response = $responsedata->orderBy($orderby, $order)->groupBy('store_invoices.order_id')->offset($start)->limit($limit)->get();
 
             if (!$response) {
                 $orderData = [];

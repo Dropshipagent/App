@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class StoreMapping extends Model {
 
-
     /**
      * The attributes that are mass assignable.
      *
@@ -15,4 +14,9 @@ class StoreMapping extends Model {
     protected $fillable = [
         'store_id', 'supplier_id', 'store_domain',
     ];
+
+    public function storeDetails() {
+        return $this->belongsTo('App\User', 'store_id');
+    }
+
 }

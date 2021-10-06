@@ -84,7 +84,7 @@ class OrdersController extends Controller {
             //$order = "desc";
             $draw = $request['draw'];
             //dd($request->all());
-            $response = $responsedata->orderBy($orderby, $order)->offset($start)->limit($limit)->get();
+            $response = $responsedata->orderBy($orderby, $order)->groupBy('store_invoices.order_id')->offset($start)->limit($limit)->get();
             if (!$response) {
                 $orderData = [];
                 $paging = [];
@@ -288,8 +288,9 @@ class OrdersController extends Controller {
         $mainInvoice = Invoice::find($invoiceID);
         $storeData = User::where('username', $mainInvoice->store_domain)->first();
         $invoiceIDs = json_decode($mainInvoice->store_invoice_ids, true);
-        $invoice_items = Invoice::show_invoice_data(helGetSupplierID($storeData->id), $invoiceIDs);
-        return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice_items' => $invoice_items, 'mainInvoice' => $mainInvoice]);
+        //$invoice_items = Invoice::show_invoice_data(helGetSupplierID($storeData->id), $invoiceIDs);
+        $invoice = Invoice::where(['supplier_id' => helGetSupplierID($storeData->id), 'id' => $invoiceID])->first();
+        return view('common.showinvoicedetail', ['storeData' => $storeData, 'invoice' => $invoice, 'mainInvoice' => $mainInvoice]);
     }
 
     public function updateInvoiceStatus(Request $request) {
